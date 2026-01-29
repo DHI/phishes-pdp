@@ -12,7 +12,7 @@ The `main` branch is protected with the following rules:
 2. **Pull Request Required**: All changes must go through a pull request
 3. **Required Reviews**: Pull requests require approval from code owners before merging
 4. **Required Status Checks**: All CI/CD checks must pass before merging
-5. **Up-to-date Branch**: Branches must be up to date with the base branch before merging
+5. **Up-to-date Branch**: Branches must include the latest commits from the base branch before merging
 
 ### Code Owners
 

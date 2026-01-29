@@ -14,9 +14,9 @@ permissions:
   pull-requests: read
 
 jobs:
-  # Check that PR follows branch protection guidelines
-  pr-validation:
-    name: PR Validation
+  # Basic PR title check
+  basic-pr-check:
+    name: Basic PR Check
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     
@@ -26,33 +26,29 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Verify PR is not directly from fork
-        run: |
-          echo "Checking PR source..."
-          echo "Base ref: ${{ github.base_ref }}"
-          echo "Head ref: ${{ github.head_ref }}"
-          
-      - name: Check PR title and description
+      - name: Check PR title exists
         run: |
           if [ -z "${{ github.event.pull_request.title }}" ]; then
             echo "Error: PR title is required"
             exit 1
           fi
-          echo "PR validation passed"
+          echo "PR basic checks passed"
 
-  # Prevent direct pushes to main (this job will fail if push is to main)
+  # Prevent direct pushes to main (safety net for misconfigured branch protection)
+  # NOTE: This job will fail if a direct push to main occurs, which should only
+  # happen if branch protection is not properly configured. Once branch protection
+  # is enabled, this job should never run because pushes will be blocked at the Git level.
   prevent-direct-push:
-    name: Prevent Direct Push to Main
+    name: Direct Push Safety Check
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
-      - name: Fail if direct push to main
+      - name: Alert on direct push to main
         run: |
-          echo "::error::Direct pushes to main branch are not allowed!"
-          echo "::error::Please create a pull request instead."
-          echo "This push should have been blocked by branch protection rules."
-          echo "Please ensure branch protection is properly configured."
+          echo "::error::Direct push to main detected!"
+          echo "::error::This should have been blocked by branch protection."
+          echo "::error::Please configure branch protection following .github/BRANCH_PROTECTION.md"
           exit 1
 
   # Basic code quality checks
@@ -73,31 +69,17 @@ jobs:
         run: |
           echo "Running basic code quality checks..."
           
-          # Check for secrets or sensitive data
+          # Check for secrets or sensitive data (warning only, not blocking)
           echo "Checking for potential secrets..."
-          if grep -r -i -E "(password|api_key|secret|token|private_key)" . --exclude-dir=.git --exclude-dir=.github --exclude="*.md" 2>/dev/null | grep -v "SECURITY.md" | grep -v "# "; then
-            echo "Warning: Potential secrets found in code. Please review."
-            # Note: We don't fail here as these might be false positives
+          SECRET_PATTERNS="password|api_key|secret|token|private_key"
+          if grep -r -i -E "$SECRET_PATTERNS" . \
+            --exclude-dir=.git \
+            --exclude-dir=.github \
+            --exclude="*.md" 2>/dev/null | grep -v "SECURITY.md"; then
+            echo "::warning::Potential secrets found in code. Please review carefully."
+            echo "Note: This is a warning only and won't block the PR."
           else
             echo "No obvious secrets detected."
-          fi
-          
-          # Check that important files exist
-          echo "Checking for important files..."
-          if [ ! -f "README.md" ]; then
-            echo "Warning: README.md not found"
-          fi
-          
-          if [ ! -f ".gitignore" ]; then
-            echo "Warning: .gitignore not found"
-          fi
-          
-          if [ ! -f "SECURITY.md" ]; then
-            echo "Warning: SECURITY.md not found"
-          fi
-          
-          if [ ! -f ".github/CODEOWNERS" ]; then
-            echo "Warning: CODEOWNERS file not found"
           fi
           
           echo "Code quality checks completed"

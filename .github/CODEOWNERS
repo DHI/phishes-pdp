@@ -12,10 +12,12 @@
 # Default owners for everything in the repo
 # These owners will be the default owners for everything in the repo.
 # They will be requested for review when someone opens a pull request.
+# 
+# IMPORTANT: Replace the placeholder below with actual GitHub usernames or team names
+# Examples:
+#   *       @DHI/phishes-maintainers  (for a team)
+#   *       @username1 @username2     (for individual users)
 *       @DHI/phishes-maintainers
-
-# You can also specify individual users instead of teams:
-# *       @username1 @username2
 
 # Specific paths can have different owners:
 # /.github/       @DHI/github-admins
