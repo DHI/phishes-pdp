@@ -25,32 +25,32 @@ This document provides step-by-step instructions for repository administrators t
 Check the following boxes and configure as described:
 
 #### Require a pull request before merging
-- ☑️ **Require a pull request before merging**
-  - ☑️ **Require approvals**: Set minimum to `1` (or higher as needed)
-  - ☑️ **Dismiss stale pull request approvals when new commits are pushed**
-  - ☑️ **Require review from Code Owners** (this enforces the CODEOWNERS file)
-  - ☑️ **Require approval of the most recent reviewable push**
+- ✅ **Require a pull request before merging**
+  - ✅ **Require approvals**: Set minimum to `1` (or higher as needed)
+  - ✅ **Dismiss stale pull request approvals when new commits are pushed**
+  - ✅ **Require review from Code Owners** (this enforces the CODEOWNERS file)
+  - ✅ **Require approval of the most recent reviewable push**
 
 #### Require status checks to pass before merging
-- ☑️ **Require status checks to pass before merging**
-  - ☑️ **Require branches to be up to date before merging**
-  - Search and add the following status checks:
-    - `PR Validation`
+- ✅ **Require status checks to pass before merging**
+  - ✅ **Require branches to be up to date before merging**
+  - Search and add the following status checks (these match the job names in the workflow):
+    - `Basic PR Check`
     - `Code Quality Checks`
     - `Security Scanning`
 
 #### Additional protections
-- ☑️ **Require conversation resolution before merging**
-- ☑️ **Require signed commits** (optional but recommended)
-- ☑️ **Require linear history** (optional, prevents merge commits)
+- ✅ **Require conversation resolution before merging**
+- ✅ **Require signed commits** (optional but recommended)
+- ✅ **Require linear history** (optional, prevents merge commits)
 
 #### Rules applied to administrators
-- ☑️ **Do not allow bypassing the above settings**
+- ✅ **Do not allow bypassing the above settings**
   - This ensures that even administrators must follow the rules
   - Can be unchecked if you need admin override capability
 
 #### Restrict pushes
-- ☑️ **Restrict who can push to matching branches**
+- ✅ **Restrict who can push to matching branches**
   - Leave empty or add specific teams/users who can merge (after PR approval)
   - Typically you can leave this empty to allow anyone with write access to merge approved PRs
 

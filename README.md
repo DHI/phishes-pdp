@@ -23,6 +23,8 @@ This repository has branch protection rules enabled to ensure code quality and s
 
 Code reviews are required from designated code owners (defined in `.github/CODEOWNERS`).
 
+**Note for administrators**: Before enabling branch protection with code owner requirements, ensure the team or users referenced in the CODEOWNERS file exist and have appropriate permissions.
+
 ### 📋 Documentation
 
 - [Security Policy](SECURITY.md) - Security guidelines and vulnerability reporting
