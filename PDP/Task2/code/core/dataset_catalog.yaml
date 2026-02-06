@@ -1,0 +1,17 @@
+climate:
+  era5_precipitation:
+    path: climate/era5_precipitation/ERA5_precipitation.zarr
+    description: ERA5 precipitation
+    variable: tp
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Rainfall
+    eumunit: millimeter
+  era5_temperature:
+    path: climate/era5_temperature/ERA5_temp.zarr
+    description: ERA5 temperature
+    variable: t2m
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Temperature
+    eumunit: degree_Celsius
