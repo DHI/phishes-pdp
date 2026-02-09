@@ -1,0 +1,24 @@
+# CODEOWNERS file
+# 
+# This file defines individuals or teams that are responsible for code in this repository.
+# When a pull request modifies code that has an owner, the owners are automatically
+# requested for review.
+#
+# Lines starting with '#' are comments.
+# Each line is a file pattern followed by one or more owners.
+#
+# More details: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+# These owners will be the default owners for everything in the repo.
+# They will be requested for review when someone opens a pull request.
+# 
+# IMPORTANT: Replace the placeholder below with actual GitHub usernames or team names
+# Examples:
+#   *       @DHI/phishes-maintainers  (for a team)
+#   *       @username1 @username2     (for individual users)
+*       @DHI/phishes-maintainers
+
+# Specific paths can have different owners:
+# /.github/       @DHI/github-admins
+# /docs/          @DHI/documentation-team
