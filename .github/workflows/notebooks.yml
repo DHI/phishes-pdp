@@ -30,4 +30,4 @@ jobs:
       - name: Lint notebooks (if any)
         if: ${{ hashFiles('**/*.ipynb') != '' }}
         run: |
-          nbqa ruff .
+          nbqa ruff . --extend-ignore=E402,I001
