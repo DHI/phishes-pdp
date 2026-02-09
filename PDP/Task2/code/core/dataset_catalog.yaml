@@ -8,10 +8,26 @@ climate:
     eumtype: Rainfall
     eumunit: millimeter
   era5_temperature:
-    path: climate/era5_temperature/ERA5_temp.zarr
+    path: climate/era5_temperature/ERA5_temperature.zarr
     description: ERA5 temperature
     variable: t2m
     temporal: true
     crs: EPSG:4326
     eumtype: Temperature
     eumunit: degree_Celsius
+  era5_potential_evapotranspiration:
+    path: climate/era5_potential_evapotranspiration/ERA5_potential_evapotranspiration.zarr
+    description: ERA5 potential evapotranspiration
+    variable: pev
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Evaporation
+    eumunit: millimeter
+  # era5_surface_solar_radiation_downwards:
+  #   path: climate/era5_surface_solar_radiation_downwards/ERA5_surface_solar_radiation_downwards.zarr
+  #   description: ERA5 surface solar radiation downwards
+  #   variable: ssrd
+  #   temporal: true
+  #   crs: EPSG:4326
+  #   eumtype: Sun radiation
+  #   eumunit: watt_per_meter_pow_2
