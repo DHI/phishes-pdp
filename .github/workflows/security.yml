@@ -12,17 +12,18 @@ permissions:
 
 jobs:
   secret-scan:
-    name: Secret Scan (gitleaks)
+    name: Secret Scan (trufflehog)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run trufflehog
+        uses: trufflesecurity/trufflehog@v3
+        with:
+          path: .
+          extra_args: --fail --only-verified
 
   dependency-audit:
     name: Dependency Audit (${{ matrix.dir }})
