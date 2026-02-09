@@ -5,13 +5,12 @@ Functions for loading, reprojecting, and processing catchment geometries.
 """
 
 from pathlib import Path
-from typing import Union, Optional, Tuple, List, Iterable
+from typing import Iterable, Optional, Tuple, Union
 
-import numpy as np
 import geopandas as gpd
-import xarray as xr
+import numpy as np
 import shapely.geometry
-from shapely.geometry import Point, LineString, MultiPoint, MultiLineString
+import xarray as xr
 from shapely.ops import unary_union
 
 from core.utils import get_grid_resolution

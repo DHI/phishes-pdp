@@ -86,8 +86,13 @@ include = '\.pyi?$'
 [tool.ruff]
 line-length = 100
 target-version = "py39"
-select = ["E", "F", "W", "I", "N", "UP"]
-ignore = ["E501"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N"]
+ignore = ["E501", "I001"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["analysis", "core"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
