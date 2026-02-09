@@ -8,6 +8,21 @@ PHISHES seeks to bridge the gap between soil health data and actions, providing 
 
 The repository contains jupyter notebooks with tools for downloading forcing data for the models that are relevant for the PHISHES simulation platform. The forcing data will be cropped to the model domain and can be converted to standard formats - like netcdf, Zarr or dfs2.
 
+## Requirements
+
+- Windows or Linux operating system
+- Python x64 3.10 - 3.13
+
+## Installation
+
+## Getting started
+
+## Where can I get help?
+
+## Cloud enabled - To be enabled!!!!
+
+It is possible to run PHISHES notebooks in your favorite cloud notebook environment e.g. [Deepnote](https://deepnote.com/), [Google Colab](https://colab.research.google.com/), etc...
+
 ## 📦 What this repository contains
 
 ### Task 1: Plant Growth Module (PGM) - DFS2 Map Generator
@@ -34,21 +49,6 @@ Provides scripts and notebooks for dataset organization, downloads, and reproduc
 	├── Task1 Plant_Growth_Module/
 	└── Task2/
 ```
-
-## Requirements
-
-- Windows or Linux operating system
-- Python x64 3.10 - 3.13
-
-## Installation
-
-## Getting started
-
-## Where can I get help?
-
-## Cloud enabled - To be enabled!!!!
-
-It is possible to run PHISHES notebooks in your favorite cloud notebook environment e.g. [Deepnote](https://deepnote.com/), [Google Colab](https://colab.research.google.com/), etc...
 
 ## 📚 Documentation
 
