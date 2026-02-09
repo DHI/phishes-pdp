@@ -46,7 +46,7 @@ class PDPDataDownloader:
     # Azure Storage Configuration
     DEFAULT_AZURE_ACCOUNT = "phishesdatastore"
     DEFAULT_AZURE_CONTAINER = "zarr"
-    DEFAULT_AZURE_CREDENTIAL = "sp=racwdli&st=2026-01-27T11:10:51Z&se=2030-01-27T19:25:51Z&spr=https&sv=2024-11-04&sr=c&sig=HmebytGFihuYDBqEUODoiKQbCyYC%2BQHjLCVw3m1HMBs%3D"
+    DEFAULT_AZURE_CREDENTIAL = "sp=rl&st=2026-02-09T10:22:14Z&se=2034-12-31T18:37:14Z&spr=https&sv=2024-11-04&sr=c&sig=buOnKjOpmc%2BDZw7lnyWhMf4z5cTGVKqYHzXRnA8OTBM%3D"
 
     DEFAULT_OUTPUT_FORMAT = "nc"
     SUPPORTED_OUTPUT_FORMATS = {"nc", "zarr", "dfs2"}
