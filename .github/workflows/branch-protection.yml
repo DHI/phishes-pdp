@@ -1,0 +1,106 @@
+name: Branch Protection Checks
+
+# This workflow runs checks on pull requests to enforce code quality
+# and security standards before code can be merged to main.
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  # Basic PR title check
+  basic-pr-check:
+    name: Basic PR Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR title exists
+        run: |
+          if [ -z "${{ github.event.pull_request.title }}" ]; then
+            echo "Error: PR title is required"
+            exit 1
+          fi
+          echo "PR basic checks passed"
+
+  # Prevent direct pushes to main (safety net for misconfigured branch protection)
+  # NOTE: This job will fail if a direct push to main occurs, which should only
+  # happen if branch protection is not properly configured. Once branch protection
+  # is enabled, this job should never run because pushes will be blocked at the Git level.
+  prevent-direct-push:
+    name: Direct Push Safety Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Alert on direct push to main
+        run: |
+          echo "::error::Direct push to main detected!"
+          echo "::error::This should have been blocked by branch protection."
+          echo "::error::Please configure branch protection following .github/BRANCH_PROTECTION.md"
+          exit 1
+
+  # Basic code quality checks
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Check for common issues
+        run: |
+          echo "Running basic code quality checks..."
+
+          # Check for secrets or sensitive data (warning only, not blocking)
+          echo "Checking for potential secrets..."
+          SECRET_PATTERNS="password|api_key|secret|token|private_key"
+          if grep -r -i -E "$SECRET_PATTERNS" . \
+            --exclude-dir=.git \
+            --exclude-dir=.github \
+            --exclude="*.md" 2>/dev/null | grep -v "SECURITY.md"; then
+            echo "::warning::Potential secrets found in code. Please review carefully."
+            echo "Note: This is a warning only and won't block the PR."
+          else
+            echo "No obvious secrets detected."
+          fi
+
+          echo "Code quality checks completed"
+
+  # Security scanning
+  security-check:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run basic security checks
+        run: |
+          echo "Running security checks..."
+
+          # Check for executable files that shouldn't be committed
+          echo "Checking for unexpected executable files..."
+          find . -type f -executable -not -path "./.git/*" | while read file; do
+            echo "Found executable: $file"
+          done
+
+          echo "Security checks completed"
