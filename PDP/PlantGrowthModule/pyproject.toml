@@ -2,7 +2,7 @@
 name = "plant-growth-module"
 version = "0.1.0"
 description = "Plant Growth Module (PGM) for MIKE SHE Integration. Use 'uv sync --link-mode copy' on OneDrive."
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "pandas>=2.0.0",
     "numpy>=1.24.0",
