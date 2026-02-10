@@ -165,7 +165,7 @@ DataDownloadTool/
 │   │   ├── timeseries.py           # Time series analysis
 │   │   └── visualization.py        # Plotting functions
 ├── notebooks/
-│   └── t2_data_downloader.ipynb    # Main tutorial notebook
+│   └── data_download_tool.ipynb     # Main tutorial notebook
 ├── data/
 │   └── shp/                        # Catchment shapefiles
 │       └── catchment_template/     # Example catchment

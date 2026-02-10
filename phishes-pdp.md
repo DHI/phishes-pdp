@@ -27,6 +27,8 @@ PHISHES PDP is a collection of Python tools and notebooks that support catchment
 phishes-pdp/
 ├── README.md
 ├── phishes-pdp.md
+├── SECURITY.md
+├── .github/
 ├── images/
 └── PDP/
     ├── DataDownloadTool/
