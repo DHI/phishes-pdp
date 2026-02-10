@@ -54,7 +54,9 @@ Provides scripts and notebooks for dataset organization, downloads, and reproduc
 ```
 phishes-pdp/
 ├── README.md
-├── pdp_agent.md
+├── phishes-pdp.md
+├── SECURITY.md
+├── .github/
 ├── images/
 └── PDP/
     ├── PlantGrowthModule/
