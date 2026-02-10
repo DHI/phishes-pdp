@@ -69,14 +69,10 @@ Repository = "https://github.com/phishes/data-downloader"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+
 [tool.hatch.build.targets.wheel]
-packages = ["."]
-only-include = [
-    "setup_folder_structure.py",
-    "download_datasets.py",
-    "test_setup.py",
-    "config_template.py",
-]
+packages = ["src"]
+
 
 [tool.black]
 line-length = 100

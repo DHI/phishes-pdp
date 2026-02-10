@@ -23,11 +23,11 @@ climate:
     crs: EPSG:4326
     eumtype: Evaporation
     eumunit: millimeter
-  # era5_surface_solar_radiation_downwards:
-  #   path: climate/era5_surface_solar_radiation_downwards/ERA5_surface_solar_radiation_downwards.zarr
-  #   description: ERA5 surface solar radiation downwards
-  #   variable: ssrd
-  #   temporal: true
-  #   crs: EPSG:4326
-  #   eumtype: Sun radiation
-  #   eumunit: watt_per_meter_pow_2
+  era5_surface_solar_radiation_downwards:
+    path: climate/era5_surface_solar_radiation_downwards/ERA5_surface_solar_radiation_downwards.zarr
+    description: ERA5 surface solar radiation downwards
+    variable: ssrd
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Sun radiation
+    eumunit: watt_per_meter_pow_2
