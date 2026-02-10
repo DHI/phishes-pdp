@@ -32,8 +32,8 @@ jobs:
       fail-fast: false
       matrix:
         dir:
-          - PDP/PlantGrowthModule
-          - PDP/DataDownloadTool
+          - plant-growth-module
+          - data-download-tool
 
     steps:
       - name: Checkout

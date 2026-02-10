@@ -7,8 +7,8 @@ Thank you for your interest in contributing! This guide explains how to get star
 1. **Fork & clone** the repository
 2. **Create a branch** from `main` for your work
 3. **Set up** the module you're working on (see module READMEs):
-   - [PDP/DataDownloadTool/README.md](PDP/DataDownloadTool/README.md)
-   - [PDP/PlantGrowthModule/README.md](PDP/PlantGrowthModule/README.md)
+   - [data-download-tool/README.md](data-download-tool/README.md)
+   - [plant-growth-module/README.md](plant-growth-module/README.md)
 
 ## Development Workflow
 

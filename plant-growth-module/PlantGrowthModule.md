@@ -22,7 +22,7 @@ For user-facing documentation (installation, execution, configuration, troublesh
 ## Project Structure
 
 ```
-PlantGrowthModule/
+plant-growth-module/
 ├── src/
 │   ├── __init__.py
 │   └── pgm_helper.py              # All reusable helper functions and column-name constants
