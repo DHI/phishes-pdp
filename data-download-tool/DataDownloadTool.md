@@ -26,7 +26,7 @@ See [README.md](README.md) for notebook execution steps in VS Code or Jupyter.
 ## Project Structure
 
 ```
-DataDownloadTool/
+data-download-tool/
 ├── src/
 │   ├── core/
 │   │   ├── utils.py                # Path helpers and dataset opening
