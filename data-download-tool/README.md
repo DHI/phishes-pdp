@@ -55,7 +55,7 @@ And generates:
 Navigate to the project directory and create the virtual environment with all dependencies:
 
 ```bash
-cd DataDownloadTool
+cd data-download-tool
 uv sync --link-mode copy
 ```
 
@@ -78,17 +78,17 @@ This command will:
 
 1. **Open the correct folder in VS Code:**
 
-   > ⚠️ **Critical:** You must open the `DataDownloadTool` folder itself (or its parent `PDP\DataDownloadTool`) as the workspace root in VS Code. If you open a higher-level parent folder (e.g., the repository root), VS Code **will not detect** the `.venv` Python environment and the Jupyter kernel will not appear in the kernel picker.
+   > ⚠️ **Critical:** You must open the `data-download-tool` folder itself as the workspace root in VS Code. If you open a higher-level parent folder (e.g., the repository root), VS Code **will not detect** the `.venv` Python environment and the Jupyter kernel will not appear in the kernel picker.
 
    **How to open the correct folder:**
    - Launch VS Code
    - Go to **File → Open Folder…** (or press `Ctrl + K`, `Ctrl + O`)
-   - Browse to and select the `DataDownloadTool` folder, then click **Select Folder**
-   - Verify the VS Code Explorer sidebar shows `DataDownloadTool` as the top-level folder
+   - Browse to and select the `data-download-tool` folder, then click **Select Folder**
+   - Verify the VS Code Explorer sidebar shows `data-download-tool` as the top-level folder
 
    **Why this matters:**
    - VS Code discovers Python environments (`.venv/`) relative to the opened workspace root
-   - The `.venv` created by `uv sync` lives inside `DataDownloadTool/.venv/`
+   - The `.venv` created by `uv sync` lives inside `data-download-tool/.venv/`
    - If your workspace root is a parent folder, VS Code won't look inside nested subdirectories for virtual environments, so the kernel won't be found
 
 2. **Open the notebook:**
@@ -150,7 +150,7 @@ jupyter notebook notebooks/data_download_tool.ipynb
 ## 📁 Project Structure
 
 ```
-DataDownloadTool/
+data-download-tool/
 ├── src/
 │   ├── core/                       # Core functionality modules
 │   │   ├── __init__.py             # Package exports

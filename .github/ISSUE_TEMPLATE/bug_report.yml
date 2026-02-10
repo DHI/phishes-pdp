@@ -12,8 +12,8 @@ body:
       label: Module
       description: Which module is affected?
       options:
-        - DataDownloadTool
-        - PlantGrowthModule
+        - data-download-tool
+        - plant-growth-module
         - Repository / CI
         - Other
     validations:
