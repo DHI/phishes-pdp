@@ -12,7 +12,7 @@ This repository hosts Python tooling and notebooks that support the PHISHES simu
 - A Plant Growth Module (PGM) workflow for generating DFS2 maps
 - Reproducible project structures, logging, and analysis helpers
 
-Most user-facing workflows are provided as Jupyter notebooks in the PDP modules.
+Most user-facing workflows are provided as Jupyter notebooks in the module folders.
 
 ## Requirements
 
@@ -23,14 +23,14 @@ Most user-facing workflows are provided as Jupyter notebooks in the PDP modules.
 
 Installations are handled per sub-project. See the module README files for setup steps:
 
-- [PDP/DataDownloadTool/README.md](PDP/DataDownloadTool/README.md)
-- [PDP/PlantGrowthModule/README.md](PDP/PlantGrowthModule/README.md)
+- [data-download-tool/README.md](data-download-tool/README.md)
+- [plant-growth-module/README.md](plant-growth-module/README.md)
 
 ## Where can I get help?
 
 - Module-specific documentation:
-  - [PDP/DataDownloadTool/README.md](PDP/DataDownloadTool/README.md)
-  - [PDP/PlantGrowthModule/README.md](PDP/PlantGrowthModule/README.md)
+  - [data-download-tool/README.md](data-download-tool/README.md)
+  - [plant-growth-module/README.md](plant-growth-module/README.md)
 - Project documentation: [phishes-pdp.md](phishes-pdp.md)
 
 ## 📦 What this repository contains
@@ -39,15 +39,15 @@ Installations are handled per sub-project. See the module README files for setup
 
 Generates spatially distributed DFS2 maps for DHI’s ECO Lab Plant Growth Module using land-use data and species parameters.
 
-- Location: [PDP/PlantGrowthModule/](PDP/PlantGrowthModule/)
-- Documentation: [PDP/PlantGrowthModule/README.md](PDP/PlantGrowthModule/README.md)
+- Location: [plant-growth-module/](plant-growth-module/)
+- Documentation: [plant-growth-module/README.md](plant-growth-module/README.md)
 
 ### Data Download Tool
 
 Provides scripts and notebooks for dataset organization, downloads, and reproducible project structure setup.
 
-- Location: [PDP/DataDownloadTool/](PDP/DataDownloadTool/)
-- Documentation: [PDP/DataDownloadTool/README.md](PDP/DataDownloadTool/README.md)
+- Location: [data-download-tool/](data-download-tool/)
+- Documentation: [data-download-tool/README.md](data-download-tool/README.md)
 
 ## 📁 Repository structure (high level)
 
@@ -58,9 +58,8 @@ phishes-pdp/
 ├── SECURITY.md
 ├── .github/
 ├── images/
-└── PDP/
-    ├── PlantGrowthModule/
-    └── DataDownloadTool/
+├── data-download-tool/
+└── plant-growth-module/
 ```
 
 ## 📚 Documentation

@@ -30,18 +30,17 @@ phishes-pdp/
 ├── SECURITY.md
 ├── .github/
 ├── images/
-└── PDP/
-    ├── DataDownloadTool/
-    └── PlantGrowthModule/
+├── data-download-tool/
+└── plant-growth-module/
 ```
 
 ## Modules
 
 ### Data Download Tool
 
-- Location: [PDP/DataDownloadTool/](PDP/DataDownloadTool/)
-- User documentation: [PDP/DataDownloadTool/README.md](PDP/DataDownloadTool/README.md)
-- Agent context: [PDP/DataDownloadTool/DataDownloadTool.md](PDP/DataDownloadTool/DataDownloadTool.md)
+- Location: [data-download-tool/](data-download-tool/)
+- User documentation: [data-download-tool/README.md](data-download-tool/README.md)
+- Agent context: [data-download-tool/DataDownloadTool.md](data-download-tool/DataDownloadTool.md)
 
 Key capabilities:
 
@@ -52,9 +51,9 @@ Key capabilities:
 
 ### Plant Growth Module (PGM)
 
-- Location: [PDP/PlantGrowthModule/](PDP/PlantGrowthModule/)
-- User documentation: [PDP/PlantGrowthModule/README.md](PDP/PlantGrowthModule/README.md)
-- Agent context: [PDP/PlantGrowthModule/PlantGrowthModule.md](PDP/PlantGrowthModule/PlantGrowthModule.md)
+- Location: [plant-growth-module/](plant-growth-module/)
+- User documentation: [plant-growth-module/README.md](plant-growth-module/README.md)
+- Agent context: [plant-growth-module/PlantGrowthModule.md](plant-growth-module/PlantGrowthModule.md)
 
 Key capabilities:
 
@@ -66,8 +65,8 @@ Key capabilities:
 
 Installations are handled per sub-project. See the module README files for setup steps:
 
-- [PDP/DataDownloadTool/README.md](PDP/DataDownloadTool/README.md)
-- [PDP/PlantGrowthModule/README.md](PDP/PlantGrowthModule/README.md)
+- [data-download-tool/README.md](data-download-tool/README.md)
+- [plant-growth-module/README.md](plant-growth-module/README.md)
 
 ## Configuration
 
@@ -90,8 +89,8 @@ Refer to each module README and agent context file for exact parameters and defa
 
 Module-specific troubleshooting is documented in each README:
 
-- [PDP/DataDownloadTool/README.md](PDP/DataDownloadTool/README.md)
-- [PDP/PlantGrowthModule/README.md](PDP/PlantGrowthModule/README.md)
+- [data-download-tool/README.md](data-download-tool/README.md)
+- [plant-growth-module/README.md](plant-growth-module/README.md)
 
 ## System Requirements
 
