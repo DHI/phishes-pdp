@@ -16,8 +16,8 @@ jobs:
       fail-fast: false
       matrix:
         dir:
-          - PDP/Task1 Plant_Growth_Module
-          - PDP/Task2
+          - PDP/PlantGrowthModule
+          - PDP/DataDownloadTool
 
     steps:
       - name: Checkout
