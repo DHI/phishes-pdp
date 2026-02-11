@@ -31,7 +31,7 @@ data-download-tool/
 │   ├── core/
 │   │   ├── utils.py                # Path helpers and dataset opening
 │   │   ├── folder_structure.py     # Folder hierarchy creation
-│   │   └── downloader.py           # Azure download functionality
+│   │   └── downloader.py           # Download functionality
 │   ├── analysis/
 │   │   ├── catchment.py            # Catchment loading and processing
 │   │   ├── timeseries.py           # Time series analysis
@@ -49,14 +49,13 @@ data-download-tool/
 Core configuration is done in the notebook (`src/example_usage.ipynb`). The key values are:
 
 - Catchment input: shapefile path or manual extent
-- Azure connection: `azure_account`, `azure_credential` (SAS token), `azure_container`
 - Output base path for downloaded data and logs
-- Optional buffer distance around catchment (`buffer_km`)
+- Optional buffer distance around catchment (`buffer_cells`)
 - Dataset selection: category, subcategory, optional time range, optional variable list
 
 ## Available Datasets
 
-See [README.md](README.md) for the dataset list and availability. The Azure container layout is:
+See [README.md](README.md) for the dataset list and availability. The PDP datastore layout is:
 
 ```
 pdp-datasets/
