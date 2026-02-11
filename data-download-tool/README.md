@@ -1,13 +1,13 @@
 # PHISHES Digital Platform - Data Download Tool
 
-A Python toolkit for downloading and managing soil science datasets from Azure cloud storage based on user-defined catchment boundaries.
+A Python toolkit for downloading and managing soil science datasets from the PDP datastore based on user-defined catchment boundaries.
 
 ## 🌍 What Does This Tool Do?
 
 The PHISHES Digital Platform (PDP) Data Download Tool works with the following inputs and capabilities for catchment-scale soil science modeling:
 
 - **Catchment spatial data** (Shapefile format or extent) defining your study area boundary
-- **Azure Blob Storage** containing curated datasets in Zarr format
+- **PDP datastore** containing curated datasets in Zarr format
 - **Spatial subsetting** to extract only data within your catchment
 - **Automated downloads** with proper folder organization
 
@@ -156,7 +156,7 @@ data-download-tool/
 │   │   ├── __init__.py             # Package exports
 │   │   ├── utils.py                # Utility functions
 │   │   ├── folder_structure.py     # Folder structure creation
-│   │   ├── downloader.py           # Azure data downloader
+│   │   ├── downloader.py           # Data downloader
 │   │   ├── dfsio.py                # DFS file I/O utilities
 │   │   └── dataset_catalog.yaml    # Available datasets definition
 │   ├── analysis/                   # Analysis modules
@@ -202,7 +202,7 @@ Configure these settings in the notebook when initializing the downloader:
 
 ## 📚 Available Datasets
 
-The following datasets are currently available in Azure storage:
+The following datasets are currently available in PDP datastore:
 
 | Category | Subcategory                            | Variable | Unit | Timestep | Spatial Res.   |
 | -------- | -------------------------------------- | -------- | ---- | -------- | -------------- |
@@ -222,11 +222,11 @@ Additional categories (soil, topography, landuse, hydrology) will be added as th
 **Connection Error:**
 
 ```
-Cannot connect to Azure storage
+Cannot connect to PDP datastore
 ```
 
 - Check internet connection
-- Azure credentials are built into the downloader
+- Credentials are built into the downloader
 
 **Catchment CRS Error:**
 
@@ -259,7 +259,7 @@ The following are needed to run the tool:
 
 - Python 3.9+
 - ~2 GB RAM minimum (more for large catchments)
-- Internet connection for Azure access
+- Internet connection for data access
 - Disk space varies by catchment size and time range
 
 ---
