@@ -1,6 +1,7 @@
 climate:
   era5_precipitation:
     path: climate/era5_precipitation/ERA5_precipitation.zarr
+    display_name: ERA5 precipitation
     description: ERA5 precipitation
     variable: tp
     temporal: true
@@ -9,6 +10,7 @@ climate:
     eumunit: millimeter
   era5_temperature:
     path: climate/era5_temperature/ERA5_temperature.zarr
+    display_name: ERA5 temperature
     description: ERA5 temperature
     variable: t2m
     temporal: true
@@ -17,6 +19,7 @@ climate:
     eumunit: degree_Celsius
   era5_potential_evapotranspiration:
     path: climate/era5_potential_evapotranspiration/ERA5_potential_evapotranspiration.zarr
+    display_name: ERA5 potential evapotranspiration
     description: ERA5 potential evapotranspiration
     variable: pev
     temporal: true
