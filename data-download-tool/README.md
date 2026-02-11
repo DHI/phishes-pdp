@@ -96,7 +96,7 @@ This command will:
 
 3. **Select the Python kernel:**
    - Click on the kernel selector in the top-right corner of the notebook
-   - Choose the `.venv` environment (e.g., `Python 3.x (.venv)`) created by `uv sync`
+   - Choose the `.venv` environment (e.g., `phishes-data-downloader (.venv)`) created by `uv sync`. `phishes-data-downloader` should be the recommended environment.
    - If it does not appear, confirm you opened the correct folder (see step 1) and that you ran `uv sync` successfully
 
 4. **Run the notebook:**
