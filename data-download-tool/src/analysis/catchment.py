@@ -13,7 +13,7 @@ import shapely.geometry
 import xarray as xr
 from shapely.ops import unary_union
 
-from core.utils import get_grid_resolution
+from ..core.utils import get_grid_resolution
 
 # European Area of Interest bounding box (EPSG:4326)
 EUROPE_AOI = {

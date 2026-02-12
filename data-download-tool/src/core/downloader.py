@@ -22,7 +22,7 @@ import rioxarray  # noqa: F401 - enables .rio accessor on xarray objects
 import xarray as xr
 
 from .utils import build_dataset_path, get_grid_resolution, remove_path_with_retry
-from analysis import load_catchment, validate_catchment_gdf, reproject_catchment
+from ..analysis import load_catchment, validate_catchment_gdf, reproject_catchment
 from . import dfsio
 
 

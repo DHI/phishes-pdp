@@ -3,6 +3,7 @@
   "config": {
     "default": true,
     "MD001": false,
+    "MD024": { "siblings_only": true },
     "MD010": false,
     "MD012": false,
     "MD013": false,
@@ -12,7 +13,8 @@
     "MD032": false,
     "MD034": false,
     "MD036": false,
-    "MD040": false
+    "MD040": false,
+    "MD051": false
   },
   "globs": ["**/*.md"],
   "ignores": ["**/node_modules/**"]
