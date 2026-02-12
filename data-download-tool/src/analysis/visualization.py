@@ -133,6 +133,7 @@ def plot_time_series(
     title: Optional[str] = None,
     xlabel: str = "Time",
     ylabel: Optional[str] = None,
+    eumtype: Optional[str] = None,
 ) -> Tuple[plt.Figure, plt.Axes]:
     """
     Plot time series data.
@@ -153,6 +154,8 @@ def plot_time_series(
         X-axis label.
     ylabel : str, optional
         Y-axis label. If None, uses data.name.
+    eumtype : str, optional
+        EUM type metadata. If "Evaporation" or "Rainfall", plot as a bar chart.
 
     Returns
     -------
@@ -164,12 +167,16 @@ def plot_time_series(
     else:
         fig = ax.get_figure()
 
-    data.plot(ax=ax, label=label)
+    if eumtype in {"Evaporation", "Rainfall"}:
+        series = data.to_pandas()
+        ax.bar(series.index, series.values, label=label)  # type: ignpre
+    else:
+        data.plot(ax=ax, label=label)  # type: ignore
     ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel or data.name or "Value")
+    ax.set_ylabel(ylabel or data.name or "Value")  # type: ignore
     if title:
         ax.set_title(title)
     ax.legend()
     plt.tight_layout()
 
-    return fig, ax
+    return fig, ax  # type: ignore

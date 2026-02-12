@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+title: "PHISHES PDP — Digital Platform Tooling"
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+authors:
+  - name: "PHISHES Research Team"
+    affiliation: "DHI"
+repository-code: "https://github.com/DHI/phishes-pdp"
+license: MIT
+version: "1.0.0"
+date-released: "2026-02-09"
+keywords:
+  - soil science
+  - hydrology
+  - MIKE SHE
+  - ECO Lab
+  - geospatial
+  - climate data
