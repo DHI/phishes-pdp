@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "/PDP/Task1 Plant_Growth_Module"
+    directory: "/plant-growth-module"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -9,7 +9,7 @@ updates:
     open-pull-requests-limit: 5
 
   - package-ecosystem: "pip"
-    directory: "/PDP/Task2"
+    directory: "/data-download-tool"
     schedule:
       interval: "weekly"
       day: "monday"

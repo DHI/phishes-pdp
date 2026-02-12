@@ -4,55 +4,67 @@
 
 PHISHES seeks to bridge the gap between soil health data and actions, providing much-needed predictive capability in terms of the consequences of actions on the provision of soil functions and associated ecosystem services, taking into account soil use, soil contamination and various drivers such as climate change.
 
-### Python tools for retrieving model input data
+## Overview
 
-The repository contains jupyter notebooks with tools for downloading forcing data for the models that are relevant for the PHISHES simulation platform. The forcing data will be cropped to the model domain and can be converted to standard formats - like netcdf, Zarr or dfs2.
+This repository hosts Python tooling and notebooks that support the PHISHES simulation platform. It includes:
+
+- Data download and preprocessing utilities for model forcing data
+- A Plant Growth Module (PGM) workflow for generating DFS2 maps
+- Reproducible project structures, logging, and analysis helpers
+
+Most user-facing workflows are provided as Jupyter notebooks in the module folders.
 
 ## Requirements
 
-- Windows or Linux operating system
+- Windows, Linux, or macOS
 - Python x64 3.10 - 3.13
 
 ## Installation
 
-## Getting started
+Installations are handled per sub-project. See the module README files for setup steps:
+
+- [data-download-tool/README.md](data-download-tool/README.md)
+- [plant-growth-module/README.md](plant-growth-module/README.md)
 
 ## Where can I get help?
 
-## Cloud enabled - To be enabled!!!!
-
-It is possible to run PHISHES notebooks in your favorite cloud notebook environment e.g. [Deepnote](https://deepnote.com/), [Google Colab](https://colab.research.google.com/), etc...
+- Module-specific documentation:
+  - [data-download-tool/README.md](data-download-tool/README.md)
+  - [plant-growth-module/README.md](plant-growth-module/README.md)
+- Project documentation: [phishes-pdp.md](phishes-pdp.md)
 
 ## 📦 What this repository contains
 
-### Task 1: Plant Growth Module (PGM) - DFS2 Map Generator
+### Plant Growth Module (PGM) - DFS2 Map Generator
 
 Generates spatially distributed DFS2 maps for DHI’s ECO Lab Plant Growth Module using land-use data and species parameters.
 
-- Location: [PDP/Task1 Plant_Growth_Module/](PDP/Task1%20Plant_Growth_Module/)
-- Documentation: [PDP/Task1 Plant_Growth_Module/README.md](PDP/Task1%20Plant_Growth_Module/README.md)
+- Location: [plant-growth-module/](plant-growth-module/)
+- Documentation: [plant-growth-module/README.md](plant-growth-module/README.md)
 
-### Task 2: Data Management and Processing
+### Data Download Tool
 
 Provides scripts and notebooks for dataset organization, downloads, and reproducible project structure setup.
 
-- Location: [PDP/Task2/](PDP/Task2/)
-- Documentation: [PDP/Task2/README.md](PDP/Task2/README.md)
+- Location: [data-download-tool/](data-download-tool/)
+- Documentation: [data-download-tool/README.md](data-download-tool/README.md)
 
 ## 📁 Repository structure (high level)
 
 ```
-11829965_PHISHES/
+phishes-pdp/
 ├── README.md
-├── pdp_agent.md
-└── PDP/
-	├── Task1 Plant_Growth_Module/
-	└── Task2/
+├── phishes-pdp.md
+├── SECURITY.md
+├── .github/
+├── images/
+├── data-download-tool/
+└── plant-growth-module/
 ```
 
 ## 📚 Documentation
 
-- Technical details: [pdp_agent.md](pdp_agent.md)
+- Technical details: [phishes-pdp.md](phishes-pdp.md)
 
 ---
 
