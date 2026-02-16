@@ -119,6 +119,20 @@ class PDPDataDownloader:
         self.log_file = self.output_base.joinpath("logs", "download_log.json")
         self.download_history = self._load_download_history()
 
+    def set_output_format(self, output_format: Optional[str] = None):
+        """Set the output format for downloaded datasets."""
+        if output_format:
+            output_format = output_format.lower()
+            if output_format not in self.SUPPORTED_OUTPUT_FORMATS:
+                raise ValueError(
+                    f"Unsupported output_format: {output_format}. "
+                    f"Use one of {sorted(self.SUPPORTED_OUTPUT_FORMATS)}."
+                )
+            self.output_format = output_format
+            print(f"Output format set to: {self.output_format}")
+        else:
+            print(f"Output format remains: {self.output_format}")
+
     def _load_catalog(self) -> Dict:
         """Load dataset catalog from YAML file."""
         if not self.CATALOG_FILE.exists():
