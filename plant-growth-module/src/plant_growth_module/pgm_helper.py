@@ -7,11 +7,40 @@ import mikeio
 # Column name variants for land use mapping
 VAL_COLS = ["CODE", "VALUE"]
 CLASS_COLS = ["CLASS", "SPECIESID"]
+APPLY_COLS = ["APPLY", "USE", "ACTIVE"]
 
 # Column name variants for template files
 ID_COLS = ["SPECIESID", "SPECIES", "ID", "CLASS"]
 VALUE_COLS = ["VALUE", "VAL", "AMOUNT"]
 KEY_COLS = ["CONSTANT", "VARIABLE", "KEY", "NAME", "PARAM", "PARAMETER"]
+TEMPLATE_COLS = ["TEMPLATE", "SCOPE", "SOURCE"]
+TYPE_COLS = ["TYPE", "MAPTYPE", "MAP"]
+
+
+# State variables source dictionary (to be extended as PGM evolves)
+STATE_VARIABLE_SCOPE = {
+    "BCa_2D": "landuse",
+    "BNa_2D": "landuse",
+    "BCb_2D": "landuse",
+    "BNb_2D": "landuse",
+    "BCc": "landuse",
+    "BNc": "landuse",
+    "BCs": "landuse",
+    "LAI_2D": "landuse",
+    "RD_2D": "landuse",
+    "SOC": "soilprofile",
+    "SON": "soilprofile",
+    "NH4": "soilprofile",
+    "NO3": "soilprofile",
+    "S_NO3": "soilprofile",
+    "S_NH4": "soilprofile",
+    "S_PWV": "soilprofile",
+    "DO": "soilprofile",
+    "AO": "soilprofile",
+    "LAI": "soilprofile",
+    "RD": "soilprofile",
+    "BCh_2D": "soilprofile",
+}
 
 
 def find_col(df, cols):
@@ -101,6 +130,7 @@ def generate_dfs2_map(
     species_values,
     output_path,
     variable_name,
+    default_species_values=None,
 ):
     """Generate a DFS2 map by mapping species values to land use codes.
 
@@ -118,7 +148,11 @@ def generate_dfs2_map(
         Output file path for the DFS2
     variable_name : str
         Name of the variable/constant
+    default_species_values : dict, optional
+        Default values by species/class (e.g. filler zeros for classes with Apply=0)
     """
+    default_species_values = default_species_values or {}
+
     # Create output grid initialized with zeros
     output_grid = np.zeros_like(landuse_data, dtype=np.float32)
 
@@ -126,8 +160,14 @@ def generate_dfs2_map(
     # Process each code separately to prevent value overwrites
     for code, species in code_to_species.items():
         if species in species_values:
-            mask = landuse_data == code
-            output_grid[mask] = species_values[species]
+            value = species_values[species]
+        elif species in default_species_values:
+            value = default_species_values[species]
+        else:
+            continue
+
+        mask = landuse_data == code
+        output_grid[mask] = value
 
     # Create DFS2 with same geometry as input
     # Expand dimensions to match mikeio's expected shape (time, y, x)
@@ -146,6 +186,38 @@ def generate_dfs2_map(
         warnings.filterwarnings("ignore", message="Time step is 0.0 seconds")
         da.to_dfs(output_path)
     print(f"  📁 Created: {output_path.name}")
+
+
+def split_lu_mapping_by_apply(lu_df, code_col, class_col, apply_col=None):
+    """Create land use mapping and collect classes with Apply=0 for filler values.
+
+    Parameters:
+    -----------
+    lu_df : pd.DataFrame
+        Land use classification dataframe
+    code_col : str
+        Column name containing numeric grid codes
+    class_col : str
+        Column name containing class/species names
+    apply_col : str, optional
+        Column indicating whether PGM applies to this class (1=yes, 0=no)
+
+    Returns:
+    --------
+    tuple[dict, set]
+        code_to_species mapping and set of class names with Apply=0
+    """
+    code_to_species = dict(zip(lu_df[code_col], lu_df[class_col]))
+
+    if apply_col is None:
+        return code_to_species, set()
+
+    apply_values = lu_df[apply_col].fillna(1)
+    apply_values = apply_values.astype(str).str.strip().str.lower()
+    apply_mask = apply_values.isin(["0", "false", "no", "n"])
+
+    zero_classes = set(lu_df.loc[apply_mask, class_col].dropna().tolist())
+    return code_to_species, zero_classes
 
 
 def validate_paths(landuse_dfs2, lu_template, template_files, output_dir):

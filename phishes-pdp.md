@@ -5,6 +5,7 @@ This file provides technical context for the entire repository. For user-facing 
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [Repository Design](REPOSITORY_DESIGN.md)
 - [Repository Structure](#repository-structure)
 - [Modules](#modules)
 - [Installation](#installation)
@@ -20,6 +21,12 @@ PHISHES PDP is a collection of Python tools and notebooks that support catchment
 
 - Data Download Tool for retrieving and processing model forcing data
 - Plant Growth Module (PGM) for generating DFS2 maps for DHI ECO Lab / MIKE SHE
+
+## Repository Design
+
+Repository-level design is maintained in:
+
+- [REPOSITORY_DESIGN.md](REPOSITORY_DESIGN.md)
 
 ## Repository Structure
 
