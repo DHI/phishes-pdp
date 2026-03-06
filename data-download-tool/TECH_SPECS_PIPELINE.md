@@ -31,35 +31,35 @@ flowchart LR
 - Inputs: catchment (shapefile, GeoDataFrame, or manual extent), dataset selection, output base, optional time range
 - Outputs: validated catchment geometry and user options
 
-2. Quality checks
+1. Quality checks
 
 - Inputs: catchment geometry
 - Outputs: validated geometry, rejected with error if AOI overlap or size limits fail
 
-3. Catalog lookup and remote open
+1. Catalog lookup and remote open
 
 - Inputs: selected dataset category/subcategory
 - Outputs: catalog metadata and remotely opened Azure Zarr dataset
 
-4. Spatial subset / optional clip
+1. Spatial subset / optional clip
 
 - Inputs: opened dataset and catchment bounds/geometry
 - Outputs: spatially subset dataset (with optional catchment mask)
 
-5. Temporal subset (optional)
+1. Temporal subset (optional)
 
 - Inputs: subset dataset and optional time range
 - Outputs: time-filtered dataset for temporal products
 
-6. Format conversion
+1. Format conversion
 
 - Inputs: xarray Dataset
 - Outputs: NetCDF (.nc), Zarr (directory), or DFS2 (.dfs2)
 
-7. Write outputs and append log
+1. Write outputs and append log
 
 - Inputs: converted output and run metadata
-- Outputs: file written to data/<category>/<subcategory>/ and entry appended to logs/download_log.json
+- Outputs: file written to `data/{category}/{subcategory}/` and entry appended to `logs/download_log.json`
 
 ## Folder Structure (Implemented)
 
@@ -79,7 +79,7 @@ project_root/
 
 Implementation notes:
 
-- Current code writes datasets to data/<category>/<subcategory>/<subcategory>.<ext> and logs to logs/download_log.json.
+- Current code writes datasets to `data/{category}/{subcategory}/{subcategory}.{ext}` and logs to `logs/download_log.json`.
 - Advanced project-run folder orchestration is out of scope for this tool.
 
 ## Input/Output Schema
