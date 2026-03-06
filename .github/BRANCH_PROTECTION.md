@@ -35,6 +35,8 @@ Check the following boxes and configure as described:
 - ✅ **Require status checks to pass before merging**
   - ✅ **Require branches to be up to date before merging**
   - Search and add the following status checks (these match the job names in the workflow):
+    - `Lint and Test (plant-growth-module)`
+    - `Lint and Test (data-download-tool)`
     - `Basic PR Check`
     - `Code Quality Checks`
     - `Security Scanning`
@@ -88,7 +90,9 @@ Edit `.github/CODEOWNERS` file to specify:
 ### 3. Set Up Required Status Checks
 Ensure the GitHub Actions workflow runs on all PRs:
 - The `.github/workflows/branch-protection.yml` workflow will run automatically
-- Add additional CI/CD workflows as needed
+- The `.github/workflows/ci.yml` workflow runs module-specific tests on push/PR:
+  - `Lint and Test (plant-growth-module)`
+  - `Lint and Test (data-download-tool)`
 
 ### 4. Enable Dependabot
 Configure automated dependency updates:

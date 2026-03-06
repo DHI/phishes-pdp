@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [ "**" ]
 
 permissions:
   contents: read
@@ -15,9 +15,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dir:
-          - plant-growth-module
-          - data-download-tool
+        include:
+          - dir: plant-growth-module
+            test_deps: "pytest numpy pandas mikeio"
+          - dir: data-download-tool
+            test_deps: "pytest numpy pandas xarray shapely geopandas matplotlib mikeio pyyaml adlfs rioxarray fsspec"
 
     steps:
       - name: Checkout
@@ -33,10 +35,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff black pytest
 
-      - name: Install project (if pyproject exists)
+      - name: Install project (editable, no deps)
         if: ${{ hashFiles(format('{0}/pyproject.toml', matrix.dir)) != '' }}
         run: |
-          pip install -e "${{ matrix.dir }}"
+          pip install -e "${{ matrix.dir }}" --no-deps
+
+      - name: Install test dependencies
+        run: |
+          pip install ${{ matrix.test_deps }}
 
       - name: Ruff
         run: |
