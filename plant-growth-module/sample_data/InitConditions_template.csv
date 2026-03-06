@@ -1,0 +1,28 @@
+﻿template,ID,variable,value,type,,,,,,NOTE,
+landuse,Clover-grass mixture (with a predominance of clovers),LAI,0.1,1,,,,,,"""speciesID"" shoudl match the land use class name; in a 'no-match' situation nothing happens.",
+landuse,Winter wheat,LAI,0.2,1,,,,,,"""variable"" matches the variables that need initial conditions in our PGM, this implementation should be generic ('LAI' and 'RD' used as eg).",
+landuse,Spring barley,LAI,0.3,1,,,,,,"""value"" is the constant value according to the plant species",
+landuse,Mixture for nectar-producing fallow (eco-payment),LAI,0.4,1,,,,,,"""type"" is either 0 and 1, where 0 is uniform and 1 means map; if user sets 0 no map is produced.",
+landuse,Clover-grass mixture (with a predominance of clovers),RD,100,1,,,,,,,
+landuse,Winter wheat,RD,200,1,,,,,,,template
+landuse,Spring barley,RD,300,1,,,,,,BCa_2D,landuse
+landuse,Mixture for nectar-producing fallow (eco-payment),RD,400,1,,,,,,BNa_2D,landuse
+soilprofile,1,SOC,1,1,,,,,,BCb_2D,landuse
+soilprofile,2,SOC,2,1,,,,,,BNb_2D,landuse
+soilprofile,3,SOC,3,1,,,,,,BCc,landuse
+soilprofile,4,SOC,4,1,,,,,,BNc,landuse
+,,,,,,,,,,BCs,landuse
+,,,,,,,,,,LAI_2D,landuse
+,,,,,,,,,,RD_2D,landuse
+,,,,,,,,,,SOC,soilprofile
+,,,,,,,,,,SON,soilprofile
+,,,,,,,,,,NH4,soilprofile
+,,,,,,,,,,NO3,soilprofile
+,,,,,,,,,,S_NO3,soilprofile
+,,,,,,,,,,S_NH4,soilprofile
+,,,,,,,,,,S_PWV,soilprofile
+,,,,,,,,,,DO,soilprofile
+,,,,,,,,,,AO,soilprofile
+,,,,,,,,,,LAI,soilprofile
+,,,,,,,,,,RD,soilprofile
+,,,,,,,,,,BCh_2D,soilprofile
