@@ -14,7 +14,12 @@ def test_find_col_case_insensitive():
 
 
 def test_confirm_columns_auto_confirm():
-    assert pgm_helper.confirm_columns({"Code column": "CODE"}, auto_confirm=True, context="x") is True
+    assert (
+        pgm_helper.confirm_columns(
+            {"Code column": "CODE"}, auto_confirm=True, context="x"
+        )
+        is True
+    )
 
 
 def test_confirm_columns_user_paths(monkeypatch):
@@ -65,7 +70,9 @@ def test_generate_dfs2_map(monkeypatch, tmp_path):
 
 def test_split_lu_mapping_by_apply():
     df = pd.DataFrame({"CODE": [1, 2], "CLASS": ["A", "B"], "APPLY": [1, 0]})
-    mapping, zero_classes = pgm_helper.split_lu_mapping_by_apply(df, "CODE", "CLASS", "APPLY")
+    mapping, zero_classes = pgm_helper.split_lu_mapping_by_apply(
+        df, "CODE", "CLASS", "APPLY"
+    )
     assert mapping[1] == "A"
     assert "B" in zero_classes
 
