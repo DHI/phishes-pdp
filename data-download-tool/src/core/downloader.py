@@ -254,6 +254,147 @@ class PDPDataDownloader:
         except KeyError:
             raise ValueError(f"Dataset not found: {category}/{subcategory}")
 
+    def open_dataset(self, category: str, subcategory: str) -> xr.Dataset:
+        """
+        Open a remote dataset from Azure Blob Storage.
+
+        Parameters
+        ----------
+        category : str
+            Dataset category (e.g., 'climate').
+        subcategory : str
+            Dataset subcategory (e.g., 'temperature').
+
+        Returns
+        -------
+        xarray.Dataset
+            The opened remote dataset (lazy-loaded).
+        """
+        dataset_info = self.get_dataset_info(category, subcategory)
+        azure_path = f"{self.azure_container}/{dataset_info['path']}"
+
+        print(f"Opening remote dataset: {category} --> {subcategory}")
+
+        try:
+            store = self.fs.get_mapper(azure_path)
+            try:
+                ds = xr.open_zarr(store, consolidated=True)
+            except Exception:
+                ds = xr.open_zarr(store, consolidated=False)
+        except Exception as e:
+            print(f"ERROR: Failed to open dataset: {e}")
+            raise
+
+        return ds
+
+    def process_dataset(
+        self,
+        ds: xr.Dataset,
+        category: str,
+        subcategory: str,
+        time_range: Optional[Tuple[str, str]] = None,
+        variables: Optional[List[str]] = None,
+    ) -> xr.Dataset:
+        """
+        Apply spatial subsetting, temporal subsetting, and variable selection.
+
+        Parameters
+        ----------
+        ds : xarray.Dataset
+            Input dataset (e.g., from :meth:`open_dataset`).
+        category : str
+            Dataset category (e.g., 'climate').
+        subcategory : str
+            Dataset subcategory (e.g., 'temperature').
+        time_range : tuple of str, optional
+            Start and end dates for temporal data (e.g., ('2010-01-01', '2020-12-31')).
+        variables : list of str, optional
+            Specific variables to keep. If None, keeps all.
+
+        Returns
+        -------
+        xarray.Dataset
+            Processed (subsetted) dataset.
+        """
+        dataset_info = self.get_dataset_info(category, subcategory)
+
+        # Get catchment in dataset CRS
+        catchment_reproj = reproject_catchment(self.catchment, dataset_info["crs"])
+        bounds = catchment_reproj.total_bounds  # (minx, miny, maxx, maxy)
+
+        # Spatial subsetting
+        ds = self._spatial_subset(ds, bounds, catchment_reproj, dataset_info["crs"])
+
+        # Temporal subsetting
+        if time_range and dataset_info["temporal"]:
+            ds = self._temporal_subset(ds, time_range)
+
+        # Variable selection
+        if variables:
+            ds = ds[variables]
+
+        return ds
+
+    def save_dataset(
+        self,
+        ds: xr.Dataset,
+        category: str,
+        subcategory: str,
+        time_range: Optional[Tuple[str, str]] = None,
+    ) -> Path:
+        """
+        Save a processed dataset to disk and log the download.
+
+        Parameters
+        ----------
+        ds : xarray.Dataset
+            Dataset to save (e.g., from :meth:`process_dataset`).
+        category : str
+            Dataset category (e.g., 'climate').
+        subcategory : str
+            Dataset subcategory (e.g., 'temperature').
+        time_range : tuple of str, optional
+            Time range used during processing (logged for reference).
+
+        Returns
+        -------
+        Path
+            Path to the saved dataset.
+        """
+        dataset_info = self.get_dataset_info(category, subcategory)
+
+        output_path = build_dataset_path(
+            self.output_base, category, subcategory, self.output_format
+        )
+
+        # Remove existing if present
+        remove_path_with_retry(output_path)
+
+        print(f"Writing output to: {output_path}")
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Write to disk
+        if self.output_format == "zarr":
+            ds.to_zarr(output_path, mode="w", consolidated=True, zarr_format=2, safe_chunks=False)
+        elif self.output_format == "dfs2":
+            dfsio.create_file(
+                ds,
+                output_path,
+                varname=dataset_info.get("variable"),
+                eumtype=dataset_info.get("eumtype"),
+                eumunit=dataset_info.get("eumunit"),
+            )
+        else:
+            ds.to_netcdf(output_path, mode="w", engine="netcdf4")
+
+        # Log download
+        catchment_reproj = reproject_catchment(self.catchment, dataset_info["crs"])
+        bounds = catchment_reproj.total_bounds
+        self._log_download(category, subcategory, dataset_info, output_path, bounds, time_range)
+
+        print(f"Download complete: {output_path.relative_to(self.output_base)}")
+        return output_path
+
     def download_dataset(
         self,
         category: str,
@@ -263,6 +404,9 @@ class PDPDataDownloader:
     ) -> Path:
         """
         Download a specific dataset clipped to catchment extent.
+
+        Convenience method that calls :meth:`open_dataset`, :meth:`process_dataset`,
+        and :meth:`save_dataset` in sequence.
 
         Parameters
         ----------
@@ -280,76 +424,12 @@ class PDPDataDownloader:
         Path
             Path to downloaded dataset.
         """
-        # Get dataset info
-        dataset_info = self.get_dataset_info(category, subcategory)
-
         print(f"Starting download: {category} --> {subcategory}")
         print("This may take a few minutes depending on the data size and your connection.")
 
-        # Setup paths
-        azure_path = f"{self.azure_container}/{dataset_info['path']}"
-        output_path = build_dataset_path(
-            self.output_base, category, subcategory, self.output_format
-        )
-
-        # Get catchment in dataset CRS
-        catchment_reproj = reproject_catchment(self.catchment, dataset_info["crs"])
-        bounds = catchment_reproj.total_bounds  # (minx, miny, maxx, maxy)
-
-        # Open remote dataset
-        try:
-            store = self.fs.get_mapper(azure_path)
-            # Try opening with consolidated metadata first, then fall back
-            try:
-                ds = xr.open_zarr(store, consolidated=True)
-            except Exception:
-                # Fall back to non-consolidated
-                ds = xr.open_zarr(store, consolidated=False)
-
-        except Exception as e:
-            print(f"ERROR: Failed to open dataset: {e}")
-            raise
-
-        # Spatial subsetting
-        ds_subset = self._spatial_subset(ds, bounds, catchment_reproj, dataset_info["crs"])
-
-        # Temporal subsetting
-        if time_range and dataset_info["temporal"]:
-            ds_subset = self._temporal_subset(ds_subset, time_range)
-
-        # Variable selection
-        if variables:
-            ds_subset = ds_subset[variables]
-
-        # Remove existing if present
-        remove_path_with_retry(output_path)
-
-        print(f"Writing output to: {output_path}")
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        # Write to disk
-        if self.output_format == "zarr":
-            # Write to zarr v2 format for compatibility
-            # Use safe_chunks=False to handle chunking mismatches from spatial subsetting
-            ds_subset.to_zarr(
-                output_path, mode="w", consolidated=True, zarr_format=2, safe_chunks=False
-            )
-        elif self.output_format == "dfs2":
-            dfsio.create_file(
-                ds_subset,
-                output_path,
-                varname=dataset_info.get("variable"),
-                eumtype=dataset_info.get("eumtype"),
-                eumunit=dataset_info.get("eumunit"),
-            )
-        else:
-            # NetCDF output
-            ds_subset.to_netcdf(output_path, mode="w", engine="netcdf4")
-
-        # Log download
-        self._log_download(category, subcategory, dataset_info, output_path, bounds, time_range)
-
-        print(f"Download complete: {output_path.relative_to(self.output_base)}")
-        return output_path
+        ds = self.open_dataset(category, subcategory)
+        ds = self.process_dataset(ds, category, subcategory, time_range, variables)
+        return self.save_dataset(ds, category, subcategory, time_range)
 
     def _spatial_subset(
         self,
@@ -429,7 +509,7 @@ class PDPDataDownloader:
             ds_subset = ds.sel({x_dim: slice(minx, maxx), y_dim: slice(miny, maxy)})
 
             # If we got empty dimensions, fall back to nearest neighbor
-            if ds_subset.dims.get(x_dim, 0) == 0 or ds_subset.dims.get(y_dim, 0) == 0:
+            if ds_subset.sizes.get(x_dim, 0) == 0 or ds_subset.sizes.get(y_dim, 0) == 0:
                 print("Slice selection returned empty, using nearest neighbor selection")
 
                 center_x = (minx + maxx) / 2
@@ -469,7 +549,7 @@ class PDPDataDownloader:
             print(f"ERROR: Selection failed: {e}, returning full dataset")
             return ds
 
-        print(f"Subset shape: {dict(ds_subset.dims)}")
+        print(f"Subset shape: {dict(ds_subset.sizes)}")
         return ds_subset
 
     def _temporal_subset(self, ds: xr.Dataset, time_range: Tuple[str, str]) -> xr.Dataset:

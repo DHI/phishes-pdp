@@ -31,6 +31,7 @@
 - [ ] I ran relevant tests or explained why not
 - [ ] I confirmed no secrets are included
 - [ ] I reviewed CI/quality checks
+- [ ] CI passed for both modules: Lint and Test (data-download-tool) and Lint and Test (plant-growth-module)
 
 ## Reviewers
 
