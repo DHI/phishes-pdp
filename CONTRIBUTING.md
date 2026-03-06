@@ -12,6 +12,17 @@ Thank you for your interest in contributing! This guide explains how to get star
 
 ## Development Workflow
 
+### Optional: Auto-format on commit (recommended)
+
+Install pre-commit once at repository root:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+After this, Ruff lint fixes and Ruff formatting run automatically on each commit.
+
 1. Install dependencies with `uv sync --link-mode copy` inside the relevant module folder
 2. Make your changes
 3. Run linting and formatting checks:
