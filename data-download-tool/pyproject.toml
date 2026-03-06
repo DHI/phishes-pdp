@@ -50,11 +50,11 @@ dependencies = [
 
 [project.optional-dependencies]
 jupyter = ["jupyter>=1.0.0", "ipywidgets>=8.0.0"]
-dev = ["pytest>=7.2.0", "black>=23.1.0", "flake8>=6.0.0", "ruff>=0.1.0"]
+dev = ["pytest>=7.2.0", "flake8>=6.0.0", "ruff>=0.1.0"]
 all = ["phishes-data-downloader[jupyter,dev]"]
 
 [dependency-groups]
-dev = ["pytest>=7.2.0", "black>=23.1.0", "ruff>=0.1.0"]
+dev = ["pytest>=7.2.0", "ruff>=0.1.0"]
 
 [project.scripts]
 phishes-setup = "setup_folder_structure:main"
@@ -72,12 +72,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
-
-
-[tool.black]
-line-length = 100
-target-version = ['py310', 'py311', 'py312']
-include = '\.pyi?$'
 
 [tool.ruff]
 line-length = 100

@@ -18,7 +18,7 @@ Thank you for your interest in contributing! This guide explains how to get star
 
    ```bash
    ruff check .
-   black --check .
+   ruff format --check .
    ```
 
 4. If you changed notebooks, verify they run end-to-end with a clean kernel restart
@@ -35,7 +35,7 @@ Thank you for your interest in contributing! This guide explains how to get star
 
 ## Code Style
 
-- **Python**: Follow [PEP 8](https://peps.python.org/pep-0008/). We use `ruff` for linting and `black` for formatting (line length 100).
+- **Python**: Follow [PEP 8](https://peps.python.org/pep-0008/). We use `ruff` for linting and formatting (line length 100).
 - **Markdown**: Must pass `markdownlint-cli2`. See [.markdownlint-cli2.jsonc](.markdownlint-cli2.jsonc) for config.
 - **Notebooks**: Code cells are linted with `nbqa ruff`.
 
