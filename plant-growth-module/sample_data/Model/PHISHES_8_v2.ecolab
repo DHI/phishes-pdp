@@ -1,0 +1,3186 @@
+// Created     : 2025-12-12 8:40:13
+// DLL         : C:\Program Files (x86)\DHI\MIKE Zero\2026\bin\x64\pfs2004.dll
+// Version     : 24.0.2.19324
+// type = 2
+
+[ECO_LAB_SETUP]
+   DESCRIPTION = 'Crop model 1'
+   ONLINE_HELP = ''
+   DOCUMENTATION = ''
+   [MISC]
+      DESCRIPTION = 'Miscellaneous Description'
+      ONLINE_HELP = 'Miscellaneous Online help'
+      DOCUMENTATION = 'Miscellaneous Documentation'
+      ECOLAB_VERSION = 2125.176
+      PARSER_VERSION = 2125.176
+      DOCUMENT_REVISION = 8
+      RANDSEED = '0x6124'
+      DEBUG_LEVEL = 6
+      DEBUG_LOG = '.\Debug_v2\log.log'
+      RANDOM_PARTICLE_DIR = 'NO'
+      BUILD_SPATIAL_TREE = 'NO'
+      CHECKSUM = '0'
+      OPTIMISE = 'YES'
+      TRIGONOMETRICS = 'Degree'
+      ENHANCED_SETTLING_BUOYANCY = 0
+      STRICT_SCOPE_RULES = 'NO'
+      CACHE_GETVALUE_INDEX = 'YES'
+      [PH_SETTINGS]
+         MAIN_OPTION = 'User defined'
+         CONSTANT_SET = 4
+         KSO4_OPTION = 1
+         BORAT_OPTION = 1
+         PH_SCALE = 2
+      EndSect  // PH_SETTINGS
+
+   EndSect  // MISC
+
+   [STATE_VARIABLES]
+      DESCRIPTION = ''
+      ONLINE_HELP = ''
+      DOCUMENTATION = ''
+      [STATE_VARIABLE_1]
+         SYMBOL = 'BCa_2D'
+         ID = 1
+         DESCRIPTION = 'BCa_2D, Plant above ground biomass C, g/m2'
+         ONLINE_HELP = 'StateVariable_1 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'undefined'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10000000.0
+      EndSect  // STATE_VARIABLE_1
+
+      [STATE_VARIABLE_2]
+         SYMBOL = 'BNa_2D'
+         ID = 2
+         DESCRIPTION = 'BNa_2D, Plant above ground biomass N, g/m2'
+         ONLINE_HELP = 'StateVariable_7 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'gN/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1000000.0
+      EndSect  // STATE_VARIABLE_2
+
+      [STATE_VARIABLE_3]
+         SYMBOL = 'BCb_2D'
+         ID = 3
+         DESCRIPTION = 'BCb_2D, Crop below ground biomass carbon, gC/m2'
+         ONLINE_HELP = 'StateVariable_7 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'gC/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100000000.0
+      EndSect  // STATE_VARIABLE_3
+
+      [STATE_VARIABLE_4]
+         SYMBOL = 'BNb_2D'
+         ID = 4
+         DESCRIPTION = 'BNb, Plant below ground biomass N, gN/m2'
+         ONLINE_HELP = 'StateVariable_8 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'gN/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100000000.0
+      EndSect  // STATE_VARIABLE_4
+
+      [STATE_VARIABLE_5]
+         SYMBOL = 'BCc'
+         ID = 5
+         DESCRIPTION = 'BCc, Crop C, gC/m2'
+         ONLINE_HELP = 'StateVariable_6 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'gC/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10000000.0
+      EndSect  // STATE_VARIABLE_5
+
+      [STATE_VARIABLE_6]
+         SYMBOL = 'BNc'
+         ID = 6
+         DESCRIPTION = 'BNc, Crop N, gN/m2'
+         ONLINE_HELP = 'StateVariable_9 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'gN/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100000000.0
+      EndSect  // STATE_VARIABLE_6
+
+      [STATE_VARIABLE_7]
+         SYMBOL = 'BCs'
+         ID = 7
+         DESCRIPTION = 'BCs, Seeds of BC, no/m2'
+         ONLINE_HELP = 'StateVariable_2 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'no/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100000000000
+      EndSect  // STATE_VARIABLE_7
+
+      [STATE_VARIABLE_8]
+         SYMBOL = 'LAI_2D'
+         ID = 8
+         DESCRIPTION = 'LAI, Leaf area Index of plant, m2/m2'
+         ONLINE_HELP = 'StateVariable_4 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'm2/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // STATE_VARIABLE_8
+
+      [STATE_VARIABLE_9]
+         SYMBOL = 'RD_2D'
+         ID = 9
+         DESCRIPTION = 'RD_2D, Rooth depth, mm'
+         ONLINE_HELP = 'StateVariable_5 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'mm'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100000000.0
+      EndSect  // STATE_VARIABLE_9
+
+      [STATE_VARIABLE_10]
+         SYMBOL = 'SOC'
+         ID = 10
+         DESCRIPTION = 'SOC, Soil organic carbon, gC/m2'
+         ONLINE_HELP = 'StateVariable_10 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'gC/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100000000.0
+      EndSect  // STATE_VARIABLE_10
+
+      [STATE_VARIABLE_11]
+         SYMBOL = 'SON'
+         ID = 11
+         DESCRIPTION = 'SON, Soil sediment organic N, gN/m3'
+         ONLINE_HELP = 'StateVariable_11 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'gN/m3'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1000000000.0
+      EndSect  // STATE_VARIABLE_11
+
+      [STATE_VARIABLE_12]
+         SYMBOL = 'NH4'
+         ID = 12
+         DESCRIPTION = 'NH4, Ammonia in pore water, mg/L'
+         ONLINE_HELP = 'StateVariable_12 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 100404
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'ADVECTION_DISPERSION'
+         UNIT = 'mg/l'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -10.0
+         MAX_VALUE = 10000000.0
+      EndSect  // STATE_VARIABLE_12
+
+      [STATE_VARIABLE_13]
+         SYMBOL = 'NO3'
+         ID = 13
+         DESCRIPTION = 'NO3, Nitrate+Nitrit in pore water, mg/L'
+         ONLINE_HELP = 'StateVariable_13 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 100404
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'ADVECTION_DISPERSION'
+         UNIT = 'mg/l'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10000000.0
+      EndSect  // STATE_VARIABLE_13
+
+      [STATE_VARIABLE_14]
+         SYMBOL = 'S_NO3'
+         ID = 14
+         DESCRIPTION = 'S_SON3, Summed NO3 mass in rooting depth, gN/m2'
+         ONLINE_HELP = 'StateVariable_14 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'gN/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // STATE_VARIABLE_14
+
+      [STATE_VARIABLE_15]
+         SYMBOL = 'S_NH4'
+         ID = 15
+         DESCRIPTION = 'S_NH4, Summed NH4 mass in rooting depth, gN/m2'
+         ONLINE_HELP = 'StateVariable_15 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'gN/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // STATE_VARIABLE_15
+
+      [STATE_VARIABLE_16]
+         SYMBOL = 'S_PWV'
+         ID = 16
+         DESCRIPTION = 'S_PWV, Summed pore water volume in the rooting depth, m3/m2'
+         ONLINE_HELP = 'StateVariable_16 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'm3/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // STATE_VARIABLE_16
+
+      [STATE_VARIABLE_17]
+         SYMBOL = 'DO'
+         ID = 17
+         DESCRIPTION = 'DO, Pore water dissolved oxygen, mg/L'
+         ONLINE_HELP = 'DO Online help'
+         DOCUMENTATION = 'DO Documentation'
+         EUM_TYPE = 100404
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'ADVECTION_DISPERSION'
+         UNIT = 'mg/l'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // STATE_VARIABLE_17
+
+      [STATE_VARIABLE_18]
+         SYMBOL = 'AO'
+         ID = 18
+         DESCRIPTION = 'AO, Oxygen in air of pore volume, g/m3'
+         ONLINE_HELP = 'StateVariable_19 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'undefined'
+         DEFAULT_VALUE = 0.279
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100000.0
+      EndSect  // STATE_VARIABLE_18
+
+      [STATE_VARIABLE_19]
+         SYMBOL = 'LAI'
+         ID = 19
+         DESCRIPTION = 'LAI, Leaf area index for MIKE SHE combining all functional groups, m2/m2'
+         ONLINE_HELP = 'StateVariable_17 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'm2/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -1.0
+         MAX_VALUE = 100.0
+      EndSect  // STATE_VARIABLE_19
+
+      [STATE_VARIABLE_20]
+         SYMBOL = 'RD'
+         ID = 20
+         DESCRIPTION = 'RD, Rooting depth for MIKE SHE combining all functional groups, mm'
+         ONLINE_HELP = 'StateVariable_20 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'mm'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1000000000.0
+      EndSect  // STATE_VARIABLE_20
+
+      [STATE_VARIABLE_21]
+         SYMBOL = 'BCh_2D'
+         ID = 21
+         DESCRIPTION = 'BCh_2D'
+         ONLINE_HELP = 'StateVariable_21 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'WC'
+         TRANSPORT = 'FIXED'
+         UNIT = 'undefined'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // STATE_VARIABLE_21
+
+   EndSect  // STATE_VARIABLES
+
+   [CONSTANTS]
+      DESCRIPTION = ''
+      ONLINE_HELP = ''
+      DOCUMENTATION = ''
+      [CONSTANT_1]
+         SYMBOL = 'sel_temp'
+         ID = 22
+         DESCRIPTION = 'sel_temp, switch to select temperature from forcing or MIKE SHE, nu'
+         ONLINE_HELP = 'sel_temp Online help'
+         DOCUMENTATION = 'sel_temp Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_1
+
+      [CONSTANT_2]
+         SYMBOL = 'mybc'
+         ID = 23
+         DESCRIPTION = 'mybc, maximal growth rate of BC, /d'
+         ONLINE_HELP = 'mybc Online help'
+         DOCUMENTATION = 'mybc Documentation'
+         EUM_TYPE = 100150
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '/d'
+         DEFAULT_VALUE = 4.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10.0
+      EndSect  // CONSTANT_2
+
+      [CONSTANT_3]
+         SYMBOL = 'lasa'
+         ID = 24
+         DESCRIPTION = 'lasa, Lassiter constant for BC, nu'
+         ONLINE_HELP = 'lasa1 Online help'
+         DOCUMENTATION = 'lasa1 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 0.6
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_3
+
+      [CONSTANT_4]
+         SYMBOL = 'mabce'
+         ID = 25
+         DESCRIPTION = 'mabce, Half-saturation constant for Lassiter temperature dependency for growth, nu'
+         ONLINE_HELP = 'mabce Online help'
+         DOCUMENTATION = 'mabce Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 1.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_4
+
+      [CONSTANT_5]
+         SYMBOL = 'topt'
+         ID = 26
+         DESCRIPTION = 'topt, Optimal temperature for growth of BC, deg'
+         ONLINE_HELP = 'topt1 Online help'
+         DOCUMENTATION = 'topt1 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg'
+         DEFAULT_VALUE = 20.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_5
+
+      [CONSTANT_6]
+         SYMBOL = 'tmax'
+         ID = 27
+         DESCRIPTION = 'tmax, Lethal temperature for growth og BC, deg'
+         ONLINE_HELP = 'tmax1 Online help'
+         DOCUMENTATION = 'tmax1 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg'
+         DEFAULT_VALUE = 45.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_6
+
+      [CONSTANT_7]
+         SYMBOL = 'seed_mass'
+         ID = 28
+         DESCRIPTION = 'seed_mass, Mass of 1 BC seed, g'
+         ONLINE_HELP = 'seed_mass Online help'
+         DOCUMENTATION = 'seed_mass Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g'
+         DEFAULT_VALUE = 0.5
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10.0
+      EndSect  // CONSTANT_7
+
+      [CONSTANT_8]
+         SYMBOL = 'rbma_d'
+         ID = 29
+         DESCRIPTION = 'rbma_d, maximum respiration rate dark of BC at 20C., 1/d'
+         ONLINE_HELP = 'rbma Online help'
+         DOCUMENTATION = 'rbma Documentation'
+         EUM_TYPE = 100150
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '/d'
+         DEFAULT_VALUE = 0.05
+         MIN_VALUE = 0.0
+         MAX_VALUE = 2.0
+      EndSect  // CONSTANT_8
+
+      [CONSTANT_9]
+         SYMBOL = 'rbma_l'
+         ID = 30
+         DESCRIPTION = 'rbma_l, maximum respiration rate light of BC at 20C, 1/d'
+         ONLINE_HELP = 'Constant_26 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 100150
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '/d'
+         DEFAULT_VALUE = 0.01
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10.0
+      EndSect  // CONSTANT_9
+
+      [CONSTANT_10]
+         SYMBOL = 'tetb'
+         ID = 31
+         DESCRIPTION = 'tetb, temperature dependency for BC respiration, nu'
+         ONLINE_HELP = 'tetb Online help'
+         DOCUMENTATION = 'tetb Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 1.04
+         MIN_VALUE = 1.0
+         MAX_VALUE = 1.2
+      EndSect  // CONSTANT_10
+
+      [CONSTANT_11]
+         SYMBOL = 'kgrmt'
+         ID = 32
+         DESCRIPTION = 'kgrmt, Seed germination threshhold for BC, deg'
+         ONLINE_HELP = 'kgerm_temp Online help'
+         DOCUMENTATION = 'kgerm_temp Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg'
+         DEFAULT_VALUE = 5.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_11
+
+      [CONSTANT_12]
+         SYMBOL = 'kgrmbc'
+         ID = 33
+         DESCRIPTION = 'kgrmbc, BC seed germination rate, 1/d'
+         ONLINE_HELP = 'kgrmbc Online help'
+         DOCUMENTATION = 'kgrmbc Documentation'
+         EUM_TYPE = 100150
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '/d'
+         DEFAULT_VALUE = 0.2
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10.0
+      EndSect  // CONSTANT_12
+
+      [CONSTANT_13]
+         SYMBOL = 'alfa_t'
+         ID = 34
+         DESCRIPTION = 'alfa_t_NOT_USED, alfa for smoothing temperature, nu'
+         ONLINE_HELP = 'alfa_t Online help'
+         DOCUMENTATION = 'alfa_t Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 0.06
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_13
+
+      [CONSTANT_14]
+         SYMBOL = 'latitu'
+         ID = 35
+         DESCRIPTION = 'latitu, Latidude, deg'
+         ONLINE_HELP = 'latitu Online help'
+         DOCUMENTATION = 'latitu Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'degrees'
+         DEFAULT_VALUE = 55.0
+         MIN_VALUE = -90.0
+         MAX_VALUE = 90.0
+      EndSect  // CONSTANT_14
+
+      [CONSTANT_15]
+         SYMBOL = 'fac'
+         ID = 36
+         DESCRIPTION = 'fac, Factor for dark calculations, nu'
+         ONLINE_HELP = 'fac Online help'
+         DOCUMENTATION = 'fac Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 1.3
+         MIN_VALUE = 1.0
+         MAX_VALUE = 2.0
+      EndSect  // CONSTANT_15
+
+      [CONSTANT_16]
+         SYMBOL = 'ihb20'
+         ID = 37
+         DESCRIPTION = 'ihb20,  Light  intensity for photo inhibition at 20 deg, E/m2/d'
+         ONLINE_HELP = 'ihb20 Online help'
+         DOCUMENTATION = 'ihb20 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'E/m2/d'
+         DEFAULT_VALUE = 250.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 500.0
+      EndSect  // CONSTANT_16
+
+      [CONSTANT_17]
+         SYMBOL = 'tetl'
+         ID = 38
+         DESCRIPTION = 'tetl, BC  Temperature dependency for growth, nu'
+         ONLINE_HELP = 'tetl Online help'
+         DOCUMENTATION = 'tetl Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 1.04
+         MIN_VALUE = 1.0
+         MAX_VALUE = 1.2
+      EndSect  // CONSTANT_17
+
+      [CONSTANT_18]
+         SYMBOL = 'ike20'
+         ID = 39
+         DESCRIPTION = 'ike20, Light saturation intensity at 20 deg, E/m2/d'
+         ONLINE_HELP = 'ike20 Online help'
+         DOCUMENTATION = 'ike20 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'E/m2/d'
+         DEFAULT_VALUE = 150.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 500.0
+      EndSect  // CONSTANT_18
+
+      [CONSTANT_19]
+         SYMBOL = 'tetk'
+         ID = 40
+         DESCRIPTION = 'tetk, Temperature dependency for light saturation intensity, nu.'
+         ONLINE_HELP = 'tetk Online help'
+         DOCUMENTATION = 'tetk Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 1.04
+         MIN_VALUE = 1.0
+         MAX_VALUE = 1.2
+      EndSect  // CONSTANT_19
+
+      [CONSTANT_20]
+         SYMBOL = 'icb20'
+         ID = 41
+         DESCRIPTION = 'icb20, Light intensity at 20 C for compensation, E/m2/d'
+         ONLINE_HELP = 'icb20 Online help'
+         DOCUMENTATION = 'icb20 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'uE/m2/s'
+         DEFAULT_VALUE = 12.0
+         MIN_VALUE = 3.0
+         MAX_VALUE = 500.0
+      EndSect  // CONSTANT_20
+
+      [CONSTANT_21]
+         SYMBOL = 'alfa_BC'
+         ID = 42
+         DESCRIPTION = 'alfa_BC,  Mid summer gradient coefficient for light prbc curve, ugC/gC*m2/uE'
+         ONLINE_HELP = 'alfa_EC Online help'
+         DOCUMENTATION = 'alfa_EC Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'ugC/gC*m2/uE'
+         DEFAULT_VALUE = 0.55
+         MIN_VALUE = 0.0005
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_21
+
+      [CONSTANT_22]
+         SYMBOL = 'k_lai'
+         ID = 43
+         DESCRIPTION = 'k_lai, light extinction coefficient, nu'
+         ONLINE_HELP = 'k_lai Online help'
+         DOCUMENTATION = 'k_lai Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         DEFAULT_VALUE = 0.4
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_22
+
+      [CONSTANT_23]
+         SYMBOL = 'density'
+         ID = 44
+         DESCRIPTION = 'density'
+         ONLINE_HELP = 'Constant_23 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'NO'
+         BUILT_IN_ID = 54
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'auto'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -100000000.0
+         MAX_VALUE = 100000000.0
+      EndSect  // CONSTANT_23
+
+      [CONSTANT_24]
+         SYMBOL = 'VisibleLightFraction'
+         ID = 45
+         DESCRIPTION = 'VisibleLightFraction, fraction of total solar radiation which is within the visible spectrum'
+         ONLINE_HELP = 'VisibleLightFraction Online help'
+         DOCUMENTATION = 'VisibleLightFraction Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         DEFAULT_VALUE = 0.4298
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_24
+
+      [CONSTANT_25]
+         SYMBOL = 'wave550energy'
+         ID = 46
+         DESCRIPTION = 'wave550energy, energy per mole of light within the 550 wavelength, kJ/mol'
+         ONLINE_HELP = 'wave550energy Online help'
+         DOCUMENTATION = 'wave550energy Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'kJ/mol'
+         DEFAULT_VALUE = 217.503
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1000.0
+      EndSect  // CONSTANT_25
+
+      [CONSTANT_26]
+         SYMBOL = 'max_LAI'
+         ID = 47
+         DESCRIPTION = 'max_LAI, Maximum Leaf area index (LAI) based on species, nu'
+         ONLINE_HELP = 'max_LAI Online help'
+         DOCUMENTATION = 'max_LAI Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 6.4
+         MIN_VALUE = 0.0
+         MAX_VALUE = 30.0
+      EndSect  // CONSTANT_26
+
+      [CONSTANT_27]
+         SYMBOL = 'no_ts'
+         ID = 48
+         DESCRIPTION = 'no_ts, number of timesteps to smooth over, no'
+         ONLINE_HELP = 'no_ts Online help'
+         DOCUMENTATION = 'no_ts Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'no'
+         DEFAULT_VALUE = 30.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10000000.0
+      EndSect  // CONSTANT_27
+
+      [CONSTANT_28]
+         SYMBOL = 'kmLAI'
+         ID = 49
+         DESCRIPTION = 'kmLAI, half saturation constan controlling LAI limtation for growth, nu'
+         ONLINE_HELP = 'kmLAI Online help'
+         DOCUMENTATION = 'Reccomending 80% of maximum LAI'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 3.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_28
+
+      [CONSTANT_29]
+         SYMBOL = 'n'
+         ID = 50
+         DESCRIPTION = 'n, factor sharpening limitation crve, nu'
+         ONLINE_HELP = 'n Online help'
+         DOCUMENTATION = 'at 1 the curve is smoothest, increasing sharpens the curve'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 3.0
+         MIN_VALUE = 1.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_29
+
+      [CONSTANT_30]
+         SYMBOL = 'kcrop'
+         ID = 51
+         DESCRIPTION = 'kcrop, crop production rate, 1/d'
+         ONLINE_HELP = 'kcrop Online help'
+         DOCUMENTATION = 'kcrop Documentation'
+         EUM_TYPE = 100150
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '/d'
+         DEFAULT_VALUE = 0.05
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10.0
+      EndSect  // CONSTANT_30
+
+      [CONSTANT_31]
+         SYMBOL = 'krd'
+         ID = 52
+         DESCRIPTION = 'krd, root lenght increase rate, m/d'
+         ONLINE_HELP = 'krd Online help'
+         DOCUMENTATION = 'krd Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'm/d'
+         DEFAULT_VALUE = 0.011
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100000.0
+      EndSect  // CONSTANT_31
+
+      [CONSTANT_32]
+         SYMBOL = 'kmrd'
+         ID = 53
+         DESCRIPTION = 'kmrd, half saturation constant for limiting root growth based on BGB, nu'
+         ONLINE_HELP = 'kmrd Online help'
+         DOCUMENTATION = 'kmrd Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 50.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 500.0
+      EndSect  // CONSTANT_32
+
+      [CONSTANT_33]
+         SYMBOL = 'max_rd'
+         ID = 54
+         DESCRIPTION = 'max_rd, Maximum allowed root depth, m'
+         ONLINE_HELP = 'max_rd Online help'
+         DOCUMENTATION = 'max_rd Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'm'
+         DEFAULT_VALUE = 2.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10000000.0
+      EndSect  // CONSTANT_33
+
+      [CONSTANT_34]
+         SYMBOL = 'opt_crop'
+         ID = 55
+         DESCRIPTION = 'opt_crop, optimal temp for corp maturing, deg C'
+         ONLINE_HELP = 'opt_crop Online help'
+         DOCUMENTATION = 'opt_crop Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'ged C'
+         DEFAULT_VALUE = 15.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_34
+
+      [CONSTANT_35]
+         SYMBOL = 'rcrop'
+         ID = 56
+         DESCRIPTION = 'rcrop, Crop below ground to above ground ratio, nu'
+         ONLINE_HELP = 'rcrop Online help'
+         DOCUMENTATION = 'rcrop Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 0.6
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_35
+
+      [CONSTANT_36]
+         SYMBOL = 'kdLAI'
+         ID = 57
+         DESCRIPTION = 'kdLAI, rate of LAI reduction after crop formation starts and plant die by drying out, 1/d'
+         ONLINE_HELP = 'kdLAI Online help'
+         DOCUMENTATION = 'kdLAI Documentation'
+         EUM_TYPE = 100150
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '/d'
+         DEFAULT_VALUE = 0.02
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10.0
+      EndSect  // CONSTANT_36
+
+      [CONSTANT_37]
+         SYMBOL = 'topt_g'
+         ID = 58
+         DESCRIPTION = 'topt_g, Optimal temperature for seed germination, deg C'
+         ONLINE_HELP = 'topt_g Online help'
+         DOCUMENTATION = 'topt_g Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg C'
+         DEFAULT_VALUE = 12.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 25.0
+      EndSect  // CONSTANT_37
+
+      [CONSTANT_38]
+         SYMBOL = 'Ltg'
+         ID = 59
+         DESCRIPTION = 'Ltg, Lethal temperature for seed germination, deg C'
+         ONLINE_HELP = 'Ltg Online help'
+         DOCUMENTATION = 'Ltg Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg C'
+         DEFAULT_VALUE = 35.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 50.0
+      EndSect  // CONSTANT_38
+
+      [CONSTANT_39]
+         SYMBOL = 'SMopt_g'
+         ID = 60
+         DESCRIPTION = 'SMopt_g, Ideal soil moisture needed for seed germination, %'
+         ONLINE_HELP = 'SMopt_g Online help'
+         DOCUMENTATION = 'SMopt_g Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '%'
+         DEFAULT_VALUE = 70.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_39
+
+      [CONSTANT_40]
+         SYMBOL = 'Lsm'
+         ID = 61
+         DESCRIPTION = 'Lsm, Lethal soil moisture needed for seed germination, %'
+         ONLINE_HELP = 'Lsm Online help'
+         DOCUMENTATION = 'Lsm Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '%'
+         DEFAULT_VALUE = 95.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_40
+
+      [CONSTANT_41]
+         SYMBOL = 'sowing'
+         ID = 62
+         DESCRIPTION = 'sowing, Day number of year (1-366) when seeds are introduced to soil, no'
+         ONLINE_HELP = 'sowing Online help'
+         DOCUMENTATION = 'sowing Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'no'
+         DEFAULT_VALUE = 75.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 366.0
+      EndSect  // CONSTANT_41
+
+      [CONSTANT_42]
+         SYMBOL = 'd_cell_top'
+         ID = 63
+         DESCRIPTION = 'd_cell_top, Depth to cell top, m'
+         ONLINE_HELP = 'Constant_42 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'NO'
+         BUILT_IN_ID = 54
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'auto'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -100000000.0
+         MAX_VALUE = 100000000.0
+      EndSect  // CONSTANT_42
+
+      [CONSTANT_43]
+         SYMBOL = 'd_cell_bottom'
+         ID = 64
+         DESCRIPTION = 'd_cell_bottom, Depth to cell bottom, m'
+         ONLINE_HELP = 'Constant_43 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'NO'
+         BUILT_IN_ID = 54
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'auto'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -100000000.0
+         MAX_VALUE = 100000000.0
+      EndSect  // CONSTANT_43
+
+      [CONSTANT_44]
+         SYMBOL = 'kdebc'
+         ID = 65
+         DESCRIPTION = 'kdebc, death rate of plant biomass, 1/d'
+         ONLINE_HELP = 'kdebc Online help'
+         DOCUMENTATION = 'kdebc Documentation'
+         EUM_TYPE = 100150
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '/d'
+         DEFAULT_VALUE = 0.01
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_44
+
+      [CONSTANT_45]
+         SYMBOL = 'krsn'
+         ID = 66
+         DESCRIPTION = 'krsn, seed N_C ratio, gN/gC'
+         ONLINE_HELP = 'krsn Online help'
+         DOCUMENTATION = 'krsn Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gN/gC'
+         DEFAULT_VALUE = 0.045
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_45
+
+      [CONSTANT_46]
+         SYMBOL = 'POR'
+         ID = 67
+         DESCRIPTION = 'POR, Porocity aka Saturated moisture content, nu'
+         ONLINE_HELP = 'Constant_46 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'NO'
+         BUILT_IN_ID = 54
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'auto'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -100000000.0
+         MAX_VALUE = 100000000.0
+      EndSect  // CONSTANT_46
+
+      [CONSTANT_47]
+         SYMBOL = 'kmsn'
+         ID = 68
+         DESCRIPTION = 'kmsn,  Sediment: Propertionality factor for mineralisation of SON, n.u.'
+         ONLINE_HELP = 'kmsn Online help'
+         DOCUMENTATION = 'kmsn Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 1.0
+         MIN_VALUE = 0.8
+         MAX_VALUE = 1.6
+      EndSect  // CONSTANT_47
+
+      [CONSTANT_48]
+         SYMBOL = 'krsoc'
+         ID = 69
+         DESCRIPTION = 'krsoc, Mineralisation rate organic matter in soil, 1/d'
+         ONLINE_HELP = 'krsoc Online help'
+         DOCUMENTATION = 'krsoc Documentation'
+         EUM_TYPE = 100150
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '/d'
+         DEFAULT_VALUE = 0.002
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_48
+
+      [CONSTANT_49]
+         SYMBOL = 'tetn'
+         ID = 70
+         DESCRIPTION = 'tetn, Sediment: Temperature dependency sediment N release, nu.'
+         ONLINE_HELP = 'tetn Online help'
+         DOCUMENTATION = 'tetn Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 1.08
+         MIN_VALUE = 1.0
+         MAX_VALUE = 1.2
+      EndSect  // CONSTANT_49
+
+      [CONSTANT_50]
+         SYMBOL = 'knim'
+         ID = 71
+         DESCRIPTION = 'knim, Sediment: N:C ratio of immobile N, g N/g C'
+         ONLINE_HELP = 'knim Online help'
+         DOCUMENTATION = 'knim Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         DEFAULT_VALUE = 0.083
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_50
+
+      [CONSTANT_51]
+         SYMBOL = 'pnre'
+         ID = 72
+         DESCRIPTION = 'pnre, Readfiled N:C, g N/g C'
+         ONLINE_HELP = 'pnre Online help'
+         DOCUMENTATION = 'pnre Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g N/g C'
+         DEFAULT_VALUE = 0.176
+         MIN_VALUE = 0.15
+         MAX_VALUE = 0.2
+      EndSect  // CONSTANT_51
+
+      [CONSTANT_52]
+         SYMBOL = 'Trans'
+         ID = 73
+         DESCRIPTION = 'Trans, transition rate of sediment mass , 1/d'
+         ONLINE_HELP = 'Trans Online help'
+         DOCUMENTATION = 'Trans Documentation'
+         EUM_TYPE = 100150
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '/d'
+         DEFAULT_VALUE = 0.002
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_52
+
+      [CONSTANT_53]
+         SYMBOL = 'knit'
+         ID = 74
+         DESCRIPTION = 'knit, Sediment: Max. nitrification rate at 20 C in sediment, 1/d'
+         ONLINE_HELP = 'knit Online help'
+         DOCUMENTATION = 'knit Documentation'
+         EUM_TYPE = 100150
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '/d'
+         DEFAULT_VALUE = 0.8
+         MIN_VALUE = 0.0
+         MAX_VALUE = 10.0
+      EndSect  // CONSTANT_53
+
+      [CONSTANT_54]
+         SYMBOL = 'hmt'
+         ID = 75
+         DESCRIPTION = 'hmt, Half saturation concenration for nitrification in water column, g N/m3'
+         ONLINE_HELP = 'hmt Online help'
+         DOCUMENTATION = 'hmt Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gN/m3'
+         DEFAULT_VALUE = 0.01
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_54
+
+      [CONSTANT_55]
+         SYMBOL = 'aeration_depth'
+         ID = 76
+         DESCRIPTION = 'aeration_depth, Soil depth affected by rearation, m'
+         ONLINE_HELP = 'areation_depth Online help'
+         DOCUMENTATION = 'areation_depth Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'm'
+         DEFAULT_VALUE = 0.05
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_55
+
+      [CONSTANT_56]
+         SYMBOL = 'Ka'
+         ID = 77
+         DESCRIPTION = 'Ka, Areation rate, 1/d'
+         ONLINE_HELP = 'Ka Online help'
+         DOCUMENTATION = 'Ka Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         DEFAULT_VALUE = 1.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_56
+
+      [CONSTANT_57]
+         SYMBOL = 'vo'
+         ID = 78
+         DESCRIPTION = 'vo,  O2:C ratio Production/consumption, g DO/g C'
+         ONLINE_HELP = 'vo Online help'
+         DOCUMENTATION = 'vo Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g DO/g C'
+         DEFAULT_VALUE = 3.5
+         MIN_VALUE = 2.0
+         MAX_VALUE = 8.0
+      EndSect  // CONSTANT_57
+
+      [CONSTANT_58]
+         SYMBOL = 'kden'
+         ID = 79
+         DESCRIPTION = 'kden, Maximum de-nitrification, g N/m3/d'
+         ONLINE_HELP = 'kden Online help'
+         DOCUMENTATION = 'kden Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g N/m3/d'
+         DEFAULT_VALUE = 0.01
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_58
+
+      [CONSTANT_59]
+         SYMBOL = 'hno3'
+         ID = 80
+         DESCRIPTION = 'hno3, Half saturation NO3 conc. for denitrification, g N/m3'
+         ONLINE_HELP = 'hno3 Online help'
+         DOCUMENTATION = 'hno3 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g N/m3'
+         DEFAULT_VALUE = 0.05
+         MIN_VALUE = 0.0
+         MAX_VALUE = 0.5
+      EndSect  // CONSTANT_59
+
+      [CONSTANT_60]
+         SYMBOL = 'mdo3'
+         ID = 81
+         DESCRIPTION = 'mdo3, DO half-saturation concentration, g DO/m3'
+         ONLINE_HELP = 'mdo3 Online help'
+         DOCUMENTATION = 'mdo3 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g DO/m3'
+         DEFAULT_VALUE = 2.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 8.0
+      EndSect  // CONSTANT_60
+
+      [CONSTANT_61]
+         SYMBOL = 'ksb'
+         ID = 82
+         DESCRIPTION = 'ksb, Half saturation DO conc for denitrification, g DO/m3'
+         ONLINE_HELP = 'ksb Online help'
+         DOCUMENTATION = 'ksb Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g DO/m3'
+         DEFAULT_VALUE = 2.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 8.0
+      EndSect  // CONSTANT_61
+
+      [CONSTANT_62]
+         SYMBOL = 'hudc'
+         ID = 83
+         DESCRIPTION = 'hudc,  Dissolved org. C half saturation concentration  for denitrification, g C/m3'
+         ONLINE_HELP = 'hudc Online help'
+         DOCUMENTATION = 'hudc Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g C/m3'
+         DEFAULT_VALUE = 0.2
+         MIN_VALUE = 0.0
+         MAX_VALUE = 100.0
+      EndSect  // CONSTANT_62
+
+      [CONSTANT_63]
+         SYMBOL = 'krsoc1'
+         ID = 84
+         DESCRIPTION = 'krsoc1, fraction of minSOC & rson to resp & SNH, n.u'
+         ONLINE_HELP = 'krsoc1 Online help'
+         DOCUMENTATION = 'krsoc1 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         DEFAULT_VALUE = 0.75
+         MIN_VALUE = 0.0
+         MAX_VALUE = 1.0
+      EndSect  // CONSTANT_63
+
+   EndSect  // CONSTANTS
+
+   [FORCINGS]
+      DESCRIPTION = ''
+      ONLINE_HELP = ''
+      DOCUMENTATION = ''
+      [FORCING_1]
+         SYMBOL = 'Temp_she'
+         ID = 85
+         DESCRIPTION = 'Temp_she, Temperature from MIKE SHE, deg'
+         ONLINE_HELP = 'Forcing_1 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'NO'
+         BUILT_IN_ID = 55
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'auto'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -100000000.0
+         MAX_VALUE = 100000000.0
+      EndSect  // FORCING_1
+
+      [FORCING_2]
+         SYMBOL = 'Temp_atm_not_used'
+         ID = 86
+         DESCRIPTION = 'Temp_atm, Athmospheric temperature, deg'
+         ONLINE_HELP = 'Forcing_2 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -30.0
+         MAX_VALUE = 100.0
+      EndSect  // FORCING_2
+
+      [FORCING_3]
+         SYMBOL = 'Temp_soil'
+         ID = 87
+         DESCRIPTION = 'Temp_soil, Soil temperature, deg'
+         ONLINE_HELP = 'Forcing_5 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'NO'
+         BUILT_IN_ID = 55
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'auto'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -100000000.0
+         MAX_VALUE = 100000000.0
+      EndSect  // FORCING_3
+
+      [FORCING_4]
+         SYMBOL = 'ios_she'
+         ID = 88
+         DESCRIPTION = 'ios, Surface light, W/m2'
+         ONLINE_HELP = 'ios Online help'
+         DOCUMENTATION = 'ios Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'NO'
+         BUILT_IN_ID = 55
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'auto'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -100000000.0
+         MAX_VALUE = 100000000.0
+      EndSect  // FORCING_4
+
+      [FORCING_5]
+         SYMBOL = 'ios_eco_not_used'
+         ID = 89
+         DESCRIPTION = 'ios_eco, Surface light for hourly calculations, Watt/m2'
+         ONLINE_HELP = 'Forcing_4 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'W/m2'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 3000.0
+      EndSect  // FORCING_5
+
+      [FORCING_6]
+         SYMBOL = 'SM'
+         ID = 90
+         DESCRIPTION = 'SM, Unsaturated zone water content, %'
+         ONLINE_HELP = 'Forcing_6 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'NO'
+         BUILT_IN_ID = 55
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'auto'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -100000000.0
+         MAX_VALUE = 100000000.0
+      EndSect  // FORCING_6
+
+      [FORCING_7]
+         SYMBOL = 'dt'
+         ID = 91
+         DESCRIPTION = 'dt, MIKE SHE time step, s'
+         ONLINE_HELP = 'dt Online help'
+         DOCUMENTATION = 'dt Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'NO'
+         BUILT_IN_ID = 55
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'auto'
+         DEFAULT_VALUE = 0.0
+         MIN_VALUE = -100000000.0
+         MAX_VALUE = 100000000.0
+      EndSect  // FORCING_7
+
+      [FORCING_8]
+         SYMBOL = 'eco_depth'
+         ID = 92
+         DESCRIPTION = 'eco_depth'
+         ONLINE_HELP = 'Forcing_8 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'm'
+         DEFAULT_VALUE = 5.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 12000.0
+      EndSect  // FORCING_8
+
+      [FORCING_9]
+         SYMBOL = 'P'
+         ID = 93
+         DESCRIPTION = 'P, Athmpspheric pressure, hPa'
+         ONLINE_HELP = 'P Online help'
+         DOCUMENTATION = 'P Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         IS_USER_SPECIFIED = 'YES'
+         BUILT_IN_ID = -1
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'hPa'
+         DEFAULT_VALUE = 1013.0
+         MIN_VALUE = 0.0
+         MAX_VALUE = 2000.0
+      EndSect  // FORCING_9
+
+   EndSect  // FORCINGS
+
+   [AUXILIARY_VARIABLES]
+      DESCRIPTION = ''
+      ONLINE_HELP = ''
+      DOCUMENTATION = ''
+      [AUXILIARY_VARIABLE_1]
+         SYMBOL = 'dz'
+         ID = 94
+         DESCRIPTION = 'dz, depth of the layer, m'
+         ONLINE_HELP = 'Auxiliary_24 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'm'
+         EXPRESSION = '"(d_cell_bottom-d_cell_top)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_1
+
+      [AUXILIARY_VARIABLE_2]
+         SYMBOL = 'pwv'
+         ID = 95
+         DESCRIPTION = 'pwv, pore water volume, m3/m2'
+         ONLINE_HELP = 'pwv Online help'
+         DOCUMENTATION = 'pwv Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'm3/m2'
+         EXPRESSION = '"POR*SM*dz"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_2
+
+      [AUXILIARY_VARIABLE_3]
+         SYMBOL = 'pav'
+         ID = 96
+         DESCRIPTION = 'pav, pore volume occupied by air, m3/m2'
+         ONLINE_HELP = 'pav Online help'
+         DOCUMENTATION = 'pav Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'm3/m2'
+         EXPRESSION = '"POR*(1-SM)*dz"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_3
+
+      [AUXILIARY_VARIABLE_4]
+         SYMBOL = 'lcd'
+         ID = 97
+         DESCRIPTION = 'lcd, layer center depth, m'
+         ONLINE_HELP = 'Auxiliary_27 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'm'
+         EXPRESSION = '"d_cell_top+dz/2"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_4
+
+      [AUXILIARY_VARIABLE_5]
+         SYMBOL = 'cell_d_bot'
+         ID = 98
+         DESCRIPTION = 'cell_d_bot, Depth of cell bottom, mm'
+         ONLINE_HELP = 'Auxiliary_28 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'mm'
+         EXPRESSION = '"(dz+0.25)*1000"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_5
+
+      [AUXILIARY_VARIABLE_6]
+         SYMBOL = 'help_RD'
+         ID = 99
+         DESCRIPTION = 'help_RD'
+         ONLINE_HELP = 'Auxiliary_26 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"(LAI_2D/(max_LAI*0.01+LAI_2D))"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_6
+
+      [AUXILIARY_VARIABLE_7]
+         SYMBOL = 'rear_fraction'
+         ID = 100
+         DESCRIPTION = 'rear_fraction, fraction of the current layer contriubting to the reaeration layer, nu'
+         ONLINE_HELP = 'Auxiliary_29 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'degree C'
+         EXPRESSION = '"max(0, min(dz, (0.5*dz)-lcd+aeration_depth)/dz)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_7
+
+      [AUXILIARY_VARIABLE_8]
+         SYMBOL = 'test_soil_temp_at_RD'
+         ID = 101
+         DESCRIPTION = 'test_soil_temp_at_RD'
+         ONLINE_HELP = 'Auxiliary_25 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"0"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_8
+
+      [AUXILIARY_VARIABLE_9]
+         SYMBOL = 'temp_AT'
+         ID = 102
+         DESCRIPTION = 'temp_AT, what air temperature to use MIKE_SHE or atm forcing, deg'
+         ONLINE_HELP = 'temp Online help'
+         DOCUMENTATION = 'temp Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg'
+         EXPRESSION = '"Temp_she
+
+/*IF(sel_temp>0, Temp_she,Temp_soil)*/"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_9
+
+      [AUXILIARY_VARIABLE_10]
+         SYMBOL = 'alfa'
+         ID = 103
+         DESCRIPTION = 'alfa. calculate alfa fot temperature smoothing, nu'
+         ONLINE_HELP = 'alfa Online help'
+         DOCUMENTATION = 'alfa Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         EXPRESSION = '"2/(no_ts+1)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_10
+
+      [AUXILIARY_VARIABLE_11]
+         SYMBOL = 'acc_ts'
+         ID = 104
+         DESCRIPTION = 'acc_ts, accumulated ts, s'
+         ONLINE_HELP = 'acc_ts Online help'
+         DOCUMENTATION = 'acc_ts Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 's'
+         EXPRESSION = '"SAVE(1,dt+ load(1))"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_11
+
+      [AUXILIARY_VARIABLE_12]
+         SYMBOL = 'ts'
+         ID = 105
+         DESCRIPTION = 'ts Description'
+         ONLINE_HELP = 'ts Online help'
+         DOCUMENTATION = 'ts Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"86400/dt"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_12
+
+      [AUXILIARY_VARIABLE_13]
+         SYMBOL = 'sm_T_atm'
+         ID = 106
+         DESCRIPTION = 'sm_T_atm, smoothing of air temperature, deg'
+         ONLINE_HELP = 'temp_smooth Online help'
+         DOCUMENTATION = 'temp_smooth Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg'
+         EXPRESSION = '"SMOOTHING_AVERAGE(temp_AT,alfa)
+
+/*SMOOTHING_AVERAGE(temp_AT, alfa)    if (acc_ts<no_ts*dt, temp_AT,SMOOTHING_AVERAGE(temp_AT,alfa))*/"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_13
+
+      [AUXILIARY_VARIABLE_14]
+         SYMBOL = 'ios_unit'
+         ID = 107
+         DESCRIPTION = 'ios_unit, converting light units, E/m2/d'
+         ONLINE_HELP = 'ios_unit Online help'
+         DOCUMENTATION = '(ios_eco*86400/1000) /*conversion to kJ/m2/d*/ *VisibleLightFraction*(1/wave550energy) /*convert to mol/(m2*d)*/'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'E/m2/d'
+         EXPRESSION = '"ios_she*86400 /1000/*conversion to kJ/m2/d*/ *VisibleLightFraction*(1/wave550energy) /*convert to mol/(m2*d)*/"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_14
+
+      [AUXILIARY_VARIABLE_15]
+         SYMBOL = 'io'
+         ID = 108
+         DESCRIPTION = 'io, Available light for growth corrected fro LAI, E/m2/d'
+         ONLINE_HELP = 'ios0 Online help'
+         DOCUMENTATION = 'ios0 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'E/m2/d'
+         EXPRESSION = '"ios_unit*(1-EXP(-k_lai*LAI_2D))"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_15
+
+      [AUXILIARY_VARIABLE_16]
+         SYMBOL = 'myte'
+         ID = 109
+         DESCRIPTION = 'myte, temperature dependency for growth, nu'
+         ONLINE_HELP = 'myte Online help'
+         DOCUMENTATION = 'myte Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         EXPRESSION = '"If ( temp_AT>tmax, LASSITER(lasa,mabce,topt,tmax,tmax), LASSITER(lasa,mabce,topt,tmax,temp_AT))"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_16
+
+      [AUXILIARY_VARIABLE_17]
+         SYMBOL = 'r_d'
+         ID = 110
+         DESCRIPTION = 'r_d, Relative day lenght, nu'
+         ONLINE_HELP = 'Auxiliary_4 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         EXPRESSION = '"RELATIVE_DAYLENGTH(YEAR(),MONTH(),DAY(),latitu)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_17
+
+      [AUXILIARY_VARIABLE_18]
+         SYMBOL = 'ihb'
+         ID = 111
+         DESCRIPTION = 'ihb, light inhibition for bc at 20 degrees, E/m2/d'
+         ONLINE_HELP = 'ihb Online help'
+         DOCUMENTATION = 'ihb Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'E/m2/d'
+         EXPRESSION = '"ihb20*POW(tetl,(temp_AT-20))"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_18
+
+      [AUXILIARY_VARIABLE_19]
+         SYMBOL = 'ikb'
+         ID = 112
+         DESCRIPTION = 'ikb, light saturation level for growth, E/m2/d'
+         ONLINE_HELP = 'ikb Online help'
+         DOCUMENTATION = 'ikb Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'E/m2/d'
+         EXPRESSION = '"ike20*POW(tetk,temp_AT-20)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_19
+
+      [AUXILIARY_VARIABLE_20]
+         SYMBOL = 'icb'
+         ID = 113
+         DESCRIPTION = 'icb, Compenstation light function correction to temperature, E/m2/d'
+         ONLINE_HELP = 'icb Online help'
+         DOCUMENTATION = 'icb Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'µE/m2/s'
+         EXPRESSION = '"icb20*POW(tetk,temp_AT-20)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_20
+
+      [AUXILIARY_VARIABLE_21]
+         SYMBOL = 'myi'
+         ID = 114
+         DESCRIPTION = 'myi, light availability for growth of BC, nu'
+         ONLINE_HELP = 'myi Online help'
+         DOCUMENTATION = 'myi Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         EXPRESSION = '"IF (io>ihb) THEN MAX(0, (1-(io-ihb)/(ikb-icb))) ELSE MAX(0,(MIN(io,ikb)-icb)/(ikb-icb))"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_21
+
+      [AUXILIARY_VARIABLE_22]
+         SYMBOL = 'estimate_LAI_1'
+         ID = 115
+         DESCRIPTION = 'estimate_LAI_1, LAI estimation based on above ground biomass, nu'
+         ONLINE_HELP = 'estimate_LAI Online help'
+         DOCUMENTATION = 'estimate_LAI Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         EXPRESSION = '"IF(BCa_2D<=0 || BCc>0,0, max_LAI/(1+EXP(-0.01013*(BCa_2D-212.93))))"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_22
+
+      [AUXILIARY_VARIABLE_23]
+         SYMBOL = 'fLAI'
+         ID = 116
+         DESCRIPTION = 'fLAL, LAI limitation to growth rates, nu'
+         ONLINE_HELP = 'fLAI Online help'
+         DOCUMENTATION = 'fLAI Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         EXPRESSION = '"(POW(kmLAI,n)/(POW(kmLAI,n)+POW(LAI_2D,n)))*IF(BCc>0,0,1)
+
+
+/*(LAI_2D/(max_LAI*0.001+LAI_2D))*/"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_23
+
+      [AUXILIARY_VARIABLE_24]
+         SYMBOL = 'fLAI_r'
+         ID = 117
+         DESCRIPTION = 'fLAI_r, LAI limitation for respiration and death'
+         ONLINE_HELP = 'fLAIg Online help'
+         DOCUMENTATION = 'fLAIg Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"(LAI_2D/(max_LAI*0.1+LAI_2D))"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_24
+
+      [AUXILIARY_VARIABLE_25]
+         SYMBOL = 'fbd'
+         ID = 118
+         DESCRIPTION = 'fbd, soil bulk density effect on root growth, nu'
+         ONLINE_HELP = 'fbd Online help'
+         DOCUMENTATION = 'fbd Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         EXPRESSION = '"MIN(1,EXP(-4.3*(density-1.3)))"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_25
+
+      [AUXILIARY_VARIABLE_26]
+         SYMBOL = 're_cor'
+         ID = 119
+         DESCRIPTION = 're_cor, Root elongation rate correcton for limiting factors, m/d'
+         ONLINE_HELP = 're_cor Online help'
+         DOCUMENTATION = 're_cor Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'm/d'
+         EXPRESSION = '"krd*fbd *IF(BCb_2D>0,1,0)*(1-(LAI_2D/max_LAI))*IF(Temp_soil >5,1,0)
+
+
+/*krd*(1-(BCb_2D/(1000+BCb_2D)))*fbd *IF(BCb_2D>0,1,0)*fLAI_r*/
+
+/* Temperature?? Add water limitation*/"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_26
+
+      [AUXILIARY_VARIABLE_27]
+         SYMBOL = 'rcrop0'
+         ID = 120
+         DESCRIPTION = 'rcrop0, below : above ground ratio corrected for environmental conditions, nu'
+         ONLINE_HELP = 'rcrop0 Online help'
+         DOCUMENTATION = 'rcrop0 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         EXPRESSION = '"rcrop /*affected by fertilization, water content and soil conditions ?*/"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_27
+
+      [AUXILIARY_VARIABLE_28]
+         SYMBOL = 'kgrmbc0'
+         ID = 121
+         DESCRIPTION = 'kgrmbc0, Seed germination rate corrected for temperature and soil moisture, 1/d'
+         ONLINE_HELP = 'germBCs_no0 Online help'
+         DOCUMENTATION = 'germBCs_no0 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '1/d'
+         EXPRESSION = '"kgrmbc*MAX(0,LASSITER(0.8,1,topt_g,Ltg,Temp_soil))/**MAX(0,LASSITER(0.6,1,SMopt_g,Lsm,SM))*/"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_28
+
+      [AUXILIARY_VARIABLE_29]
+         SYMBOL = 'dayno'
+         ID = 122
+         DESCRIPTION = 'dayno, Day number, no'
+         ONLINE_HELP = 'dayno Online help'
+         DOCUMENTATION = 'dayno Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'no'
+         EXPRESSION = '"DAYNUMBER(YEAR(),MONTH(),DAY())"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_29
+
+      [AUXILIARY_VARIABLE_30]
+         SYMBOL = 'bn_bc_a'
+         ID = 123
+         DESCRIPTION = 'bn_bc_a, above ground N_C ratio, gN/gC'
+         ONLINE_HELP = 'bn_a_bc_a Online help'
+         DOCUMENTATION = 'bn_a_bc_a Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gN/gC'
+         EXPRESSION = '"IF(BCa_2D>0, MAX(0,BNa_2D/BCa_2D), 0)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_30
+
+      [AUXILIARY_VARIABLE_31]
+         SYMBOL = 'bn_bc_b'
+         ID = 124
+         DESCRIPTION = 'bn_bc_b, below ground N_C ratio, gN/gC'
+         ONLINE_HELP = 'Auxiliary_26 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gN/gC'
+         EXPRESSION = '"IF(BCb_2D>0, MAX(0,BNb_2D/BCb_2D), 0)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_31
+
+      [AUXILIARY_VARIABLE_32]
+         SYMBOL = 'sno3_m2'
+         ID = 125
+         DESCRIPTION = 'sno3_m2, nitrate per area,  g/m2'
+         ONLINE_HELP = 'Auxiliary_31 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g/m2'
+         EXPRESSION = '"NO3*pwv"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_32
+
+      [AUXILIARY_VARIABLE_33]
+         SYMBOL = 'snh4_m2'
+         ID = 126
+         DESCRIPTION = 'snh4_m2, ammoia per area, g/m2'
+         ONLINE_HELP = 'Auxiliary_32 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g/m2'
+         EXPRESSION = '"0"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_33
+
+      [AUXILIARY_VARIABLE_34]
+         SYMBOL = 'layer_fraction'
+         ID = 127
+         DESCRIPTION = 'surf_layer_fraction, surface layer fraction, nu'
+         ONLINE_HELP = 'Auxiliary_33 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'nu'
+         EXPRESSION = '"max(0, min(dz, (0.5*dz)-lcd + RD_2D/1000)/dz)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_34
+
+      [AUXILIARY_VARIABLE_35]
+         SYMBOL = 'son_soc'
+         ID = 128
+         DESCRIPTION = 'son_soc, sediment N:C ratio, gN/gC'
+         ONLINE_HELP = 'son_soc Online help'
+         DOCUMENTATION = 'son_soc Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"IF(SOC>0,SON/SOC, 0)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_35
+
+      [AUXILIARY_VARIABLE_36]
+         SYMBOL = 'SOC0'
+         ID = 129
+         DESCRIPTION = 'SOC0, SOC above 0, gC/m3'
+         ONLINE_HELP = 'SOC0 Online help'
+         DOCUMENTATION = 'SOC0 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m3'
+         EXPRESSION = '"MAX(SOC,0)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_36
+
+      [AUXILIARY_VARIABLE_37]
+         SYMBOL = 'AIR'
+         ID = 130
+         DESCRIPTION = 'AIR, Concentration of Oxygen in Air corrected for pressure and temperature, g/m3'
+         ONLINE_HELP = 'AIR Online help'
+         DOCUMENTATION = 'AIR Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g/m3'
+         EXPRESSION = '"(0.2095*32*P*100)/(8.314*(Temp_soil+273.15))"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_37
+
+      [AUXILIARY_VARIABLE_38]
+         SYMBOL = 'csair'
+         ID = 131
+         DESCRIPTION = 'csair,  Dissolved oxygen saturation concentration, g DO/m3'
+         ONLINE_HELP = 'csair Online help'
+         DOCUMENTATION = 'csair Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g DO/m3'
+         EXPRESSION = '"OXYGENSATURATION(0,Temp_soil)"'
+         CALCULATION_TYPE = 'STANDARD'
+      EndSect  // AUXILIARY_VARIABLE_38
+
+   EndSect  // AUXILIARY_VARIABLES
+
+   [PROCESSES]
+      DESCRIPTION = ''
+      ONLINE_HELP = ''
+      DOCUMENTATION = ''
+      [PROCESS_1]
+         SYMBOL = 'prcr'
+         ID = 132
+         DESCRIPTION = 'prcr, crop production, gC/m2/d'
+         ONLINE_HELP = 'prcr Online help'
+         DOCUMENTATION = 'prcr Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m2/d'
+         EXPRESSION = '"BCa_2D*kcrop*IF(sm_T_atm>=opt_crop,1,0) /*what limits and increases crop production rate, temp? light? rain?*/
+
+/*IF(LAI>=max_LAI*0.95  || LAI==0  ,BCa_2D*kcrop*IF(sm_T_atm>=opt_crop,1,0),0)*/"'
+      EndSect  // PROCESS_1
+
+      [PROCESS_2]
+         SYMBOL = 'prcrn'
+         ID = 133
+         DESCRIPTION = 'prcrn,  crop production, gN/m2/d'
+         ONLINE_HELP = 'prcrn Online help'
+         DOCUMENTATION = 'prcrn Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gN/m2/d'
+         EXPRESSION = '"prcr*bn_bc_a"'
+      EndSect  // PROCESS_2
+
+      [PROCESS_3]
+         SYMBOL = 'bc_growth'
+         ID = 134
+         DESCRIPTION = 'bc_growth, Total crop growth, gC/m2/d'
+         ONLINE_HELP = 'bc_growth Online help'
+         DOCUMENTATION = 'bc_growth Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m2/d'
+         EXPRESSION = '"mybc*myte*myi*BCa_2D*r_d*fLAI"'
+      EndSect  // PROCESS_3
+
+      [PROCESS_4]
+         SYMBOL = 'prbc_a'
+         ID = 135
+         DESCRIPTION = 'prbc_a, above ground biomass carbon production, g C/m2/d'
+         ONLINE_HELP = 'prbc Online help'
+         DOCUMENTATION = 'prbc Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m2/d'
+         EXPRESSION = '"bc_growth*rcrop0"'
+      EndSect  // PROCESS_4
+
+      [PROCESS_5]
+         SYMBOL = 'rebc_a'
+         ID = 136
+         DESCRIPTION = 'rebc_a, Crop above cround biomass respiration, gC/m2/d'
+         ONLINE_HELP = 'rebc_a Online help'
+         DOCUMENTATION = 'rebc_a Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m2/d'
+         EXPRESSION = '"((1-r_d)*rbma_d*POW(tetb,(temp_AT-20))+r_d*rbma_l*POW(tetb,(temp_AT-20))) *BCa_2D*fLAI_r"'
+      EndSect  // PROCESS_5
+
+      [PROCESS_6]
+         SYMBOL = 'debc_a'
+         ID = 137
+         DESCRIPTION = 'debc_a, death of above ground biomass C, gC/m2/d'
+         ONLINE_HELP = 'debc_a Online help'
+         DOCUMENTATION = 'debc_a Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m2/d'
+         EXPRESSION = '"BCa_2D*kdebc*fLAI"'
+      EndSect  // PROCESS_6
+
+      [PROCESS_7]
+         SYMBOL = 'prbn_a'
+         ID = 138
+         DESCRIPTION = 'prbn_a, above ground biomass nitrogen production, g N/m2/d'
+         ONLINE_HELP = 'prbn_a Online help'
+         DOCUMENTATION = 'prbn_a Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g N/m2/d'
+         EXPRESSION = '"prbc_a*bn_bc_a"'
+      EndSect  // PROCESS_7
+
+      [PROCESS_8]
+         SYMBOL = 'rebn_a'
+         ID = 139
+         DESCRIPTION = 'rebn_a, respiration of above ground biomass N, gN/m2/d'
+         ONLINE_HELP = 'rebn_a Online help'
+         DOCUMENTATION = 'rebn_a Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gN/m2/d'
+         EXPRESSION = '"rebc_a*bn_bc_a"'
+      EndSect  // PROCESS_8
+
+      [PROCESS_9]
+         SYMBOL = 'debn_a'
+         ID = 140
+         DESCRIPTION = 'debn_a, death of above ground biomass N, gN/m2/d'
+         ONLINE_HELP = 'debn_a Online help'
+         DOCUMENTATION = 'debn_a Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gN/m2/d'
+         EXPRESSION = '"debc_a*bn_bc_a"'
+      EndSect  // PROCESS_9
+
+      [PROCESS_10]
+         SYMBOL = 'prbc_b'
+         ID = 141
+         DESCRIPTION = 'prbc_b, Below ground biomass growth, gC/m2/d'
+         ONLINE_HELP = 'Process_10 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m2/d'
+         EXPRESSION = '"bc_growth*(1-rcrop0)"'
+      EndSect  // PROCESS_10
+
+      [PROCESS_11]
+         SYMBOL = 'rebc_b'
+         ID = 142
+         DESCRIPTION = 'rebc_b, crop below ground respiration rate'
+         ONLINE_HELP = 'rebc_b Online help'
+         DOCUMENTATION = 'rebc_b Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"((1-r_d)*rbma_d*POW(tetb,(Temp_soil-20))+r_d*rbma_l*POW(tetb,(Temp_soil-20))) *BCb_2D*fLAI_r"'
+      EndSect  // PROCESS_11
+
+      [PROCESS_12]
+         SYMBOL = 'debc_b'
+         ID = 143
+         DESCRIPTION = 'debc_b, death of below ground biomass, gC/m2/d'
+         ONLINE_HELP = 'debc_b Online help'
+         DOCUMENTATION = 'debc_b Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m2/d'
+         EXPRESSION = '"BCb_2D*kdebc"'
+      EndSect  // PROCESS_12
+
+      [PROCESS_13]
+         SYMBOL = 'prbn_b'
+         ID = 144
+         DESCRIPTION = 'prbn_b, below ground biomass nitrogen production, g N/m2/d'
+         ONLINE_HELP = 'prbn_b Online help'
+         DOCUMENTATION = 'prbn_b Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"prbc_b * bn_bc_b"'
+      EndSect  // PROCESS_13
+
+      [PROCESS_14]
+         SYMBOL = 'rebn_b'
+         ID = 145
+         DESCRIPTION = 'rebn_b, respiration of below ground biomass N, gN/m2/d'
+         ONLINE_HELP = 'rebn_b Online help'
+         DOCUMENTATION = 'rebn_b Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"rebc_b * bn_bc_b"'
+      EndSect  // PROCESS_14
+
+      [PROCESS_15]
+         SYMBOL = 'debn_b'
+         ID = 146
+         DESCRIPTION = 'debn_b, death of below ground biomass N, gN/m2/d'
+         ONLINE_HELP = 'debn_b Online help'
+         DOCUMENTATION = 'debn_b Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"debc_b*bn_bc_b"'
+      EndSect  // PROCESS_15
+
+      [PROCESS_16]
+         SYMBOL = 'rebn_m3'
+         ID = 147
+         DESCRIPTION = 'rebn_m3 Description'
+         ONLINE_HELP = 'rebn_m3 Online help'
+         DOCUMENTATION = 'rebn_m3 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"(rebn_a+rebn_b)*pwv"'
+      EndSect  // PROCESS_16
+
+      [PROCESS_17]
+         SYMBOL = 'germBCs_no'
+         ID = 148
+         DESCRIPTION = 'germBCs_no, seed germination rate, 1/d'
+         ONLINE_HELP = 'germBCs_no Online help'
+         DOCUMENTATION = 'germBCs_no Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '1/d'
+         EXPRESSION = '"If(Temp_soil>=kgrmt && BCs>=1  && dayno>=sowing, kgrmbc0*BCs, 0)"'
+      EndSect  // PROCESS_17
+
+      [PROCESS_18]
+         SYMBOL = 'germBCs'
+         ID = 149
+         DESCRIPTION = 'germBCs, total mass of germinated seeds, gC/m2/d'
+         ONLINE_HELP = 'germBCS Online help'
+         DOCUMENTATION = 'germBCS Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g/m2/d'
+         EXPRESSION = '"germBCs_no*seed_mass"'
+      EndSect  // PROCESS_18
+
+      [PROCESS_19]
+         SYMBOL = 'germBCs_a'
+         ID = 150
+         DESCRIPTION = 'germBCs_a, rate of above ground seed germination, gC/m2/d'
+         ONLINE_HELP = 'germBCs_a Online help'
+         DOCUMENTATION = 'germBCs_a Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m2/d'
+         EXPRESSION = '"germBCs*rcrop0"'
+      EndSect  // PROCESS_19
+
+      [PROCESS_20]
+         SYMBOL = 'germBNs_a'
+         ID = 151
+         DESCRIPTION = 'germBNs_a, rate of above ground seed germination, gN/m2/d'
+         ONLINE_HELP = 'germBNs_a Online help'
+         DOCUMENTATION = 'germBNs_a Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gN/m2/d'
+         EXPRESSION = '"germBCs_a*krsn"'
+      EndSect  // PROCESS_20
+
+      [PROCESS_21]
+         SYMBOL = 'germBCs_b'
+         ID = 152
+         DESCRIPTION = 'germBCs_b, rate of below ground ground seed germination, gC/m2/d'
+         ONLINE_HELP = 'germBCs_b Online help'
+         DOCUMENTATION = 'germBCs_b Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m2/d'
+         EXPRESSION = '"germBCs*(1-rcrop0)"'
+      EndSect  // PROCESS_21
+
+      [PROCESS_22]
+         SYMBOL = 'germBNs_b'
+         ID = 153
+         DESCRIPTION = 'germBNs_b, rate of below ground seed germination, gN/m2/d'
+         ONLINE_HELP = 'germBNs_b Online help'
+         DOCUMENTATION = 'germBNs_b Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gN/m2/d'
+         EXPRESSION = '"germBCs_b*krsn"'
+      EndSect  // PROCESS_22
+
+      [PROCESS_23]
+         SYMBOL = 'updateLAI_1'
+         ID = 154
+         DESCRIPTION = 'updateLAI_1, Update LAI calculation, 1/d'
+         ONLINE_HELP = 'updateLAI Online help'
+         DOCUMENTATION = 'updateLAI Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '1/d'
+         EXPRESSION = '"(estimate_LAI_1-LAI_2D)*86400/dt*IF(BCc>0,0,1)"'
+      EndSect  // PROCESS_23
+
+      [PROCESS_24]
+         SYMBOL = 'prrd'
+         ID = 155
+         DESCRIPTION = 'prrd, Root length increase rate, mm/d'
+         ONLINE_HELP = 'prrd Online help'
+         DOCUMENTATION = 'prrd Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'mm/d'
+         EXPRESSION = '"re_cor*(1+1.5*((max_rd*1000-RD_2D)/(max_rd*1000)))*1000*if(prbc_b>0,1,0)
+
+
+/*IF(RD_2D>=max_rd*1000,0,(1-EXP(-re_cor/max_rd))*1000)*/"'
+      EndSect  // PROCESS_24
+
+      [PROCESS_25]
+         SYMBOL = 'deLAI'
+         ID = 156
+         DESCRIPTION = 'deLAI, Decrease in LAI due to crop dring out and plants dying, 1/d'
+         ONLINE_HELP = 'deLAI Online help'
+         DOCUMENTATION = 'deLAI Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = '1/d'
+         EXPRESSION = '"if(BCc>0, LAI_2D*kdLAI,0)"'
+      EndSect  // PROCESS_25
+
+      [PROCESS_26]
+         SYMBOL = 'debc'
+         ID = 157
+         DESCRIPTION = 'debc Description'
+         ONLINE_HELP = 'debc Online help'
+         DOCUMENTATION = 'debc Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"0"'
+      EndSect  // PROCESS_26
+
+      [PROCESS_27]
+         SYMBOL = 'debn'
+         ID = 158
+         DESCRIPTION = 'debn Description'
+         ONLINE_HELP = 'debn Online help'
+         DOCUMENTATION = 'debn Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"0"'
+      EndSect  // PROCESS_27
+
+      [PROCESS_28]
+         SYMBOL = 'consolSOC'
+         ID = 159
+         DESCRIPTION = 'consolSOC, Consolidation of layer 1 to layer 2, SOC1-->SOC2, g C/m2/d'
+         ONLINE_HELP = 'consolSOC Online help'
+         DOCUMENTATION = 'consolSOC Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"IF SOC0>0 THEN SOC0*Trans ELSE 0"'
+      EndSect  // PROCESS_28
+
+      [PROCESS_29]
+         SYMBOL = 'minSOC'
+         ID = 160
+         DESCRIPTION = 'minSOC, Mineralisation of sediment organic C, gC/m2/d'
+         ONLINE_HELP = 'minSOC Online help'
+         DOCUMENTATION = 'minSOC Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gC/m2/d'
+         EXPRESSION = '"krsoc*SOC0*POW(tetn,Temp_soil-20)
+*MIN(1,MAX(0.0001,son_soc-knim)/(pnre-knim))"'
+      EndSect  // PROCESS_29
+
+      [PROCESS_30]
+         SYMBOL = 'rson'
+         ID = 161
+         DESCRIPTION = 'rson, Mineralisation of organic sediment N, g N/m2/d'
+         ONLINE_HELP = 'rson Online help'
+         DOCUMENTATION = 'rson Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g N/m2/d'
+         EXPRESSION = '"kmsn*minSOC*son_soc"'
+      EndSect  // PROCESS_30
+
+      [PROCESS_31]
+         SYMBOL = 'consolSON'
+         ID = 162
+         DESCRIPTION = 'consolSON, consolidation of SON, g N/m2/d'
+         ONLINE_HELP = 'consolSON Online help'
+         DOCUMENTATION = 'consolSON Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'SETTLING'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g N/m2/d'
+         EXPRESSION = '"son_soc*consolSOC"'
+      EndSect  // PROCESS_31
+
+      [PROCESS_32]
+         SYMBOL = 'rebnm3'
+         ID = 163
+         DESCRIPTION = 'rebnm3, Total N release from plants due to maitanence, mg/L'
+         ONLINE_HELP = 'rebnm3 Online help'
+         DOCUMENTATION = 'rebnm3 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"0"'
+      EndSect  // PROCESS_32
+
+      [PROCESS_33]
+         SYMBOL = 'upbn_b'
+         ID = 164
+         DESCRIPTION = 'upbn_b Description'
+         ONLINE_HELP = 'upbn_b Online help'
+         DOCUMENTATION = 'upbn_b Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"0"'
+      EndSect  // PROCESS_33
+
+      [PROCESS_34]
+         SYMBOL = 'rsnit'
+         ID = 165
+         DESCRIPTION = 'rsnit, Nitrification sediment, g N/m3/d'
+         ONLINE_HELP = 'rsnit Online help'
+         DOCUMENTATION = 'rsnit Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g N/m3/d'
+         EXPRESSION = '"if(NH4*knit*POW(tetn,Temp_soil-20)*(DO)/((DO)+0.01)*NH4/(NH4+hmt)>DO/4.57,DO/4.57,NH4*knit*POW(tetn,Temp_soil-20)*(DO)/((DO)+0.01)*NH4/(NH4+hmt))*IF (NH4>=0.00001,1 ,0)"'
+      EndSect  // PROCESS_34
+
+      [PROCESS_35]
+         SYMBOL = 'rdenit'
+         ID = 166
+         DESCRIPTION = 'rdenit, denitrification, gN/m3/d'
+         ONLINE_HELP = 'rdenit Online help'
+         DOCUMENTATION = 'rdenit Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'gN/m3/d'
+         EXPRESSION = '"IF DO < mdo3 && NO3>0.0001 THEN kden*POW(tetn,Temp_soil-20)*(ksb+0.1)
+
+/MAX(0.01,(ksb+0.1+DO))*NO3/MAX(0.001,(NO3+hno3))*(minSOC*0.75)/MAX(0.001,(minSOC*0.75+hudc))
+
+ ELSE 0"'
+      EndSect  // PROCESS_35
+
+      [PROCESS_36]
+         SYMBOL = 'feuno3'
+         ID = 167
+         DESCRIPTION = 'feuno3 Description'
+         ONLINE_HELP = 'feuno3 Online help'
+         DOCUMENTATION = 'feuno3 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"0"'
+      EndSect  // PROCESS_36
+
+      [PROCESS_37]
+         SYMBOL = 'fAir'
+         ID = 168
+         DESCRIPTION = 'fAir, Flux of Oxygen from air to arated pore volume, g/m3/d'
+         ONLINE_HELP = 'fAir Online help'
+         DOCUMENTATION = 'fAir Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'undefined'
+         EXPRESSION = '"if (rear_fraction < 0) then
+   (AIR-AO)*86400/dt /* pull to saturation concentration */
+else
+  rear_fraction* min(Ka, 86400/dt) * (AIR-AO) /*apply rate not exeeding saturation concentration , potentially add temperature dependency*/"'
+      EndSect  // PROCESS_37
+
+      [PROCESS_38]
+         SYMBOL = 'fDO'
+         ID = 169
+         DESCRIPTION = 'fDO, Flux between AO and DO, g/m3/d'
+         ONLINE_HELP = 'fDO Online help'
+         DOCUMENTATION = 'fDO Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g/m3/d'
+         EXPRESSION = '"Ka*(csair-DO)"'
+      EndSect  // PROCESS_38
+
+      [PROCESS_39]
+         SYMBOL = 'odsc'
+         ID = 170
+         DESCRIPTION = 'odsc. oxygen demand for mineralizarion, g DO/m3/d'
+         ONLINE_HELP = 'odsc Online help'
+         DOCUMENTATION = 'odsc Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g DO/m3/d'
+         EXPRESSION = '"vo*minSOC/dz"'
+      EndSect  // PROCESS_39
+
+      [PROCESS_40]
+         SYMBOL = 'rsnit2DO'
+         ID = 171
+         DESCRIPTION = 'rsnit2DO, oxygen used during nitrification, g DO/m3/d'
+         ONLINE_HELP = 'rsnit2DO Online help'
+         DOCUMENTATION = 'rsnit2DO Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g DO/m3/d'
+         EXPRESSION = '"rsnit*4.57"'
+      EndSect  // PROCESS_40
+
+      [PROCESS_41]
+         SYMBOL = 'update_tot_LAI'
+         ID = 172
+         DESCRIPTION = 'update_tot_LAI, update combined LAI for MIKE SHE, m2/m2/d'
+         ONLINE_HELP = 'update_tot_LAI Online help'
+         DOCUMENTATION = 'update_tot_LAI Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'm2/m2/d'
+         EXPRESSION = '"updateLAI_1"'
+      EndSect  // PROCESS_41
+
+      [PROCESS_42]
+         SYMBOL = 'update_tot_RD'
+         ID = 173
+         DESCRIPTION = 'update_tot_RD,  update combined RD for MIKE SHE, mm/d'
+         ONLINE_HELP = 'update_tot_RD Online help'
+         DOCUMENTATION = 'update_tot_RD Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'mm/d'
+         EXPRESSION = '"prrd"'
+      EndSect  // PROCESS_42
+
+      [PROCESS_43]
+         SYMBOL = 'rson2nh4'
+         ID = 174
+         DESCRIPTION = 'rson2nh4, rson to NH4, g N/m2/d'
+         ONLINE_HELP = 'rson2nh4 Online help'
+         DOCUMENTATION = 'rson2nh4 Documentation'
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         OUTPUT = 'YES'
+         PROCESS_TYPE = 'TRANSFORMATION'
+         SCOPE = 'WC'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'g N/m2/d'
+         EXPRESSION = '"rson*krsoc1/dz"'
+      EndSect  // PROCESS_43
+
+   EndSect  // PROCESSES
+
+   [DERIVED_OUTPUTS]
+      DESCRIPTION = ''
+      ONLINE_HELP = ''
+      DOCUMENTATION = ''
+      [DERIVED_OUTPUT_1]
+         ID = 175
+         DESCRIPTION = 'temp_she, Air Temparature from MIKE SHE forcing, deg'
+         ONLINE_HELP = 'Derived Output 1 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg'
+         FORMAT = 'INSTANTANEOUS'
+         EXPRESSION = '"Temp_she"'
+      EndSect  // DERIVED_OUTPUT_1
+
+      [DERIVED_OUTPUT_2]
+         ID = 176
+         DESCRIPTION = 'Temp_atm, Air temperature from ecolab forcing, deg'
+         ONLINE_HELP = 'Derived Output 2 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg'
+         FORMAT = 'INSTANTANEOUS'
+         EXPRESSION = '"Temp_atm_not_used"'
+      EndSect  // DERIVED_OUTPUT_2
+
+      [DERIVED_OUTPUT_3]
+         ID = 177
+         DESCRIPTION = 'Temp_soil, Soil temperature calculated by MIKE SHE, deg'
+         ONLINE_HELP = 'Derived Output 3 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'deg'
+         FORMAT = 'INSTANTANEOUS'
+         EXPRESSION = '"Temp_soil"'
+      EndSect  // DERIVED_OUTPUT_3
+
+      [DERIVED_OUTPUT_4]
+         ID = 178
+         DESCRIPTION = 'ios_she,Surface radiation from MIKE SHE, W/m2'
+         ONLINE_HELP = 'Derived Output 4 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'W/m2'
+         FORMAT = 'INSTANTANEOUS'
+         EXPRESSION = '"ios_she"'
+      EndSect  // DERIVED_OUTPUT_4
+
+      [DERIVED_OUTPUT_5]
+         ID = 179
+         DESCRIPTION = 'ios_eco, Surface radiation from ecolab forcing, W/m2'
+         ONLINE_HELP = 'Derived Output 5 Online help'
+         DOCUMENTATION = ''
+         EUM_TYPE = 999
+         EUM_UNIT = 0
+         SCOPE = 'NOT_SPECIFIED'
+         SPATIAL_VARIATION = 'HORISONTAL_AND_VERTICAL'
+         UNIT = 'W/m2'
+         FORMAT = 'INSTANTANEOUS'
+         EXPRESSION = '"ios_eco_not_used"'
+      EndSect  // DERIVED_OUTPUT_5
+
+   EndSect  // DERIVED_OUTPUTS
+
+   [STATE_VARIABLE_EQUATIONS]
+      [STATE_VARIABLE_EQUATION_1]
+         BCa_2D = '"prbc_a-rebc_a-debc_a+germBCs_a-prcr"'
+      EndSect  // STATE_VARIABLE_EQUATION_1
+
+      [STATE_VARIABLE_EQUATION_2]
+         BNa_2D = '"prbn_a-rebn_a-debn_a+germBNs_a-prcrn"'
+      EndSect  // STATE_VARIABLE_EQUATION_2
+
+      [STATE_VARIABLE_EQUATION_3]
+         BCb_2D = '"prbc_b-rebc_b-debc_b+germBCs_b"'
+      EndSect  // STATE_VARIABLE_EQUATION_3
+
+      [STATE_VARIABLE_EQUATION_4]
+         BNb_2D = '"prbn_b-rebn_b-debn_b+germBNs_b"'
+      EndSect  // STATE_VARIABLE_EQUATION_4
+
+      [STATE_VARIABLE_EQUATION_5]
+         BCc = '"prcr"'
+      EndSect  // STATE_VARIABLE_EQUATION_5
+
+      [STATE_VARIABLE_EQUATION_6]
+         BNc = '"0"'
+      EndSect  // STATE_VARIABLE_EQUATION_6
+
+      [STATE_VARIABLE_EQUATION_7]
+         BCs = '"-germBCs_no"'
+      EndSect  // STATE_VARIABLE_EQUATION_7
+
+      [STATE_VARIABLE_EQUATION_8]
+         LAI_2D = '"updateLAI_1-deLAI"'
+      EndSect  // STATE_VARIABLE_EQUATION_8
+
+      [STATE_VARIABLE_EQUATION_9]
+         RD_2D = '"prrd"'
+      EndSect  // STATE_VARIABLE_EQUATION_9
+
+      [STATE_VARIABLE_EQUATION_10]
+         SOC = '"debc-consolSOC-minSOC"'
+      EndSect  // STATE_VARIABLE_EQUATION_10
+
+      [STATE_VARIABLE_EQUATION_11]
+         SON = '"debn-rson-consolSON"'
+      EndSect  // STATE_VARIABLE_EQUATION_11
+
+      [STATE_VARIABLE_EQUATION_12]
+         NH4 = '"rebnm3-rsnit-upbn_b+rson2nh4"'
+      EndSect  // STATE_VARIABLE_EQUATION_12
+
+      [STATE_VARIABLE_EQUATION_13]
+         NO3 = '"rsnit-rdenit-feuno3"'
+      EndSect  // STATE_VARIABLE_EQUATION_13
+
+      [STATE_VARIABLE_EQUATION_14]
+         S_NO3 = '"0"'
+      EndSect  // STATE_VARIABLE_EQUATION_14
+
+      [STATE_VARIABLE_EQUATION_15]
+         S_NH4 = '"0"'
+      EndSect  // STATE_VARIABLE_EQUATION_15
+
+      [STATE_VARIABLE_EQUATION_16]
+         S_PWV = '"0"'
+      EndSect  // STATE_VARIABLE_EQUATION_16
+
+      [STATE_VARIABLE_EQUATION_17]
+         DO = '"fDO-odsc-rsnit2DO"'
+      EndSect  // STATE_VARIABLE_EQUATION_17
+
+      [STATE_VARIABLE_EQUATION_18]
+         AO = '"fAir-fDO"'
+      EndSect  // STATE_VARIABLE_EQUATION_18
+
+      [STATE_VARIABLE_EQUATION_19]
+         LAI = '"update_tot_LAI"'
+      EndSect  // STATE_VARIABLE_EQUATION_19
+
+      [STATE_VARIABLE_EQUATION_20]
+         RD = '"update_tot_RD"'
+      EndSect  // STATE_VARIABLE_EQUATION_20
+
+      [STATE_VARIABLE_EQUATION_21]
+         BCh_2D = '"0"'
+      EndSect  // STATE_VARIABLE_EQUATION_21
+
+   EndSect  // STATE_VARIABLE_EQUATIONS
+
+EndSect  // ECO_LAB_SETUP
+
+

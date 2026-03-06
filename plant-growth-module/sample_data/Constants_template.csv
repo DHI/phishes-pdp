@@ -1,0 +1,28 @@
+﻿speciesID,constant,value,type,,,,,,NOTE,,
+Clover-grass mixture (with a predominance of clovers),tmax,22,1,,,,,,"""speciesID"" shoudl match the land use class name; in a 'no-match' situation nothing happens.",,
+Winter wheat,tmax,22,1,,,,,,"""constant"" matches the constants in our PGM, there are several, and this implementation should be generic ('tmax' and 'topt' used as eg).",,
+Spring barley,tmax,16,1,,,,,,"""value"" is the constant value according to the plant species",,
+Mixture for nectar-producing fallow (eco-payment),tmax,25,1,,,,,,"""type"" is either 0 and 1, where 0 is uniform and 1 means map; if user sets 0 no map is produced.",,
+Clover-grass mixture (with a predominance of clovers),topt,18,1,,,,,,,,
+Winter wheat,topt,18,1,,,,,,Current list of Constants in the PGM is:,,
+Spring barley,topt,14,1,,,,,,sel_temp,k_lai,kmsn
+Mixture for nectar-producing fallow (eco-payment),topt,22,1,,,,,,mybc,VisibleLightFraction,krsoc
+,,,,,,,,,lasa,wave550energy,tetn
+,,,,,,,,,mabce,max_LAI,knim
+,,,,,,,,,topt,no_ts,pnre
+,,,,,,,,,tmax,kmLAI,Trans
+,,,,,,,,,seed_mass,n,knit
+,,,,,,,,,rbma_d,kcrop,hmt
+,,,,,,,,,rbma_l,krd,aeration_depth
+,,,,,,,,,tetb,kmrd,Ka
+,,,,,,,,,kgrmt,max_rd,vo
+,,,,,,,,,kgrmbc,opt_crop,kden
+,,,,,,,,,alfa_t,rcrop,hno3
+,,,,,,,,,latitu,kdLAI,mdo3
+,,,,,,,,,fac,topt_g,ksb
+,,,,,,,,,ihb20,Ltg,hudc
+,,,,,,,,,tetl,SMopt_g,krsoc1
+,,,,,,,,,ike20,Lsm,
+,,,,,,,,,tetk,sowing,
+,,,,,,,,,icb20,kdebc,
+,,,,,,,,,alfa_BC,krsn,

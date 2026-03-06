@@ -250,6 +250,8 @@ ModuleNotFoundError: No module named 'geopandas'
 ## 📖 Additional Documentation
 
 - **Technical Details**: See [DataDownloadTool.md](DataDownloadTool.md) for architecture and implementation
+- **Repository Design Specification**: See [DESIGN_SPEC_REPOSITORY.md](DESIGN_SPEC_REPOSITORY.md) for repository-level design as a subrepository
+- **Script Download Spec**: See [TECH_SPECS_SCRIPTS.md](TECH_SPECS_SCRIPTS.md) for script download requirements and design
 
 ---
 
