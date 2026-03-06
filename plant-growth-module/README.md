@@ -17,7 +17,8 @@ A tool for generating spatially distributed DFS2 maps for DHI's ECO Lab Plant Gr
 The Plant Growth Module processes:
 
 - **Land use spatial data** (DFS2 format) containing numeric codes for different land cover types
-- **Species classification** mapping land use codes to plant species names
+- **Land use classification** mapping land use codes to plant species names (with optional `Apply` flag)
+- **Soil profile spatial data** (DFS2 format) and soil profile classification
 - **Parameter templates** (CSV files) defining species-specific constants and initial conditions
 
 And generates:
@@ -31,7 +32,8 @@ And generates:
 - ✅ Batch processing mode for automation
 - ✅ Validation of all input files before processing
 - ✅ Support for multiple parameter templates
-- ✅ Spatial mapping based on land use classification
+- ✅ Spatial mapping based on land use and soil profile classification
+- ✅ `Apply=0` support to force selected land use classes to zero in generated landuse-based maps
 
 ---
 
@@ -104,7 +106,7 @@ This command will:
 5. **Workflow:**
    - **Step 0**: Edit file paths in the configuration cell
    - **Step 0.1**: Run setup and validation
-   - **Step 1**: Load land use data and create mapping
+   - **Step 1**: Load land use + soil profile data and create mappings
    - **Step 2**: Process templates and generate DFS2 maps
    - **Step 3**: Verify output files
 
@@ -150,7 +152,9 @@ jupyter notebook notebooks/plant_growth_module.ipynb
 ```
 plant-growth-module/
 ├── src/
-│   ├── pgm_helper.py                   # Helper functions
+│   └── plant_growth_module/
+│       ├── __init__.py                # Package entry point
+│       └── pgm_helper.py              # Helper functions
 ├── notebooks/
 │   ├── plant_growth_module.ipynb      # Main notebook
 ├── pyproject.toml                      # Project dependencies
@@ -183,6 +187,8 @@ plant-growth-module/
 - **Required columns** (case-insensitive, one of each type):
   - **Code column**: `CODE`, `VALUE`
   - **Class/Species column**: `CLASS`, `SPECIESID`
+- **Optional column**:
+  - **Apply column**: `APPLY` (set `0` to force all landuse-based variables to zero for that class)
 
 **Example:**
 
@@ -192,15 +198,28 @@ plant-growth-module/
 | 2    | Pine_Forest |
 | 3    | Grassland   |
 
-#### 3. Species Parameter Templates
+#### 3. Soil Profile Spatial Data + Classification
+
+**`SoilProfile_gridcodes.dfs2`** and **`SP_template.csv`**
+
+- Soil profile grid used for soilprofile-based initial conditions
+- `SP_template.csv` maps soil profile codes to soil profile IDs/classes
+- **Required columns** (case-insensitive):
+  - **Code column**: `CODE`, `VALUE`
+  - **Profile column**: `CLASS`, `SPECIESID`
+
+#### 4. Parameter Templates
 
 **`Constants_template.csv`**, **`InitConditions_template.csv`** (one or more files)
 
 - Define species-specific parameter values for each plant type
 - **Required columns** (case-insensitive, one of each type):
-  - **Species column**: `SPECIESID`, `SPECIES`, `ID`, `CLASS`
+  - **ID column**: `SPECIESID`, `SPECIES`, `ID`, `CLASS`
   - **Parameter/Variable column**: `CONSTANT`, `VARIABLE`, `KEY`, `NAME`, `PARAM`, `PARAMETER`
   - **Value column**: `VALUE`, `VAL`, `AMOUNT`
+- **Optional columns**:
+  - **Template/scope column**: `TEMPLATE` (values such as `landuse` or `soilprofile`)
+  - **Type column**: `TYPE` (`1` = generate map, `0` = skip)
 
 **Example:**
 
@@ -259,7 +278,7 @@ Configure these settings in the notebook's configuration cell (Step 0):
   - For example, if you have a column named `PlantType`, rename it to `SPECIESID` or `CLASS`
 
   **Option 2: Add support for new column names in the code**
-  - Open [src/pgm_helper.py](src/pgm_helper.py)
+  - Open [src/plant_growth_module/pgm_helper.py](src/plant_growth_module/pgm_helper.py)
   - Find the column name lists (e.g., `CODE_COLS`, `CLASS_COLS`, `SPECIES_COLS`, etc.)
   - Add your custom column name to the appropriate list
   - Example: If your file uses `PlantType`, add it to the `SPECIES_COLS` list
