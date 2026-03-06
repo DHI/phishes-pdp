@@ -1,5 +1,4 @@
 import geopandas as gpd
-import numpy as np
 import pytest
 import xarray as xr
 from shapely.geometry import LineString, Point, Polygon
