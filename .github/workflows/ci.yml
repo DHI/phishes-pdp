@@ -33,7 +33,7 @@ jobs:
       - name: Install tooling
         run: |
           python -m pip install --upgrade pip
-          pip install ruff black pytest
+          pip install ruff pytest
 
       - name: Install project (editable, no deps)
         if: ${{ hashFiles(format('{0}/pyproject.toml', matrix.dir)) != '' }}
@@ -49,10 +49,10 @@ jobs:
           cd "${{ matrix.dir }}"
           ruff check .
 
-      - name: Black (check)
+      - name: Ruff format (check)
         run: |
           cd "${{ matrix.dir }}"
-          black --check .
+          ruff format --check .
 
       - name: Pytest (if tests exist)
         if: ${{ hashFiles(format('{0}/**/test_*.py', matrix.dir), format('{0}/**/*_test.py', matrix.dir)) != '' }}
