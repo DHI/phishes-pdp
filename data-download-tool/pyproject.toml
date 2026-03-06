@@ -50,7 +50,7 @@ dependencies = [
 
 [project.optional-dependencies]
 jupyter = ["jupyter>=1.0.0", "ipywidgets>=8.0.0"]
-dev = ["pytest>=7.2.0", "flake8>=6.0.0", "ruff>=0.1.0"]
+dev = ["pytest>=7.2.0", "ruff>=0.1.0"]
 all = ["phishes-data-downloader[jupyter,dev]"]
 
 [dependency-groups]

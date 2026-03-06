@@ -26,12 +26,20 @@ def test_list_and_verify_structure(tmp_path):
     manager.create_structure()
 
     listed = manager.list_structure()
-    assert "a" in listed and "a\\b" in listed and "logs" in listed
+    listed_normalized = {path.replace("\\", "/") for path in listed}
+    assert (
+        "a" in listed_normalized
+        and "a/b" in listed_normalized
+        and "logs" in listed_normalized
+    )
 
     verified = manager.verify_structure()
-    assert verified["a"] is True
-    assert verified["a\\b"] is True
-    assert verified["logs"] is True
+    verified_normalized = {
+        key.replace("\\", "/"): value for key, value in verified.items()
+    }
+    assert verified_normalized["a"] is True
+    assert verified_normalized["a/b"] is True
+    assert verified_normalized["logs"] is True
 
 
 def test_create_pdp_folders_convenience(tmp_path):

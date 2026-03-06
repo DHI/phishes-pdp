@@ -106,7 +106,7 @@ Functions
 - remove_path_with_retry(path, max_retries=5, retry_delays=[0.5,1,2,3,5])
   - Removes files or folders with retry logic for Windows locks
 - build_dataset_path(project_base, category, subcategory, output_format="nc")
-  - Builds data/<category>/<subcategory>/<subcategory>.<ext>
+  - Builds `data/{category}/{subcategory}/{subcategory}.{ext}`
 - open_dataset_any(path)
   - Opens Zarr, NetCDF, or DFS2 based on extension
 - cleanup_existing_dataset(dataset_path, namespace=None, dataset_var_names=("ds","ds_downloaded"))

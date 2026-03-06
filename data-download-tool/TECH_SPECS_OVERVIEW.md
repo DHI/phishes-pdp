@@ -53,7 +53,7 @@ Inputs (configured in notebook):
 
 Outputs:
 
-- data/<category>/<subcategory>/<subcategory>.<ext>
+- `data/{category}/{subcategory}/{subcategory}.{ext}`
 - logs/download_log.json
 
 ## 7. Configuration and Defaults
