@@ -70,9 +70,10 @@ When a `speciesID` in a template CSV has no matching land use class name: **sile
 ### CSV Template Internals
 
 - `type` column in Constants/InitConditions templates: `0` = uniform value (no spatial map), `1` = generate spatial DFS2 map
-- The current notebook does **not** filter on the `type` column yet — all parameters get maps generated
+- Notebook filters on `type=1` when the `type` column is available
+- InitConditions supports scope routing (`template` column or fallback dictionary): `landuse` vs `soilprofile`
 
-## Module Documentation: `src/pgm_helper.py`
+## Module Documentation: `src/plant_growth_module/pgm_helper.py`
 
 ### Constants
 
@@ -80,11 +81,22 @@ When a `speciesID` in a template CSV has no matching land use class name: **sile
 # Land use mapping columns
 VAL_COLS   = ["CODE", "VALUE"]
 CLASS_COLS = ["CLASS", "SPECIESID"]
+APPLY_COLS = ["APPLY", "USE", "ACTIVE"]
 
 # Template file columns
 ID_COLS    = ["SPECIESID", "SPECIES", "ID", "CLASS"]
 VALUE_COLS = ["VALUE", "VAL", "AMOUNT"]
 KEY_COLS   = ["CONSTANT", "VARIABLE", "KEY", "NAME", "PARAM", "PARAMETER"]
+TEMPLATE_COLS = ["TEMPLATE", "SCOPE", "SOURCE"]
+TYPE_COLS     = ["TYPE", "MAPTYPE", "MAP"]
+
+STATE_VARIABLE_SCOPE = {
+    "BCa_2D": "landuse", "BNa_2D": "landuse", "BCb_2D": "landuse", "BNb_2D": "landuse",
+    "BCc": "landuse", "BNc": "landuse", "BCs": "landuse", "LAI_2D": "landuse", "RD_2D": "landuse",
+    "SOC": "soilprofile", "SON": "soilprofile", "NH4": "soilprofile", "NO3": "soilprofile",
+    "S_NO3": "soilprofile", "S_NH4": "soilprofile", "S_PWV": "soilprofile", "DO": "soilprofile",
+    "AO": "soilprofile", "LAI": "soilprofile", "RD": "soilprofile", "BCh_2D": "soilprofile",
+}
 ```
 
 ### Functions
@@ -112,7 +124,8 @@ def generate_dfs2_map(
     code_to_species: dict,          # {code_int: species_name}
     species_values: dict,           # {species_name: numeric_value}
     output_path: Path,              # output .dfs2 file path
-    variable_name: str              # DFS2 item name
+    variable_name: str,             # DFS2 item name
+    default_species_values: dict | None = None
 ) -> None:
     """Create a single-timestep DFS2 map:
     1. Init float32 grid of zeros (same shape as landuse_data)
@@ -120,6 +133,14 @@ def generate_dfs2_map(
     3. Wrap in mikeio.DataArray with source geometry/time
     4. Write DFS2 (suppresses 0-second time-step warning)
     """
+
+def split_lu_mapping_by_apply(
+    lu_df: pd.DataFrame,
+    code_col: str,
+    class_col: str,
+    apply_col: str | None = None,
+) -> tuple[dict, set]:
+    """Return code->class mapping and set of classes with Apply=0."""
 
 def validate_paths(
     landuse_dfs2: Path,
@@ -135,7 +156,7 @@ def validate_paths(
 ### Usage Example
 
 ```python
-from src.pgm_helper import (
+from plant_growth_module.pgm_helper import (
     VAL_COLS, CLASS_COLS, find_col, generate_dfs2_map, validate_paths,
 )
 
@@ -161,30 +182,30 @@ generate_dfs2_map(
 
 The notebook (`plant_growth_module.ipynb`) has 16 cells in this fixed order:
 
-| #   | Type     | Purpose                                                                                                               |
-| --- | -------- | --------------------------------------------------------------------------------------------------------------------- |
-| 1   | Markdown | Title + workflow overview                                                                                             |
-| 2   | Code     | All imports (pathlib, pandas, numpy, mikeio, os, src.pgm_helper)                                                      |
-| 3   | Markdown | Step 0 — Configuration instructions                                                                                   |
-| 4   | Code     | Path definitions (`LANDUSE_DFS2`, `LU_TEMPLATE`, `TEMPLATE_FILES`, `OUTPUT_DIR`, `AUTO_CONFIRM`) + `validate_paths()` |
-| 5   | Code     | Empty (scratch cell)                                                                                                  |
-| 6   | Markdown | Step 1 header                                                                                                         |
-| 7   | Markdown | Step 1.A — Load spatial grid                                                                                          |
-| 8   | Code     | Read DFS2 via `mikeio.Dfs2()`, extract numpy array                                                                    |
-| 9   | Markdown | Step 1.B — Create code→species mapping                                                                                |
-| 10  | Code     | Read LU template, `find_col()`, `confirm_columns()`, build `code_to_species` dict                                     |
-| 11  | Markdown | Step 2 header                                                                                                         |
-| 12  | Markdown | Step 2.A — Processing loop description                                                                                |
-| 13  | Code     | Loop over `TEMPLATE_FILES`, detect columns, generate DFS2 per parameter                                               |
-| 14  | Markdown | Step 3 header                                                                                                         |
-| 15  | Code     | List generated .dfs2 files with sizes                                                                                 |
-| 16  | Code     | Verification — read sample file, check shape/range/geometry match                                                     |
+| #   | Type     | Purpose                                                                                                                                          |
+| --- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Markdown | Title + workflow overview                                                                                                                        |
+| 2   | Code     | All imports (pathlib, pandas, numpy, mikeio, os, plant_growth_module.pgm_helper)                                                                 |
+| 3   | Markdown | Step 0 — Configuration instructions                                                                                                              |
+| 4   | Code     | Path definitions (`LANDUSE_DFS2`, `LU_TEMPLATE`, `SOILPROFILE_DFS2`, `SP_TEMPLATE`, `TEMPLATE_FILES`, `OUTPUT_DIR`, `AUTO_CONFIRM`) + validation |
+| 5   | Code     | Empty (scratch cell)                                                                                                                             |
+| 6   | Markdown | Step 1 header                                                                                                                                    |
+| 7   | Markdown | Step 1.A — Load land use and soil profile grids                                                                                                  |
+| 8   | Code     | Read both DFS2 maps via `mikeio.Dfs2()`, extract arrays, validate matching shapes                                                                |
+| 9   | Markdown | Step 1.B — Create land use and soil profile code mappings                                                                                        |
+| 10  | Code     | Read LU/SP templates, handle optional `Apply`, build `code_to_species` + `code_to_soilprofile`                                                   |
+| 11  | Markdown | Step 2 header                                                                                                                                    |
+| 12  | Markdown | Step 2.A — Processing loop description                                                                                                           |
+| 13  | Code     | Loop over `TEMPLATE_FILES`, detect columns, generate DFS2 per parameter                                                                          |
+| 14  | Markdown | Step 3 header                                                                                                                                    |
+| 15  | Code     | List generated .dfs2 files with sizes                                                                                                            |
+| 16  | Code     | Verification — read sample file, check shape/range/geometry match                                                                                |
 
 ## Code Style Conventions
 
 - **Path construction**: Use `Path.joinpath()` — not the `/` operator
-- **Imports**: All in cell 2. Order: stdlib → third-party → `src.pgm_helper`
-- **Helper functions**: All reusable logic in `src/pgm_helper.py`, not inline in notebook
+- **Imports**: All in cell 2. Order: stdlib → third-party → `plant_growth_module.pgm_helper`
+- **Helper functions**: All reusable logic in `src/plant_growth_module/pgm_helper.py`, not inline in notebook
 - **Notebook cells**: Must execute sequentially top-to-bottom with no out-of-order dependencies
 - **Error handling**: `validate_paths()` before processing; raise `FileNotFoundError` or `ValueError` on bad input
 
@@ -198,7 +219,8 @@ The notebook (`plant_growth_module.ipynb`) has 16 cells in this fixed order:
 ## Common Pitfalls
 
 - Species name matching is **case-sensitive** and must be exact between CSV files and land use classifications
-- `type=0` vs `type=1` semantics exist in templates but the notebook currently generates maps for **all** parameters regardless
+- `type` filtering is string-based (`"1"` is included), so unexpected encodings should be cleaned in source CSVs
+- Soil profile initial-condition rows can use profile names or codes; ambiguous values may lead to missing assignments
 - Empty `Path(r"")` strings in notebook config cell — all must be filled with absolute paths before running
 - `find_col()` returns `None` if no column variant matches — always check before using the result
 - Output DFS2 files inherit geometry from the input LandUse.DFS2 — grid mismatch will produce incorrect spatial mapping
@@ -213,7 +235,6 @@ The notebook (`plant_growth_module.ipynb`) has 16 cells in this fixed order:
 
 ## Future Enhancements
 
-- [ ] Filter on `type` column: only generate maps where type=1, skip type=0
 - [ ] Streamlit web interface for non-programmer users
 - [ ] Time-varying DFS2 map support
 - [ ] MIKE SHE Python API integration
