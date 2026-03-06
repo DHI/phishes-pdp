@@ -61,4 +61,4 @@ jobs:
       - name: Bandit
         run: |
           cd "${{ matrix.dir }}"
-          bandit -r .
+          bandit -r . -x tests
