@@ -27,16 +27,10 @@ def test_list_and_verify_structure(tmp_path):
 
     listed = manager.list_structure()
     listed_normalized = {path.replace("\\", "/") for path in listed}
-    assert (
-        "a" in listed_normalized
-        and "a/b" in listed_normalized
-        and "logs" in listed_normalized
-    )
+    assert "a" in listed_normalized and "a/b" in listed_normalized and "logs" in listed_normalized
 
     verified = manager.verify_structure()
-    verified_normalized = {
-        key.replace("\\", "/"): value for key, value in verified.items()
-    }
+    verified_normalized = {key.replace("\\", "/"): value for key, value in verified.items()}
     assert verified_normalized["a"] is True
     assert verified_normalized["a/b"] is True
     assert verified_normalized["logs"] is True
