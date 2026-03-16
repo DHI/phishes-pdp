@@ -171,7 +171,8 @@ data-download-tool/
 │       └── catchment_template/     # Example catchment
 ├── pyproject.toml                  # Project dependencies
 ├── README.md                       # This file
-└── DataDownloadTool.md             # Technical documentation
+├── TECH_SPECS_OVERVIEW.md          # Technical overview
+└── TECH_SPECS_DETAILED.md          # Technical details
 ```
 
 ---
@@ -249,7 +250,8 @@ ModuleNotFoundError: No module named 'geopandas'
 
 ## 📖 Additional Documentation
 
-- **Technical Details**: See [DataDownloadTool.md](DataDownloadTool.md) for architecture and implementation
+- **Technical Details**: See [TECH_SPECS_DETAILED.md](TECH_SPECS_DETAILED.md) for architecture and implementation
+- **Technical Overview**: See [TECH_SPECS_OVERVIEW.md](TECH_SPECS_OVERVIEW.md) for high-level module design
 - **Repository Design Specification**: See [DESIGN_SPEC_REPOSITORY.md](DESIGN_SPEC_REPOSITORY.md) for repository-level design as a subrepository
 - **Script Download Spec**: See [TECH_SPECS_SCRIPTS.md](TECH_SPECS_SCRIPTS.md) for script download requirements and design
 
@@ -279,7 +281,7 @@ The following are needed to run the tool:
 
 For questions or issues:
 
-1. Review [DataDownloadTool.md](DataDownloadTool.md) for technical details
+1. Review [TECH_SPECS_DETAILED.md](TECH_SPECS_DETAILED.md) for technical details
 2. Explore [notebooks/data_download_tool.ipynb](notebooks/data_download_tool.ipynb) for examples
 
 ---
