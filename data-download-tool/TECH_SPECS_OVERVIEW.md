@@ -102,4 +102,4 @@ The catalog is a YAML file listing datasets by category and subcategory. Each en
 ## 13. Known Documentation Gaps
 
 - The project scripts in pyproject.toml reference setup_folder_structure:main and download_datasets:main, but those modules are not in src
-- DataDownloadTool.md references example_usage.ipynb, while the README points to notebooks/data_download_tool.ipynb
+- Older docs referenced example_usage.ipynb, while the README uses notebooks/data_download_tool.ipynb
