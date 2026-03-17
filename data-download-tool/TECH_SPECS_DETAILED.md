@@ -212,7 +212,7 @@ See pyproject.toml for declared dependencies and versions.
 ## 8. Known Documentation Gaps
 
 - pyproject.toml scripts reference setup_folder_structure:main and download_datasets:main, but no such modules exist in src
-- DataDownloadTool.md references example_usage.ipynb, while README points to notebooks/data_download_tool.ipynb
+- Older docs referenced example_usage.ipynb, while README uses notebooks/data_download_tool.ipynb
 
 ## 9. Future Enhancements (Optional)
 
