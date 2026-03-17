@@ -31,7 +31,7 @@ Installations are handled per sub-project. See the module README files for setup
 - Module-specific documentation:
   - [data-download-tool/README.md](data-download-tool/README.md)
   - [plant-growth-module/README.md](plant-growth-module/README.md)
-- Project documentation: [phishes-pdp.md](phishes-pdp.md)
+- Repository design: [REPOSITORY_DESIGN.md](REPOSITORY_DESIGN.md)
 
 ## 📦 What this repository contains
 
@@ -54,7 +54,7 @@ Provides scripts and notebooks for dataset organization, downloads, and reproduc
 ```
 phishes-pdp/
 ├── README.md
-├── phishes-pdp.md
+├── REPOSITORY_DESIGN.md
 ├── SECURITY.md
 ├── .github/
 ├── images/
@@ -64,7 +64,10 @@ phishes-pdp/
 
 ## 📚 Documentation
 
-- Technical details: [phishes-pdp.md](phishes-pdp.md)
+- Repository-level design: [REPOSITORY_DESIGN.md](REPOSITORY_DESIGN.md)
+- Module technical details:
+  - [data-download-tool/README.md](data-download-tool/README.md)
+  - [plant-growth-module/README.md](plant-growth-module/README.md)
 
 ---
 
