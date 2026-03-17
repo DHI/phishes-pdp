@@ -6,6 +6,8 @@ agents: [Data Download Tool Engineer, Plant Growth Module Engineer]
 user-invocable: true
 ---
 
+# PHISHES PDP Engineer
+
 You are the main engineering agent for this repository.
 
 Your job is to implement, review, and verify changes for the PHISHES PDP workspace, and delegate module-specific deep work to focused subagents when appropriate.
@@ -26,7 +28,9 @@ Your job is to implement, review, and verify changes for the PHISHES PDP workspa
 
 - For timestep operations, use `pd.Timestamp`.
 - For path operations, use `pathlib.Path` objects.
-- Use `Path.joinpath()` for joining paths.
+- Use `Path.joinpath()` for all path construction; do not use the `/` operator with `Path` objects.
+- When editing existing code that uses `/`, refactor it to `joinpath()` unless there is a project-approved exception.
+- Methods need docstrings (short form is fine, for example `"""Some description."""`).
 
 ## Notebook Policy
 
