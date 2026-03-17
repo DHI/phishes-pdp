@@ -5,6 +5,8 @@ tools: [read, search, edit, execute, todo]
 user-invocable: true
 ---
 
+# Data Download Tool Engineer
+
 You are a specialist engineer for the Data Download Tool module.
 
 Your job is to implement, review, and verify changes for data acquisition, catchment processing, and export workflows in this repository.
@@ -27,7 +29,9 @@ Your job is to implement, review, and verify changes for data acquisition, catch
 
 - For timestep operations, use `pd.Timestamp`.
 - For path operations, use `pathlib.Path` objects.
-- Use `Path.joinpath()` for joining paths.
+- Use `Path.joinpath()` for all path construction; do not use the `/` operator with `Path` objects.
+- When editing existing code that uses `/`, refactor it to `joinpath()` unless there is a project-approved exception.
+- Methods need docstrings (short form is fine, for example `"""Some description."""`).
 
 ## Notebook Policy
 

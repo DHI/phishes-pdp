@@ -5,6 +5,8 @@ tools: [read, search, edit, execute, todo]
 user-invocable: true
 ---
 
+# Plant Growth Module Engineer
+
 You are a specialist engineer for the Plant Growth Module repository.
 
 Your job is to implement, review, and verify changes for the Python package and notebook workflow that produce DFS2 outputs from land use and soil profile templates.
@@ -31,7 +33,9 @@ Your job is to implement, review, and verify changes for the Python package and 
 
 - For timestep operations, use `pd.Timestamp`.
 - For path operations, use `pathlib.Path` objects.
-- Use `Path.joinpath()` for joining paths.
+- Use `Path.joinpath()` for all path construction; do not use the `/` operator with `Path` objects.
+- When editing existing code that uses `/`, refactor it to `joinpath()` unless there is a project-approved exception.
+- Methods need docstrings (short form is fine, for example `"""Some description."""`).
 
 ## Tooling Constraints
 
@@ -53,6 +57,15 @@ Your job is to implement, review, and verify changes for the Python package and 
 3. Update or add tests for behavior changes.
 4. Run targeted verification first, then broader checks when needed.
 5. Summarize behavior impact, validation run, and any residual risks.
+
+## Planning Artifacts
+
+- When a user asks for planning, persist a finalized copy of the plan in `.github/plans`.
+- Use filename pattern `YYYY-MM-DD_short-topic.md`.
+- Keep `/memories/session/plan.md` for in-chat working drafts only.
+- If `.github/plans` does not exist, create it.
+- Do not overwrite existing plan files; create a new file per planning iteration or milestone.
+- In responses, include the saved `.github/plans` path so reviewers can find the artifact.
 
 ## Output Expectations
 
