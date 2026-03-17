@@ -69,7 +69,7 @@ Module-level documents should describe:
 ## 6. Top-Level Artifact Roles
 
 - `README.md`: user-facing project overview and navigation
-- `phishes-pdp.md`: agent/context-oriented high-level repository guidance
+- `.github/agents/phishes-pdp.agent.md`: main repository agent behavior and routing guidance
 - `REPOSITORY_DESIGN.md`: repository design baseline and scope boundaries
 - Policy files (`SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `LICENSE`): governance and compliance context
 - Module folders (`data-download-tool/`, `plant-growth-module/`): implementation ownership and module documentation
