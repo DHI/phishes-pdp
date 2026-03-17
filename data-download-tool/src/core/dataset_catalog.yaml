@@ -8,6 +8,7 @@ climate:
     crs: EPSG:4326
     eumtype: Rainfall
     eumunit: millimeter
+    data_value_type: StepAccumulated
   era5_temperature:
     path: climate/era5_temperature/ERA5_temperature.zarr
     display_name: ERA5 temperature
@@ -17,6 +18,7 @@ climate:
     crs: EPSG:4326
     eumtype: Temperature
     eumunit: degree_Celsius
+    data_value_type: Instantaneous
   era5_potential_evapotranspiration:
     path: climate/era5_potential_evapotranspiration/ERA5_potential_evapotranspiration.zarr
     display_name: ERA5 potential evapotranspiration
@@ -26,11 +28,14 @@ climate:
     crs: EPSG:4326
     eumtype: Evaporation
     eumunit: millimeter
+    data_value_type: StepAccumulated
   era5_surface_solar_radiation_downwards:
     path: climate/era5_surface_solar_radiation_downwards/ERA5_surface_solar_radiation_downwards.zarr
+    display_name: ERA5 surface solar radiation downwards
     description: ERA5 surface solar radiation downwards
     variable: ssrd
     temporal: true
     crs: EPSG:4326
     eumtype: Sun_radiation
     eumunit: watt_per_meter_pow_2
+    data_value_type: StepAccumulated
