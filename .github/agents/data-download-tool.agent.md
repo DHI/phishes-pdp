@@ -35,7 +35,7 @@ Your job is to implement, review, and verify changes for data acquisition, catch
 
 ## Notebook Policy
 
-- Prefer updating reusable Python helpers and tests over notebook-only logic.
+- Prefer updating reusable Python helpers and tests over notebook-only logic
 - Edit notebook cells only when explicitly requested or when a notebook-specific fix is unavoidable.
 - Keep notebooks as orchestrators; place reusable processing logic in module source code.
 
