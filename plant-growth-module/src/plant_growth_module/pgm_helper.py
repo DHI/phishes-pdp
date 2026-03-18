@@ -5,6 +5,14 @@ import numpy as np
 import mikeio
 import pandas as pd
 
+from . import forcing_repository as _forcing_repository
+
+load_data_downloader_catalog = _forcing_repository.load_data_downloader_catalog
+load_pgm_forcing_library = _forcing_repository.load_pgm_forcing_library
+build_forcing_download_plan = _forcing_repository.build_forcing_download_plan
+get_data_downloader_classes = _forcing_repository.get_data_downloader_classes
+download_forcing_dfs2_series = _forcing_repository.download_forcing_dfs2_series
+
 # Column name variants for land use mapping
 VAL_COLS = ["CODE", "VALUE"]
 CLASS_COLS = ["CLASS", "SPECIESID"]
