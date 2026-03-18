@@ -7,8 +7,10 @@ dependencies = [
     "pandas>=2.0.0",
     "numpy>=1.24.0",
     "mikeio>=1.6.0",
+    "pyyaml>=6.0.0",
     "streamlit>=1.30.0",
     "ipywidgets>=8.0.0",
+    "phishes-data-downloader @ git+https://github.com/DHI/phishes-pdp.git@main#subdirectory=data-download-tool",
 ]
 
 [project.optional-dependencies]
@@ -23,6 +25,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/plant_growth_module"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.uv.pip]
 link-mode = "copy"
