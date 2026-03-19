@@ -1,14 +1,16 @@
 # Plant Growth Module (PGM) - DFS2 Map Generator
 
-A tool for generating spatially distributed DFS2 maps for DHI's ECO Lab Plant Growth Module. This notebook-based application processes land use data and species-specific parameters to create input files for MIKE SHE hydrological modeling.
+A tool for generating spatially distributed DFS2 maps for DHI's ECO Lab Plant Growth Module. This notebook-based application now includes multiple workflows: a main land use and template workflow, plus a soil profile setup workflow for Task 4 outputs.
 
 ## Table of Contents
 
 - [What Does This Tool Do?](#-what-does-this-tool-do)
 - [Installation](#-installation)
 - [How to Execute the Notebook](#-how-to-execute-the-notebook)
+- [Notebook Workflows](#-notebook-workflows)
 - [Project Structure](#-project-structure)
 - [Configuration](#-configuration)
+- [Test Coverage](#-test-coverage)
 - [Troubleshooting](#-troubleshooting)
 - [License](#-license)
 
@@ -64,6 +66,13 @@ This command will:
 
 ## 🚀 How to Execute the Notebook
 
+### Notebook Selection
+
+Choose the notebook based on your task:
+
+- `notebooks/plant_growth_module.ipynb`: Main workflow for template-driven land use and soil profile map generation.
+- `notebooks/pgm_soil_profile_setup.ipynb`: Soil profile setup workflow that parses soil profile text files and generates per-cell wilting point and field capacity DFS2 maps.
+
 ### Option 1: Using VS Code (Recommended)
 
 0. **Install VS Code (free):**
@@ -85,7 +94,7 @@ This command will:
    - If your workspace root is a parent folder, VS Code won't look inside nested subdirectories for virtual environments, so the kernel won't be found
 
 2. **Open the notebook:**
-   - In the VS Code Explorer, navigate to `notebooks/plant_growth_module.ipynb` and click to open it
+   - In the VS Code Explorer, navigate to either `notebooks/plant_growth_module.ipynb` or `notebooks/pgm_soil_profile_setup.ipynb` and click to open it
 
 3. **Select the Python kernel:**
    - Click on the kernel selector in the top-right corner of the notebook
@@ -104,11 +113,19 @@ This command will:
    - Press **`Ctrl + Shift + P`** → Type "Run All Cells" → Press Enter
 
 5. **Workflow:**
-   - **Step 0**: Edit file paths in the configuration cell
-   - **Step 0.1**: Run setup and validation
-   - **Step 1**: Load land use + soil profile data and create mappings
-   - **Step 2**: Process templates and generate DFS2 maps
-   - **Step 3**: Verify output files
+   - For `notebooks/plant_growth_module.ipynb`:
+     - **Step 0**: Edit file paths in the configuration cell
+     - **Step 0.1**: Run setup and validation
+     - **Step 1**: Load land use + soil profile data and create mappings
+     - **Step 2**: Process templates and generate DFS2 maps
+     - **Step 3**: Verify output files
+
+   - For `notebooks/pgm_soil_profile_setup.ipynb`:
+     - **Step 1**: Set source folder/file names and output naming
+     - **Step 2**: Build derived paths and optional parsing overrides
+     - **Step 3**: Parse soil profile text files and save `profile_table.csv`
+     - **Step 4**: Generate `grid_codes.dfs2` and per-cell FC/WP DFS2 outputs
+     - **Step 5**: Save `summary.csv` and run diagnostics
 
 ### Option 2: Using Jupyter Lab/Notebook
 
@@ -154,12 +171,36 @@ plant-growth-module/
 ├── src/
 │   └── plant_growth_module/
 │       ├── __init__.py                # Package entry point
-│       └── pgm_helper.py              # Helper functions
+│       ├── pgm_helper.py              # Backward-compatible helper facade
+│       ├── template_maps.py           # Main template-based mapping workflow
+│       ├── soil_profile_setup.py      # Soil profile parsing and Task 4 outputs
+│       └── common_utils.py            # Shared DFS2 and utility helpers
 ├── notebooks/
-│   ├── plant_growth_module.ipynb      # Main notebook
+│   ├── plant_growth_module.ipynb      # Main template workflow notebook
+│   └── pgm_soil_profile_setup.ipynb   # Soil profile setup workflow notebook
 ├── pyproject.toml                      # Project dependencies
 └── README.md                           # This file
 ```
+
+---
+
+## 📓 Notebook Workflows
+
+### 1. Main Template Workflow
+
+- Notebook: `notebooks/plant_growth_module.ipynb`
+- Use this when generating variable maps from template CSV files and land use/soil profile classification inputs.
+- Typical outputs: one DFS2 map per variable/species mapping rule.
+
+### 2. Soil Profile Setup Workflow
+
+- Notebook: `notebooks/pgm_soil_profile_setup.ipynb`
+- Use this when preparing Task 4 soil profile outputs from preprocessed soil profile text files and profile grid codes.
+- Typical outputs:
+  - `output_data/task4_pgm_soil_profile_setup/<run_name>/grid_codes.dfs2`
+  - `output_data/task4_pgm_soil_profile_setup/<run_name>/wilting_point/*.dfs2`
+  - `output_data/task4_pgm_soil_profile_setup/<run_name>/field_capacity/*.dfs2`
+  - `profile_table.csv` and `summary.csv`
 
 ---
 
@@ -190,13 +231,13 @@ plant-growth-module/
 - **Optional column**:
   - **Apply column**: `APPLY` (set `0` to force all landuse-based variables to zero for that class)
 
-**Example:**
+- **Example:**
 
-| CODE | CLASS       |
-| ---- | ----------- |
-| 1    | Oak_Forest  |
-| 2    | Pine_Forest |
-| 3    | Grassland   |
+  | CODE | CLASS       |
+  | ---- | ----------- |
+  | 1    | Oak_Forest  |
+  | 2    | Pine_Forest |
+  | 3    | Grassland   |
 
 #### 3. Soil Profile Spatial Data + Classification
 
@@ -221,14 +262,14 @@ plant-growth-module/
   - **Template/scope column**: `TEMPLATE` (values such as `landuse` or `soilprofile`)
   - **Type column**: `TYPE` (`1` = generate map, `0` = skip)
 
-**Example:**
+- **Example:**
 
-| SPECIESID   | CONSTANT | VALUE |
-| ----------- | -------- | ----- |
-| Oak_Forest  | LAI_max  | 5.5   |
-| Oak_Forest  | RD_max   | 2.0   |
-| Pine_Forest | LAI_max  | 4.8   |
-| Pine_Forest | RD_max   | 1.8   |
+  | SPECIESID   | CONSTANT | VALUE |
+  | ----------- | -------- | ----- |
+  | Oak_Forest  | LAI_max  | 5.5   |
+  | Oak_Forest  | RD_max   | 2.0   |
+  | Pine_Forest | LAI_max  | 4.8   |
+  | Pine_Forest | RD_max   | 1.8   |
 
 ### Processing Options
 
@@ -241,6 +282,26 @@ Configure these settings in the notebook's configuration cell (Step 0):
 - **`OUTPUT_DIR`**: Specify the output directory path
   - All generated DFS2 files will be saved here
   - Use absolute paths for reliability
+
+---
+
+## 🧪 Test Coverage
+
+Run tests with coverage:
+
+```powershell
+uv run pytest
+```
+
+Generate an HTML coverage report:
+
+```powershell
+uv run pytest --cov-report=html
+```
+
+Open report:
+
+- `htmlcov/index.html`
 
 ---
 
