@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from plant_growth_module import common_utils
 from plant_growth_module import pgm_helper
 from plant_growth_module import forcing_repository
 
@@ -51,8 +52,8 @@ def test_generate_dfs2_map(monkeypatch, tmp_path):
         def to_dfs(self, output_path):
             called["output"] = output_path
 
-    monkeypatch.setattr(pgm_helper.mikeio, "DataArray", FakeDA)
-    monkeypatch.setattr(pgm_helper.mikeio, "ItemInfo", lambda name: ("item", name))
+    monkeypatch.setattr(common_utils.mikeio, "DataArray", FakeDA)
+    monkeypatch.setattr(common_utils.mikeio, "ItemInfo", lambda name: ("item", name))
 
     output = tmp_path.joinpath("map.dfs2")
     pgm_helper.generate_dfs2_map(
