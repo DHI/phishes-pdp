@@ -287,8 +287,7 @@ def parse_soil_profile_texts(
     txt_files, patterns = _find_profile_txt_files(results_dir, soil_profile_txt_glob)
     if not txt_files:
         raise FileNotFoundError(
-            "No profile text files found in "
-            f"{results_dir}. Tried patterns: {patterns}"
+            f"No profile text files found in {results_dir}. Tried patterns: {patterns}"
         )
 
     parsed_by_grid: dict[int, pd.DataFrame] = {}
