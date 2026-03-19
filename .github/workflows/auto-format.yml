@@ -1,0 +1,50 @@
+name: Auto Format
+
+on:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: write
+
+jobs:
+  ruff-auto-format:
+    # Avoid formatting commits created by this workflow to prevent loops.
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Ruff
+        run: uv tool install ruff
+
+      - name: Ruff fix and format
+        run: |
+          uvx ruff check --fix .
+          uvx ruff format .
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "No formatting changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(format): apply ruff auto-format"
+          git push
