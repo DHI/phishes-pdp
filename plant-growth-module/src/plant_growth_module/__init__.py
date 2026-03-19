@@ -2,7 +2,13 @@
 
 from importlib import import_module
 
-__all__ = ["pgm_helper", "forcing_repository"]
+__all__ = [
+    "pgm_helper",
+    "forcing_repository",
+    "common_utils",
+    "template_maps",
+    "soil_profile_setup",
+]
 
 
 def __getattr__(name):
