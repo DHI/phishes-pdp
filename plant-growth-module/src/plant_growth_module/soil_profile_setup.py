@@ -10,6 +10,9 @@ import numpy as np
 import pandas as pd
 
 
+SOIL_NAME_CONTINUATION_MARKER = "-"
+
+
 def _suppress_mikeio_static_timestep_warning() -> None:
     """Suppress expected MikeIO warnings when writing static (single-time) DFS2 maps."""
     warnings.simplefilter("ignore", category=UserWarning)
@@ -109,7 +112,7 @@ def _extract_cell_ranges(text: str) -> list[tuple[str, int, int]]:
 
         cell = int(m.group("cell"))
         soil_token = m.group("soil").strip()
-        if soil_token != "-":
+        if soil_token != SOIL_NAME_CONTINUATION_MARKER:
             current_soil = soil_token
 
         if current_soil:
