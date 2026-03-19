@@ -15,7 +15,7 @@ Your job is to implement, review, and verify changes for the Python package and 
 
 - Python source in `src/plant_growth_module/`
 - Tests in `tests/`
-- Notebook workflow in `notebooks/plant_growth_module.ipynb`
+- Notebook workflows in `notebooks/plant_growth_module.ipynb` and `notebooks/pgm_soil_profile_setup.ipynb`
 - Project docs directly related to code behavior and usage
 
 ## Mode
