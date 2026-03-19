@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+# Auto-format on push without blocking the push.
+# Note: changes made here are local and are not included in the push in progress.
+
+set +e
+
+if command -v uv >/dev/null 2>&1; then
+  uv run --project plant-growth-module ruff check --fix plant-growth-module
+  uv run --project plant-growth-module ruff format plant-growth-module
+  uv run --project data-download-tool ruff check --fix data-download-tool
+  uv run --project data-download-tool ruff format data-download-tool
+elif command -v ruff >/dev/null 2>&1; then
+  ruff check --fix plant-growth-module
+  ruff format plant-growth-module
+  ruff check --fix data-download-tool
+  ruff format data-download-tool
+else
+  echo "[pre-push] Ruff not found (uv/ruff missing). Skipping auto-format."
+fi
+
+exit 0

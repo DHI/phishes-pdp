@@ -12,10 +12,20 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["jupyter>=1.0.0", "ipykernel>=6.0.0", "pytest>=8.0.0"]
+dev = [
+    "jupyter>=1.0.0",
+    "ipykernel>=6.0.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+]
 
 [dependency-groups]
-dev = ["jupyter>=1.0.0", "ipykernel>=6.0.0", "pytest>=8.0.0"]
+dev = [
+    "jupyter>=1.0.0",
+    "ipykernel>=6.0.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -26,3 +36,10 @@ packages = ["src/plant_growth_module"]
 
 [tool.uv.pip]
 link-mode = "copy"
+
+[tool.coverage.run]
+source = ["src/plant_growth_module"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
