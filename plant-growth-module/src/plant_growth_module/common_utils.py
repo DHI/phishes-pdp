@@ -4,7 +4,6 @@ import warnings
 
 import mikeio
 import numpy as np
-import pandas as pd
 
 
 def _suppress_mikeio_static_timestep_warning() -> None:
