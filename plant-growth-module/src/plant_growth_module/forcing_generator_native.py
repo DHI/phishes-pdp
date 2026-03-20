@@ -248,7 +248,7 @@ def eum_matches(type_query: str = "", unit_query: str = "") -> dict[str, Any]:
                 continue
             try:
                 value = getattr(enum_obj, name)
-            except Exception:
+            except (AttributeError, TypeError):
                 continue
             if callable(value):
                 continue

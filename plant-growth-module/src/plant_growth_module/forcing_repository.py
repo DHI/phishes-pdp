@@ -14,8 +14,12 @@ def _get_installed_data_downloader_src_dir():
     """Return installed phishes-data-downloader src directory if available."""
     try:
         metadata = importlib.import_module("importlib.metadata")
+    except ModuleNotFoundError:
+        return None
+
+    try:
         dist = metadata.distribution("phishes-data-downloader")
-    except Exception:
+    except metadata.PackageNotFoundError:
         return None
 
     def _is_valid_src_root(path: Path):
@@ -42,14 +46,15 @@ def _get_installed_data_downloader_src_dir():
                     return candidate_src
                 if repo_path.exists() and _is_valid_src_root(repo_path):
                     return repo_path
-    except Exception:
+    except (json.JSONDecodeError, OSError, ValueError):
+        # Ignore malformed or unavailable editable-install metadata.
         pass
 
     # Last-resort probe: infer source root from sys.path entries.
     for path_entry in sys.path:
         try:
             base = Path(path_entry)
-        except Exception:
+        except (TypeError, ValueError):
             continue
 
         if _is_valid_src_root(base):
@@ -134,7 +139,8 @@ def _import_data_downloader_modules():
                     _import_data_downloader_via_runtime_package(src_dir)
                 )
                 return downloader_mod, catchment_mod
-            except Exception:
+            except (ImportError, ModuleNotFoundError, OSError, AttributeError):
+                # Fall back to a clear user-facing import error below.
                 pass
 
         raise ModuleNotFoundError(
