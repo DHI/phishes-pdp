@@ -37,7 +37,7 @@ dependencies = [
     # Azure cloud storage
     "adlfs>=2023.1.0",
     "fsspec>=2023.1.0",
-    "azure-storage-blob>=12.14.0",
+    "azure-storage-blob>=12.28.0",
     "azure-identity>=1.12.0",
     # Visualization
     "matplotlib>=3.6.0",
