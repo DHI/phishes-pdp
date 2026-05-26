@@ -39,3 +39,23 @@ climate:
     eumtype: Sun_radiation
     eumunit: watt_per_meter_pow_2
     data_value_type: StepAccumulated
+  era5_temperature_land:
+    path: climate/era5_temperature_land/ERA5_temperature_land.zarr
+    display_name: ERA5-Land 2m temperature
+    description: ERA5-Land 2m temperature
+    variable: reanalysis_era5_land
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Temperature
+    eumunit: degree_Celsius
+    data_value_type: Instantaneous
+  era5_wind_speed:
+    path: climate/era5_wind_speed/ERA5_wind_speed.zarr
+    display_name: ERA5 10m wind speed
+    description: ERA5 10m wind speed
+    variable: reanalysis_era5_single_levels
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Wind_speed
+    eumunit: meter_per_sec
+    data_value_type: Instantaneous
