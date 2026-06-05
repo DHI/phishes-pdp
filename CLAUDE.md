@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Before every push, review this file.** Whenever you push (or open a PR), re-read `CLAUDE.md` and check whether the change affects anything it documents — module layout, catalogs, public APIs, commands, conventions, or gotchas. If so, update `CLAUDE.md` in the same change. Keeping it current is part of the task, not an afterthought.
+
 ## What this repo does
 
 A two-module pipeline that produces inputs for **DHI MIKE SHE + ECO Lab Plant Growth Module** simulations. End-to-end shape:
