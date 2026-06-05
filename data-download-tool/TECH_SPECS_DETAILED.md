@@ -171,8 +171,10 @@ Functions
 
 ## 3. Data Formats
 
-- Remote storage: Zarr on Azure Blob Storage
-- Local outputs: NetCDF (.nc), Zarr (directory), DFS2 (.dfs2)
+- Remote storage: Zarr on Azure Blob Storage; Cloud Optimized GeoTIFF (COG) layers in
+  a separate container (catalog entries with `format: cog`, optional `container`, and
+  `tiled` for single-file vs mosaic). COG layers are static (`temporal: false`).
+- Local outputs: NetCDF (.nc), Zarr (directory), DFS2 (.dfs2), GeoTIFF/COG (.tif)
 - Logs: JSON with a downloads array
 
 Log entry schema
