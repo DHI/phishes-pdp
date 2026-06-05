@@ -69,6 +69,24 @@ def test_open_dataset_any_dfs2(monkeypatch, tmp_path):
     assert "lat" in ds.dims and "lon" in ds.dims
 
 
+def test_open_dataset_any_tif(monkeypatch, tmp_path):
+    import rioxarray
+
+    tif_file = tmp_path / "a.tif"
+    tif_file.write_bytes(b"")
+
+    class FakeDA:
+        def rename(self, name):
+            self.name = name
+            return self
+
+        def to_dataset(self, name):
+            return f"tif_ds:{name}"
+
+    monkeypatch.setattr(rioxarray, "open_rasterio", lambda p, masked=True: FakeDA())
+    assert utils.open_dataset_any(tif_file) == "tif_ds:band_data"
+
+
 def test_open_dataset_any_unsupported(tmp_path):
     bad = tmp_path / "a.txt"
     bad.write_text("", encoding="utf-8")

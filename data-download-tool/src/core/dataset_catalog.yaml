@@ -59,3 +59,21 @@ climate:
     eumtype: Wind_speed
     eumunit: meter_per_sec
     data_value_type: Instantaneous
+
+# Cloud Optimized GeoTIFF (COG) layers. Static rasters (no time dimension) stored
+# in a separate Azure container on the same account. Distinguished by `format: cog`.
+# Set `container` to the COG container name and `tiled: true` when a dataset is an
+# external mosaic (a prefix/folder of many .tif tiles) rather than a single .tif.
+# Output these with OUTPUT_FORMAT = "tif".
+topography:
+  cop_dem:
+    path: static_layers/cop_dem
+    container: cogs
+    format: cog
+    tiled: true
+    anon: true
+    display_name: Copernicus DEM
+    description: Copernicus digital elevation model (tiled mosaic)
+    variable: elevation
+    temporal: false
+    crs: EPSG:4326

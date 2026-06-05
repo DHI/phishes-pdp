@@ -214,6 +214,107 @@ def test_save_dataset_zarr_and_dfs2(monkeypatch, tmp_path):
     assert dfs_called["ok"] is True
 
 
+def _cog_entry():
+    return {
+        "path": "corine/CLC.tif",
+        "container": "cog",
+        "format": "cog",
+        "tiled": False,
+        "crs": "EPSG:4326",
+        "temporal": False,
+        "description": "Land cover",
+        "variable": "landcover",
+    }
+
+
+def test_open_dataset_routes_to_cog(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    d.dataset_catalog["landuse"] = {"corine": _cog_entry()}
+    d.fs = object()
+
+    monkeypatch.setattr("src.core.downloader.reproject_catchment", lambda gdf, crs: gdf)
+
+    captured = {}
+
+    def fake_open_cog(uris, **kwargs):
+        captured["uris"] = uris
+        captured.update(kwargs)
+        return "cog_ds"
+
+    monkeypatch.setattr("src.core.downloader.cogio.open_cog", fake_open_cog)
+
+    out = d.open_dataset("landuse", "corine")
+    assert out == "cog_ds"
+    assert len(captured["uris"]) == 1
+    assert captured["uris"][0].startswith("https://acct.blob.core.windows.net/cog/corine/CLC.tif")
+    assert captured["variable"] == "landcover"
+    assert captured["bbox"] is not None
+
+
+def test_open_dataset_routes_to_cog_tiled(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    entry = {
+        "path": "static_layers/cop_dem",
+        "container": "cogs",
+        "format": "cog",
+        "tiled": True,
+        "anon": True,
+        "crs": "EPSG:4326",
+        "temporal": False,
+        "description": "DEM",
+        "variable": "elevation",
+    }
+    d.dataset_catalog["topography"] = {"cop_dem": entry}
+
+    class FakeFS:
+        def glob(self, pattern):
+            assert pattern == "cogs/static_layers/cop_dem/**/*.tif"
+            return ["cogs/static_layers/cop_dem/t2.tif", "cogs/static_layers/cop_dem/t1.tif"]
+
+    d._anon_fs = FakeFS()
+    monkeypatch.setattr("src.core.downloader.reproject_catchment", lambda gdf, crs: gdf)
+
+    captured = {}
+    monkeypatch.setattr(
+        "src.core.downloader.cogio.open_cog",
+        lambda uris, **kwargs: captured.update(uris=uris, **kwargs) or "cog_ds",
+    )
+
+    out = d.open_dataset("topography", "cop_dem")
+    assert out == "cog_ds"
+    # Sorted tile list, mapped to anonymous (no SAS) HTTPS URLs.
+    assert captured["uris"] == [
+        "https://acct.blob.core.windows.net/cogs/static_layers/cop_dem/t1.tif",
+        "https://acct.blob.core.windows.net/cogs/static_layers/cop_dem/t2.tif",
+    ]
+
+
+def test_save_dataset_tif(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    d.dataset_catalog["landuse"] = {"corine": _cog_entry()}
+    d.output_format = "tif"
+    ds = xr.Dataset(
+        {"landcover": (("lat", "lon"), np.ones((2, 2)))},
+        coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
+    )
+    out = tmp_path / "data" / "landuse" / "corine" / "corine.tif"
+
+    monkeypatch.setattr("src.core.downloader.build_dataset_path", lambda *a, **k: out)
+    monkeypatch.setattr("src.core.downloader.remove_path_with_retry", lambda p: True)
+    monkeypatch.setattr("src.core.downloader.reproject_catchment", lambda gdf, crs: gdf)
+    monkeypatch.setattr(d, "_log_download", lambda *a, **k: None)
+
+    called = {}
+    monkeypatch.setattr(
+        "src.core.downloader.cogio.write_cog",
+        lambda ds, path, **kwargs: called.__setitem__("path", path),
+    )
+
+    result = d.save_dataset(ds, "landuse", "corine")
+    assert result == out
+    assert called["path"] == out
+
+
 def test_download_dataset_pipeline(monkeypatch, tmp_path):
     d = _new_downloader(tmp_path)
     monkeypatch.setattr(d, "open_dataset", lambda *args, **kwargs: "raw")
