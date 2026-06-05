@@ -20,11 +20,13 @@ import adlfs
 import geopandas as gpd
 import rioxarray  # noqa: F401 - enables .rio accessor on xarray objects
 import xarray as xr
+from shapely.ops import unary_union
 
 from .utils import build_dataset_path, get_grid_resolution, remove_path_with_retry
 from ..analysis import load_catchment, validate_catchment_gdf, reproject_catchment
 from . import dfsio
 from . import cogio
+from . import geoparquetio
 
 
 class PDPDataDownloader:
@@ -50,9 +52,14 @@ class PDPDataDownloader:
     DEFAULT_AZURE_CREDENTIAL = "sp=rl&st=2026-02-09T10:22:14Z&se=2034-12-31T18:37:14Z&spr=https&sv=2024-11-04&sr=c&sig=buOnKjOpmc%2BDZw7lnyWhMf4z5cTGVKqYHzXRnA8OTBM%3D"
 
     DEFAULT_OUTPUT_FORMAT = "nc"
-    SUPPORTED_OUTPUT_FORMATS = {"nc", "zarr", "dfs2", "tif"}
+    # Raster outputs flow through the xarray pipeline; vector (GeoParquet) outputs
+    # flow through GeoPandas. Both sets are accepted by output_format validation.
+    RASTER_OUTPUT_FORMATS = {"nc", "zarr", "dfs2", "tif"}
+    VECTOR_OUTPUT_FORMATS = {"parquet", "shp"}
+    SUPPORTED_OUTPUT_FORMATS = RASTER_OUTPUT_FORMATS | VECTOR_OUTPUT_FORMATS
     CATALOG_FILE = Path(__file__).parent.joinpath("dataset_catalog.yaml")
     COG_CATALOG_FILE = Path(__file__).parent.joinpath("cog_catalog.yaml")
+    GEOPARQUET_CATALOG_FILE = Path(__file__).parent.joinpath("geoparquet_catalog.yaml")
 
     def __init__(
         self,
@@ -136,22 +143,24 @@ class PDPDataDownloader:
             print(f"Output format remains: {self.output_format}")
 
     def _load_catalog(self) -> Dict:
-        """Load the dataset catalog, merging the COG catalog into it.
+        """Load the dataset catalog, merging the COG and GeoParquet catalogs into it.
 
-        Zarr time-series datasets live in ``dataset_catalog.yaml`` and COG raster
-        layers in ``cog_catalog.yaml``; both are merged per-category so they share
-        a single namespace for ``download_dataset(category, subcategory)``.
+        Zarr time-series datasets live in ``dataset_catalog.yaml``, COG raster
+        layers in ``cog_catalog.yaml``, and GeoParquet vector layers in
+        ``geoparquet_catalog.yaml``; all are merged per-category so they share a
+        single namespace for ``download_dataset(category, subcategory)``.
         """
         if not self.CATALOG_FILE.exists():
             raise FileNotFoundError(f"Dataset catalog not found: {self.CATALOG_FILE}")
         with open(self.CATALOG_FILE, "r") as f:
             catalog = yaml.safe_load(f) or {}
 
-        if self.COG_CATALOG_FILE.exists():
-            with open(self.COG_CATALOG_FILE, "r") as f:
-                cog_catalog = yaml.safe_load(f) or {}
-            for category, subcategories in cog_catalog.items():
-                catalog.setdefault(category, {}).update(subcategories)
+        for extra_catalog in (self.COG_CATALOG_FILE, self.GEOPARQUET_CATALOG_FILE):
+            if extra_catalog.exists():
+                with open(extra_catalog, "r") as f:
+                    entries = yaml.safe_load(f) or {}
+                for category, subcategories in entries.items():
+                    catalog.setdefault(category, {}).update(subcategories)
 
         return catalog
 
@@ -374,6 +383,73 @@ class PDPDataDownloader:
             self._anon_fs = adlfs.AzureBlobFileSystem(account_name=self.azure_account, anon=True)
         return self._anon_fs
 
+    def _download_geoparquet(self, category: str, subcategory: str) -> Path:
+        """
+        Download a GeoParquet (vector) dataset clipped to the catchment.
+
+        Vector data is a GeoDataFrame, not a raster, so it bypasses the xarray
+        ``open_dataset``/``process_dataset``/``save_dataset`` pipeline: this method
+        reads, spatially filters (keeping intersecting features whole), and writes
+        the result as GeoParquet or Shapefile in one pass.
+
+        Parameters
+        ----------
+        category : str
+            Dataset category (e.g., 'soil').
+        subcategory : str
+            Dataset subcategory (e.g., 'lucas_2018_bulk_density').
+
+        Returns
+        -------
+        Path
+            Path to the saved vector dataset.
+        """
+        info = self.get_dataset_info(category, subcategory)
+        container = info.get("container", self.azure_container)
+
+        # Catchment bounds and geometry in the dataset CRS.
+        catchment_reproj = reproject_catchment(self.catchment, info["crs"])
+        bbox = tuple(catchment_reproj.total_bounds)
+        geom = unary_union(catchment_reproj.geometry)
+
+        fs = self._cog_filesystem(info)
+        blob_path = f"{container}/{info['path']}"
+
+        try:
+            gdf = geoparquetio.open_geoparquet(
+                blob_path,
+                mask_geometry=geom,
+                mask_crs=info["crs"],
+                bbox=bbox,
+                crs=info["crs"],
+                filesystem=fs,
+            )
+        except Exception as e:
+            print(f"ERROR: Failed to open GeoParquet dataset: {e}")
+            raise
+
+        # Vector data can only be written as a vector format; if the downloader's
+        # output_format is a raster format, fall back to GeoParquet.
+        if self.output_format in self.VECTOR_OUTPUT_FORMATS:
+            fmt = self.output_format
+        else:
+            fmt = "parquet"
+            print(
+                f"Output format '{self.output_format}' is raster-only; "
+                f"writing vector dataset as '{fmt}' instead."
+            )
+
+        output_path = build_dataset_path(self.output_base, category, subcategory, fmt)
+        remove_path_with_retry(output_path)
+
+        print(f"Writing output to: {output_path}")
+        geoparquetio.write_geoparquet(gdf, output_path, fmt)
+
+        self._log_download(category, subcategory, info, output_path, bbox, None)
+
+        print(f"Download complete: {output_path.relative_to(self.output_base)}")
+        return output_path
+
     def process_dataset(
         self,
         ds: xr.Dataset,
@@ -478,6 +554,12 @@ class PDPDataDownloader:
                 crs=dataset_info["crs"],
                 varname=dataset_info.get("variable"),
             )
+        elif self.output_format in self.VECTOR_OUTPUT_FORMATS:
+            raise ValueError(
+                f"Output format '{self.output_format}' is vector-only and cannot be "
+                f"used for the raster dataset {category}/{subcategory}. "
+                f"Use one of {sorted(self.RASTER_OUTPUT_FORMATS)}."
+            )
         else:
             ds.to_netcdf(output_path, mode="w", engine="netcdf4")
 
@@ -520,6 +602,11 @@ class PDPDataDownloader:
         """
         print(f"Starting download: {category} --> {subcategory}")
         print("This may take a few minutes depending on the data size and your connection.")
+
+        # Vector (GeoParquet) datasets use a dedicated GeoPandas path rather than
+        # the xarray open/process/save pipeline used for raster datasets.
+        if self.get_dataset_info(category, subcategory).get("format") == "geoparquet":
+            return self._download_geoparquet(category, subcategory)
 
         ds = self.open_dataset(category, subcategory)
         ds = self.process_dataset(ds, category, subcategory, time_range, variables)
