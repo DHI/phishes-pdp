@@ -154,10 +154,16 @@ def open_dataset_any(path: Union[str, Path]) -> xr.Dataset:
     --------
     >>> ds = open_dataset_any(Path("data").joinpath("climate", "temperature", "temperature.zarr"))
     >>> ds = open_dataset_any(Path("data").joinpath("climate", "temperature", "temperature.nc"))
+    >>> ds = open_dataset_any(Path("data").joinpath("landuse", "corine_2018", "corine_2018.tif"))
     """
     path = Path(path)
 
-    if path.suffix == ".zarr" or path.is_dir():
+    if path.suffix in (".tif", ".tiff"):
+        import rioxarray
+
+        da = rioxarray.open_rasterio(path, masked=True).rename("band_data")
+        return da.to_dataset(name="band_data")
+    elif path.suffix == ".zarr" or path.is_dir():
         return xr.open_zarr(path, consolidated=True)
     elif path.suffix == ".nc":
         return xr.open_dataset(path, engine="netcdf4")
@@ -166,7 +172,8 @@ def open_dataset_any(path: Union[str, Path]) -> xr.Dataset:
     else:
         raise ValueError(
             f"Unsupported file format: {path.suffix}. "
-            f"Supported formats: .zarr (directory), .nc (NetCDF), .dfs2 (MIKE IO)"
+            f"Supported formats: .zarr (directory), .nc (NetCDF), .dfs2 (MIKE IO), "
+            f".tif/.tiff (COG GeoTIFF)"
         )
 
 

@@ -24,6 +24,7 @@ import xarray as xr
 from .utils import build_dataset_path, get_grid_resolution, remove_path_with_retry
 from ..analysis import load_catchment, validate_catchment_gdf, reproject_catchment
 from . import dfsio
+from . import cogio
 
 
 class PDPDataDownloader:
@@ -49,7 +50,7 @@ class PDPDataDownloader:
     DEFAULT_AZURE_CREDENTIAL = "sp=rl&st=2026-02-09T10:22:14Z&se=2034-12-31T18:37:14Z&spr=https&sv=2024-11-04&sr=c&sig=buOnKjOpmc%2BDZw7lnyWhMf4z5cTGVKqYHzXRnA8OTBM%3D"
 
     DEFAULT_OUTPUT_FORMAT = "nc"
-    SUPPORTED_OUTPUT_FORMATS = {"nc", "zarr", "dfs2"}
+    SUPPORTED_OUTPUT_FORMATS = {"nc", "zarr", "dfs2", "tif"}
     CATALOG_FILE = Path(__file__).parent.joinpath("dataset_catalog.yaml")
 
     def __init__(
@@ -271,10 +272,13 @@ class PDPDataDownloader:
             The opened remote dataset (lazy-loaded).
         """
         dataset_info = self.get_dataset_info(category, subcategory)
-        azure_path = f"{self.azure_container}/{dataset_info['path']}"
 
         print(f"Opening remote dataset: {category} --> {subcategory}")
 
+        if dataset_info.get("format", "zarr") == "cog":
+            return self._open_cog_dataset(dataset_info)
+
+        azure_path = f"{self.azure_container}/{dataset_info['path']}"
         try:
             store = self.fs.get_mapper(azure_path)
             try:
@@ -286,6 +290,75 @@ class PDPDataDownloader:
             raise
 
         return ds
+
+    def _open_cog_dataset(self, dataset_info: Dict) -> xr.Dataset:
+        """
+        Open a COG dataset (single file or tiled mosaic) from Azure Blob Storage.
+
+        Parameters
+        ----------
+        dataset_info : dict
+            Catalog entry with ``path``, ``crs``, ``variable``, optional
+            ``container`` (defaults to the downloader's container), ``tiled``,
+            and ``anon`` (use anonymous access for the COG container).
+
+        Returns
+        -------
+        xarray.Dataset
+            Dataset with ``y``/``x`` dimensions and CRS set.
+        """
+        container = dataset_info.get("container", self.azure_container)
+
+        # Catchment bounds in the dataset CRS, used to select intersecting tiles.
+        catchment_reproj = reproject_catchment(self.catchment, dataset_info["crs"])
+        bbox = tuple(catchment_reproj.total_bounds)
+
+        # Resolve the list of tile URIs. For a tiled mosaic we list the prefix via the
+        # filesystem; for a single file we use its path directly. The blobs are read by
+        # GDAL/rasterio from their HTTPS URLs (range reads) rather than streamed through
+        # the filesystem object, which is much faster for many tiles.
+        if dataset_info.get("tiled", False):
+            fs = self._cog_filesystem(dataset_info)
+            prefix = f"{container}/{dataset_info['path']}".rstrip("/")
+            blob_paths = sorted(fs.glob(prefix + "/**/*.tif"))
+            if not blob_paths:
+                raise FileNotFoundError(f"No .tif tiles found under prefix: {prefix}")
+        else:
+            blob_paths = [f"{container}/{dataset_info['path']}"]
+
+        anon = dataset_info.get("anon", False)
+        uris = [self._blob_url(p, anon=anon) for p in blob_paths]
+
+        try:
+            return cogio.open_cog(
+                uris,
+                variable=dataset_info["variable"],
+                crs=dataset_info["crs"],
+                bbox=bbox,
+            )
+        except Exception as e:
+            print(f"ERROR: Failed to open COG dataset: {e}")
+            raise
+
+    def _blob_url(self, blob_path: str, anon: bool = False) -> str:
+        """Build an HTTPS blob URL (with SAS token unless anonymous) for GDAL/vsicurl."""
+        url = f"https://{self.azure_account}.blob.core.windows.net/{blob_path}"
+        if not anon and self.azure_credential:
+            url += "?" + self.azure_credential.lstrip("?")
+        return url
+
+    def _cog_filesystem(self, dataset_info: Dict):
+        """Return the filesystem used to list tiles for a COG dataset.
+
+        COG containers may use different credentials than the default Zarr
+        container. When the catalog entry sets ``anon: true``, use a cached
+        anonymous filesystem; otherwise reuse the main (SAS-authenticated) one.
+        """
+        if not dataset_info.get("anon", False):
+            return self.fs
+        if getattr(self, "_anon_fs", None) is None:
+            self._anon_fs = adlfs.AzureBlobFileSystem(account_name=self.azure_account, anon=True)
+        return self._anon_fs
 
     def process_dataset(
         self,
@@ -383,6 +456,13 @@ class PDPDataDownloader:
                 varname=dataset_info.get("variable"),
                 eumtype=dataset_info.get("eumtype"),
                 eumunit=dataset_info.get("eumunit"),
+            )
+        elif self.output_format == "tif":
+            cogio.write_cog(
+                ds,
+                output_path,
+                crs=dataset_info["crs"],
+                varname=dataset_info.get("variable"),
             )
         else:
             ds.to_netcdf(output_path, mode="w", engine="netcdf4")
@@ -489,6 +569,12 @@ class PDPDataDownloader:
 
             # Clean up and restore standard coordinate names
             ds = ds.drop_vars("spatial_ref", errors="ignore").rename({"y": "lat", "x": "lon"})
+
+            # The clip is the spatial subset; return it directly. Falling through to the
+            # slice-based selection below would re-subset and, for rasters with descending
+            # latitude (e.g. COG DEM tiles), collapse to the nearest-neighbor fallback grid.
+            print(f"Subset shape: {dict(ds.sizes)}")
+            return ds
 
         elif self.buffer_cells > 0:
             x_coord = ds[x_dim]
