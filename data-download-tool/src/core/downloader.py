@@ -52,6 +52,7 @@ class PDPDataDownloader:
     DEFAULT_OUTPUT_FORMAT = "nc"
     SUPPORTED_OUTPUT_FORMATS = {"nc", "zarr", "dfs2", "tif"}
     CATALOG_FILE = Path(__file__).parent.joinpath("dataset_catalog.yaml")
+    COG_CATALOG_FILE = Path(__file__).parent.joinpath("cog_catalog.yaml")
 
     def __init__(
         self,
@@ -135,11 +136,24 @@ class PDPDataDownloader:
             print(f"Output format remains: {self.output_format}")
 
     def _load_catalog(self) -> Dict:
-        """Load dataset catalog from YAML file."""
+        """Load the dataset catalog, merging the COG catalog into it.
+
+        Zarr time-series datasets live in ``dataset_catalog.yaml`` and COG raster
+        layers in ``cog_catalog.yaml``; both are merged per-category so they share
+        a single namespace for ``download_dataset(category, subcategory)``.
+        """
         if not self.CATALOG_FILE.exists():
             raise FileNotFoundError(f"Dataset catalog not found: {self.CATALOG_FILE}")
         with open(self.CATALOG_FILE, "r") as f:
-            return yaml.safe_load(f)
+            catalog = yaml.safe_load(f) or {}
+
+        if self.COG_CATALOG_FILE.exists():
+            with open(self.COG_CATALOG_FILE, "r") as f:
+                cog_catalog = yaml.safe_load(f) or {}
+            for category, subcategories in cog_catalog.items():
+                catalog.setdefault(category, {}).update(subcategories)
+
+        return catalog
 
     def _setup_azure_connection(self, credential: Optional[str] = None):
         """

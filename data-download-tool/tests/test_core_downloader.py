@@ -85,9 +85,26 @@ def test_load_catalog(tmp_path, monkeypatch):
     catalog = tmp_path / "dataset_catalog.yaml"
     catalog.write_text("climate:\n  rain:\n    description: Rain\n", encoding="utf-8")
     monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
+    monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", tmp_path / "no_cog.yaml")
     d = _new_downloader(tmp_path)
     loaded = PDPDataDownloader._load_catalog(d)
     assert "climate" in loaded
+
+
+def test_load_catalog_merges_cog_catalog(tmp_path, monkeypatch):
+    catalog = tmp_path / "dataset_catalog.yaml"
+    catalog.write_text("climate:\n  rain:\n    description: Rain\n", encoding="utf-8")
+    cog = tmp_path / "cog_catalog.yaml"
+    cog.write_text(
+        "soil:\n  ksat_b000cm:\n    format: cog\n    description: Ksat\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
+    monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", cog)
+    d = _new_downloader(tmp_path)
+    loaded = PDPDataDownloader._load_catalog(d)
+    assert "climate" in loaded
+    assert loaded["soil"]["ksat_b000cm"]["format"] == "cog"
 
 
 def test_load_and_save_download_history(tmp_path):
