@@ -332,6 +332,114 @@ def test_save_dataset_tif(monkeypatch, tmp_path):
     assert called["path"] == out
 
 
+def _geoparquet_entry():
+    return {
+        "path": "Soil/LUCAS_2018_bulk_density.parquet",
+        "container": "geoparquet",
+        "format": "geoparquet",
+        "anon": False,
+        "crs": "EPSG:4326",
+        "temporal": False,
+        "description": "LUCAS bulk density",
+        "variable": "bulk_density",
+    }
+
+
+def test_download_dataset_routes_to_geoparquet(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    d.dataset_catalog["soil"] = {"lucas": _geoparquet_entry()}
+    d.fs = object()
+    d.output_format = "parquet"
+
+    monkeypatch.setattr("src.core.downloader.reproject_catchment", lambda gdf, crs: gdf)
+
+    captured = {}
+
+    def fake_open(blob_path, **kwargs):
+        captured["blob_path"] = blob_path
+        captured.update(kwargs)
+        return "gdf"
+
+    out_path = tmp_path / "data" / "soil" / "lucas" / "lucas.parquet"
+    monkeypatch.setattr("src.core.downloader.geoparquetio.open_geoparquet", fake_open)
+
+    def fake_build(base, cat, sub, fmt):
+        captured["fmt"] = fmt
+        return out_path
+
+    monkeypatch.setattr("src.core.downloader.build_dataset_path", fake_build)
+    monkeypatch.setattr("src.core.downloader.remove_path_with_retry", lambda p: True)
+    written = {}
+    monkeypatch.setattr(
+        "src.core.downloader.geoparquetio.write_geoparquet",
+        lambda gdf, path, fmt: written.update(gdf=gdf, path=path, fmt=fmt),
+    )
+    monkeypatch.setattr(d, "_log_download", lambda *a, **k: None)
+
+    result = d.download_dataset("soil", "lucas")
+    assert result == out_path
+    assert captured["blob_path"] == "geoparquet/Soil/LUCAS_2018_bulk_density.parquet"
+    assert captured["fmt"] == "parquet"
+    assert written == {"gdf": "gdf", "path": out_path, "fmt": "parquet"}
+
+
+def test_download_geoparquet_falls_back_to_parquet_for_raster_format(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    d.dataset_catalog["soil"] = {"lucas": _geoparquet_entry()}
+    d.fs = object()
+    d.output_format = "nc"  # raster format -> should fall back to parquet
+
+    monkeypatch.setattr("src.core.downloader.reproject_catchment", lambda gdf, crs: gdf)
+    monkeypatch.setattr("src.core.downloader.geoparquetio.open_geoparquet", lambda *a, **k: "gdf")
+    captured = {}
+
+    def fake_build(base, cat, sub, fmt):
+        captured["fmt"] = fmt
+        return tmp_path / "o.parquet"
+
+    monkeypatch.setattr("src.core.downloader.build_dataset_path", fake_build)
+    monkeypatch.setattr("src.core.downloader.remove_path_with_retry", lambda p: True)
+    monkeypatch.setattr("src.core.downloader.geoparquetio.write_geoparquet", lambda *a, **k: None)
+    monkeypatch.setattr(d, "_log_download", lambda *a, **k: None)
+
+    d.download_dataset("soil", "lucas")
+    assert captured["fmt"] == "parquet"
+
+
+def test_save_dataset_rejects_vector_format_for_raster(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    d.output_format = "shp"
+    ds = xr.Dataset(
+        {"rain": (("lat", "lon"), np.ones((1, 1)))},
+        coords={"lat": [0], "lon": [0]},
+    )
+    monkeypatch.setattr(
+        "src.core.downloader.build_dataset_path", lambda *a, **k: tmp_path / "x.shp"
+    )
+    monkeypatch.setattr("src.core.downloader.remove_path_with_retry", lambda p: True)
+    monkeypatch.setattr("src.core.downloader.reproject_catchment", lambda gdf, crs: gdf)
+    monkeypatch.setattr(d, "_log_download", lambda *a, **k: None)
+
+    with pytest.raises(ValueError):
+        d.save_dataset(ds, "climate", "rain")
+
+
+def test_load_catalog_merges_geoparquet_catalog(tmp_path, monkeypatch):
+    catalog = tmp_path / "dataset_catalog.yaml"
+    catalog.write_text("climate:\n  rain:\n    description: Rain\n", encoding="utf-8")
+    gpq = tmp_path / "geoparquet_catalog.yaml"
+    gpq.write_text(
+        "soil:\n  lucas:\n    format: geoparquet\n    description: LUCAS\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
+    monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", tmp_path / "no_cog.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "GEOPARQUET_CATALOG_FILE", gpq)
+    d = _new_downloader(tmp_path)
+    loaded = PDPDataDownloader._load_catalog(d)
+    assert loaded["soil"]["lucas"]["format"] == "geoparquet"
+
+
 def test_download_dataset_pipeline(monkeypatch, tmp_path):
     d = _new_downloader(tmp_path)
     monkeypatch.setattr(d, "open_dataset", lambda *args, **kwargs: "raw")

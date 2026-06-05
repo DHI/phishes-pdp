@@ -33,6 +33,7 @@ dependencies = [
     "rioxarray>=0.15.0",
     "pyproj>=3.4.0",
     "fiona>=1.9.0",
+    "pyarrow>=10.0.0",
     "mikeio>=1.0.0",
     # Azure cloud storage
     "adlfs>=2023.1.0",
