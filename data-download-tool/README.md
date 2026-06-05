@@ -160,7 +160,8 @@ data-download-tool/
 │   │   ├── downloader.py           # Data downloader
 │   │   ├── dfsio.py                # DFS file I/O utilities
 │   │   ├── cogio.py                # COG (GeoTIFF) read/write utilities
-│   │   └── dataset_catalog.yaml    # Available datasets definition
+│   │   ├── dataset_catalog.yaml    # Zarr datasets definition
+│   │   └── cog_catalog.yaml        # COG (GeoTIFF) datasets definition
 │   ├── analysis/                   # Analysis modules
 │   │   ├── __init__.py             # Package exports
 │   │   ├── catchment.py            # Catchment processing & validation
@@ -223,11 +224,23 @@ Additional categories (soil, topography, landuse, hydrology) will be added as th
 
 ### COG (Cloud Optimized GeoTIFF) datasets
 
-Static raster layers can be served as COGs from a separate Azure container on the same
-account. They are downloaded through the same workflow (`download_dataset(category,
-subcategory)` with `time_range=None`) and written as `.tif` (`output_format = "tif"`).
+Static raster layers are served as COGs from the public `cogs` Azure container. They
+are downloaded through the same workflow (`download_dataset(category, subcategory)` with
+`time_range=None`) and written as `.tif` (`output_format = "tif"`).
 
-A COG entry in `dataset_catalog.yaml` adds these fields on top of the standard ones:
+COG datasets are defined in **`src/core/cog_catalog.yaml`** (kept separate from the Zarr
+`dataset_catalog.yaml` to keep each file focused; the downloader merges both at load
+time). Currently available:
+
+| Category   | Subcategory(ies)                                  | Tiled | Spatial Res. |
+| ---------- | ------------------------------------------------- | ----- | ------------ |
+| topography | cop_dem                                           | yes   | ~30 m        |
+| landcover  | esa_worldcover_2021                               | yes   | ~10 m        |
+| soil       | wc_33kpa_b000cm … b200cm (6 depths)               | no    | ~250 m       |
+| soil       | wc_1500kpa_b000cm … b200cm (6 depths)             | no    | ~250 m       |
+| soil       | ksat_b000cm, b030cm, b060cm, b100cm               | no    | ~1 km        |
+
+A COG entry adds these fields on top of the standard ones:
 
 | Field       | Meaning                                                                       |
 | ----------- | ----------------------------------------------------------------------------- |
@@ -237,8 +250,9 @@ A COG entry in `dataset_catalog.yaml` adds these fields on top of the standard o
 | `anon`      | `true` to read the COG container with anonymous (public) access.              |
 | `temporal`  | `false` for COGs (no time dimension; temporal subsetting is skipped).         |
 
-When `tiled: true`, the reader mosaics only the tiles whose bounds intersect the
-catchment. `eumtype`/`eumunit` are not needed for COG entries (those drive DFS2 output).
+When `tiled: true`, the reader reads all tile extents in parallel and mosaics only the
+tiles whose bounds intersect the catchment. `eumtype`/`eumunit` are not needed for COG
+entries (those drive DFS2 output).
 
 ---
 
