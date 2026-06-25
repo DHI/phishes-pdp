@@ -1,0 +1,29 @@
+# GeoParquet (vector) catalog.
+#
+# Static vector layers (no time dimension) stored as GeoParquet files in the
+# "geoparquet" Azure container. Kept separate from dataset_catalog.yaml (Zarr
+# time series) and cog_catalog.yaml (COG rasters); the downloader loads and
+# merges all three per-category into one namespace.
+#
+# GeoParquet-specific fields:
+#   format: geoparquet -> routes the entry to the GeoParquet (vector) reader
+#   container: geoparquet -> Azure container holding the .parquet files
+#   path: <blob path>  -> single .parquet file within the container
+#   anon: true|false   -> read the container with anonymous access (false: use SAS)
+#   temporal: false    -> static layer; temporal subsetting is skipped
+#   crs: EPSG:....      -> assigned only if the file lacks CRS metadata
+#   variable           -> informational / logged; the data is columnar, not gridded
+# Features intersecting the catchment are kept whole (no geometry truncation).
+# Download these with OUTPUT_FORMAT = "parquet" (GeoParquet) or "shp" (Shapefile).
+
+soil:
+  lucas_2018_bulk_density:
+    path: Soil/LUCAS_2018_bulk_density.parquet
+    container: geoparquet
+    format: geoparquet
+    anon: false
+    display_name: LUCAS 2018 Bulk Density (points)
+    description: LUCAS 2018 topsoil bulk density sample points.
+    variable: bulk_density
+    temporal: false
+    crs: EPSG:4326

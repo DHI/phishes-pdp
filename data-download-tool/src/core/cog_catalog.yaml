@@ -1,0 +1,221 @@
+# Cloud Optimized GeoTIFF (COG) catalog.
+#
+# Static raster layers (no time dimension) stored as COGs in the public "cogs"
+# Azure container. Kept separate from dataset_catalog.yaml (Zarr time series) to
+# keep each file focused; the downloader loads and merges both.
+#
+# COG-specific fields:
+#   format: cog        -> routes the entry to the COG reader
+#   container: cogs    -> Azure container holding the COGs
+#   tiled: true|false  -> true: `path` is a prefix/folder of many tiles (mosaicked
+#                         to the catchment); false: `path` is a single .tif
+#   anon: true         -> read the container with anonymous (public) access
+#   temporal: false    -> static layer; temporal subsetting is skipped
+# Download these with OUTPUT_FORMAT = "tif".
+
+landcover:
+  esa_worldcover_2021:
+    path: static_layers/esa_worldcover_europe_2021_v200
+    container: cogs
+    format: cog
+    tiled: true
+    anon: true
+    display_name: ESA WorldCover Europe 2021 (v200)
+    description: ESA WorldCover Europe 2021 v200 (tiled mosaic, ~10 m)
+    variable: landcover
+    temporal: false
+    crs: EPSG:4326
+
+topography:
+  cop_dem:
+    path: static_layers/cop_dem
+    container: cogs
+    format: cog
+    tiled: true
+    anon: true
+    display_name: Copernicus DEM
+    description: Copernicus digital elevation model (tiled mosaic)
+    variable: elevation
+    temporal: false
+    crs: EPSG:4326
+
+soil:
+  # OpenLandMap soil water content at 33 kPa (field capacity), 250 m, by depth.
+  wc_33kpa_b000cm:
+    path: soil/soil_water_retention/OLM_WC_33kPa_250m_b000cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 33 kPa, 0 cm
+    description: Soil water content at 33 kPa (field capacity), 0 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  wc_33kpa_b010cm:
+    path: soil/soil_water_retention/OLM_WC_33kPa_250m_b010cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 33 kPa, 10 cm
+    description: Soil water content at 33 kPa (field capacity), 10 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  wc_33kpa_b030cm:
+    path: soil/soil_water_retention/OLM_WC_33kPa_250m_b030cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 33 kPa, 30 cm
+    description: Soil water content at 33 kPa (field capacity), 30 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  wc_33kpa_b060cm:
+    path: soil/soil_water_retention/OLM_WC_33kPa_250m_b060cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 33 kPa, 60 cm
+    description: Soil water content at 33 kPa (field capacity), 60 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  wc_33kpa_b100cm:
+    path: soil/soil_water_retention/OLM_WC_33kPa_250m_b100cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 33 kPa, 100 cm
+    description: Soil water content at 33 kPa (field capacity), 100 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  wc_33kpa_b200cm:
+    path: soil/soil_water_retention/OLM_WC_33kPa_250m_b200cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 33 kPa, 200 cm
+    description: Soil water content at 33 kPa (field capacity), 200 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  # OpenLandMap soil water content at 1500 kPa (wilting point), 250 m, by depth.
+  wc_1500kpa_b000cm:
+    path: soil/soil_water_retention/OLM_WC_1500kPa_250m_b000cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 1500 kPa, 0 cm
+    description: Soil water content at 1500 kPa (wilting point), 0 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  wc_1500kpa_b010cm:
+    path: soil/soil_water_retention/OLM_WC_1500kPa_250m_b010cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 1500 kPa, 10 cm
+    description: Soil water content at 1500 kPa (wilting point), 10 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  wc_1500kpa_b030cm:
+    path: soil/soil_water_retention/OLM_WC_1500kPa_250m_b030cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 1500 kPa, 30 cm
+    description: Soil water content at 1500 kPa (wilting point), 30 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  wc_1500kpa_b060cm:
+    path: soil/soil_water_retention/OLM_WC_1500kPa_250m_b060cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 1500 kPa, 60 cm
+    description: Soil water content at 1500 kPa (wilting point), 60 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  wc_1500kpa_b100cm:
+    path: soil/soil_water_retention/OLM_WC_1500kPa_250m_b100cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 1500 kPa, 100 cm
+    description: Soil water content at 1500 kPa (wilting point), 100 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  wc_1500kpa_b200cm:
+    path: soil/soil_water_retention/OLM_WC_1500kPa_250m_b200cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Soil water content at 1500 kPa, 200 cm
+    description: Soil water content at 1500 kPa (wilting point), 200 cm depth
+    variable: water_content
+    temporal: false
+    crs: EPSG:4326
+  # OpenLandMap saturated hydraulic conductivity (Ksat), 1 km, by depth.
+  ksat_b000cm:
+    path: soil/soil_ksat/OLM_Ksat_1km_b000cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Saturated hydraulic conductivity, 0 cm
+    description: Saturated hydraulic conductivity (Ksat), 0 cm depth
+    variable: ksat
+    temporal: false
+    crs: EPSG:4326
+  ksat_b030cm:
+    path: soil/soil_ksat/OLM_Ksat_1km_b030cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Saturated hydraulic conductivity, 30 cm
+    description: Saturated hydraulic conductivity (Ksat), 30 cm depth
+    variable: ksat
+    temporal: false
+    crs: EPSG:4326
+  ksat_b060cm:
+    path: soil/soil_ksat/OLM_Ksat_1km_b060cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Saturated hydraulic conductivity, 60 cm
+    description: Saturated hydraulic conductivity (Ksat), 60 cm depth
+    variable: ksat
+    temporal: false
+    crs: EPSG:4326
+  ksat_b100cm:
+    path: soil/soil_ksat/OLM_Ksat_1km_b100cm_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: Saturated hydraulic conductivity, 100 cm
+    description: Saturated hydraulic conductivity (Ksat), 100 cm depth
+    variable: ksat
+    temporal: false
+    crs: EPSG:4326
