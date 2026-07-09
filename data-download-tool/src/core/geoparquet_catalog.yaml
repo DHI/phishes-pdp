@@ -21,7 +21,7 @@ soil:
     path: Soil/LUCAS_2018_bulk_density.parquet
     container: geoparquet
     format: geoparquet
-    anon: false
+    anon: true
     display_name: LUCAS 2018 Bulk Density (points)
     description: LUCAS 2018 topsoil bulk density sample points.
     variable: bulk_density
