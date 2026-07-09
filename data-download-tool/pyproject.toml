@@ -24,7 +24,7 @@ dependencies = [
     "pandas>=1.5.0",
     "xarray>=2023.1.0",
     "zarr>=2.13.0",
-    "dask>=2023.1.0",
+    "dask>=2026.3.0",
     "netCDF4>=1.6.5",
     # Geospatial libraries
     "geopandas>=0.12.0",
@@ -33,11 +33,12 @@ dependencies = [
     "rioxarray>=0.15.0",
     "pyproj>=3.4.0",
     "fiona>=1.10.1",
+    "pyarrow>=10.0.0",
     "mikeio>=1.0.0",
     # Azure cloud storage
     "adlfs>=2023.1.0",
     "fsspec>=2023.1.0",
-    "azure-storage-blob>=12.14.0",
+    "azure-storage-blob>=12.28.0",
     "azure-identity>=1.12.0",
     # Visualization
     "matplotlib>=3.6.0",
@@ -50,11 +51,11 @@ dependencies = [
 
 [project.optional-dependencies]
 jupyter = ["jupyter>=1.0.0", "ipywidgets>=8.0.0"]
-dev = ["pytest>=7.2.0", "ruff>=0.1.0"]
+dev = ["pytest>=9.0.3", "ruff>=0.1.0"]
 all = ["phishes-data-downloader[jupyter,dev]"]
 
 [dependency-groups]
-dev = ["pytest>=7.2.0", "ruff>=0.1.0"]
+dev = ["pytest>=9.0.3", "ruff>=0.1.0"]
 
 [project.scripts]
 phishes-setup = "setup_folder_structure:main"
