@@ -42,6 +42,49 @@ def get_grid_resolution(
     return float(np.abs(coords[1] - coords[0]))
 
 
+def regularize_axis(
+    coords: Union[xr.DataArray, np.ndarray],
+    rtol: float = 0.25,
+) -> np.ndarray:
+    """
+    Snap a near-equidistant coordinate axis to an exactly uniform grid.
+
+    Some sources store coordinates rounded to a few decimals (e.g. MODIS CMG
+    lat/lon on a 0.05 deg grid), which introduces occasional off-by-one-decimal
+    steps. DFS2 grids must be equidistant, so mikeio rejects such an axis. When
+    the axis is uniform to within ``rtol`` of its median step, rebuild it as an
+    exact ``linspace`` (endpoints preserved, uniform spacing). Genuinely
+    irregular axes are returned unchanged so callers still fail loudly.
+
+    Parameters
+    ----------
+    coords : xarray.DataArray or numpy.ndarray
+        Coordinate values (e.g., lat or lon).
+    rtol : float, default 0.25
+        Maximum allowed deviation of any step from the median step, as a
+        fraction of the median step, for the axis to be treated as uniform.
+
+    Returns
+    -------
+    numpy.ndarray
+        Regularized coordinates if near-equidistant, otherwise the originals.
+    """
+    if hasattr(coords, "values"):
+        coords = coords.values
+    coords = np.asarray(coords)
+    if len(coords) < 3:
+        return coords
+
+    diffs = np.diff(coords)
+    median = np.median(diffs)
+    if median == 0:
+        return coords
+
+    if np.max(np.abs(diffs - median)) <= rtol * np.abs(median):
+        return np.linspace(coords[0], coords[-1], len(coords))
+    return coords
+
+
 def remove_path_with_retry(
     path: Path,
     max_retries: int = 5,
@@ -154,10 +197,16 @@ def open_dataset_any(path: Union[str, Path]) -> xr.Dataset:
     --------
     >>> ds = open_dataset_any(Path("data").joinpath("climate", "temperature", "temperature.zarr"))
     >>> ds = open_dataset_any(Path("data").joinpath("climate", "temperature", "temperature.nc"))
+    >>> ds = open_dataset_any(Path("data").joinpath("landuse", "corine_2018", "corine_2018.tif"))
     """
     path = Path(path)
 
-    if path.suffix == ".zarr" or path.is_dir():
+    if path.suffix in (".tif", ".tiff"):
+        import rioxarray
+
+        da = rioxarray.open_rasterio(path, masked=True).rename("band_data")
+        return da.to_dataset(name="band_data")
+    elif path.suffix == ".zarr" or path.is_dir():
         return xr.open_zarr(path, consolidated=True)
     elif path.suffix == ".nc":
         return xr.open_dataset(path, engine="netcdf4")
@@ -166,7 +215,8 @@ def open_dataset_any(path: Union[str, Path]) -> xr.Dataset:
     else:
         raise ValueError(
             f"Unsupported file format: {path.suffix}. "
-            f"Supported formats: .zarr (directory), .nc (NetCDF), .dfs2 (MIKE IO)"
+            f"Supported formats: .zarr (directory), .nc (NetCDF), .dfs2 (MIKE IO), "
+            f".tif/.tiff (COG GeoTIFF)"
         )
 
 
