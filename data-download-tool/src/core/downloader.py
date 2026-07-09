@@ -304,15 +304,41 @@ class PDPDataDownloader:
         azure_path = f"{self.azure_container}/{dataset_info['path']}"
         try:
             store = self.fs.get_mapper(azure_path)
-            try:
-                ds = xr.open_zarr(store, consolidated=True)
-            except Exception:
-                ds = xr.open_zarr(store, consolidated=False)
+            ds = self._open_zarr_store(store)
         except Exception as e:
             print(f"ERROR: Failed to open dataset: {e}")
             raise
 
         return ds
+
+    @staticmethod
+    def _open_zarr_store(store) -> xr.Dataset:
+        """Open a Zarr store, tolerating stores whose metadata mixes Zarr v2/v3.
+
+        Some stores carry both a Zarr v2 ``.zmetadata`` and a stray v3
+        ``zarr.json`` group marker. zarr-python then reads the (array-less) v3
+        group and returns an *empty* dataset without raising, so a plain
+        consolidated/non-consolidated fallback silently yields no variables.
+        Try consolidated, non-consolidated, then an explicit ``zarr_format=2``
+        read, and take the first result that actually exposes data variables.
+        """
+        attempts = (
+            {"consolidated": True},
+            {"consolidated": False},
+            {"consolidated": False, "zarr_format": 2},
+        )
+        last_err = None
+        for kwargs in attempts:
+            try:
+                ds = xr.open_zarr(store, **kwargs)
+            except Exception as e:  # noqa: BLE001 - try the next strategy
+                last_err = e
+                continue
+            if len(ds.data_vars) > 0:
+                return ds
+        if last_err is not None:
+            raise last_err
+        raise ValueError("Opened Zarr store contains no data variables")
 
     def _open_cog_dataset(self, dataset_info: Dict) -> xr.Dataset:
         """
