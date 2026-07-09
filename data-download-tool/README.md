@@ -21,7 +21,8 @@ And generates:
 
 - ✅ Polygon-based spatial extraction (only download what you need)
 - ✅ Zarr format for efficient cloud-optimized data access
-- ✅ Optional DFS2 export
+- ✅ Cloud Optimized GeoTIFF (COG) layers for static rasters (single file or tiled mosaic)
+- ✅ Optional DFS2 and GeoTIFF (`.tif`) export
 - ✅ Automatic catchment CRS (Coordinate Reference System) reprojection
 - ✅ Support for multiple dataset categories (climate, soil, topography, landuse, hydrology)
 - ✅ Area-weighted basin averaging and time series analysis
@@ -158,7 +159,9 @@ data-download-tool/
 │   │   ├── folder_structure.py     # Folder structure creation
 │   │   ├── downloader.py           # Data downloader
 │   │   ├── dfsio.py                # DFS file I/O utilities
-│   │   └── dataset_catalog.yaml    # Available datasets definition
+│   │   ├── cogio.py                # COG (GeoTIFF) read/write utilities
+│   │   ├── dataset_catalog.yaml    # Zarr datasets definition
+│   │   └── cog_catalog.yaml        # COG (GeoTIFF) datasets definition
 │   ├── analysis/                   # Analysis modules
 │   │   ├── __init__.py             # Package exports
 │   │   ├── catchment.py            # Catchment processing & validation
@@ -196,8 +199,13 @@ Configure these settings in the notebook when initializing the downloader:
 - **`output_base`**: Base directory for downloaded data
 - **`time_range`**: Tuple of start and end dates (e.g., `('2015-01-01', '2020-12-31')`)
 - **`buffer_cells`**: Buffer in grid cells around catchment (default: 1)
-- **`output_format`**: Output format - `"nc"` (NetCDF), `"zarr"`, or `"dfs2"`
+- **`output_format`**: Output format - `"nc"` (NetCDF), `"zarr"`, `"dfs2"`, or `"tif"` (GeoTIFF/COG)
 - **`mask_on_catchment`**: If `True`, clips data to exact catchment boundary
+
+> **COG (GeoTIFF) layers** are static rasters (no time dimension). Use
+> `output_format = "tif"` and `time_range = None` for them. They are read from a
+> separate Azure container and may be either a single `.tif` or an externally tiled
+> mosaic; see the catalog notes below.
 
 ---
 
@@ -213,6 +221,38 @@ The following datasets are currently available in PDP datastore:
 | climate  | era5_surface_solar_radiation_downwards | ssrd     | W/m² | 1 h      | 0.25° (~25 km) |
 
 Additional categories (soil, topography, landuse, hydrology) will be added as they become available.
+
+### COG (Cloud Optimized GeoTIFF) datasets
+
+Static raster layers are served as COGs from the public `cogs` Azure container. They
+are downloaded through the same workflow (`download_dataset(category, subcategory)` with
+`time_range=None`) and written as `.tif` (`output_format = "tif"`).
+
+COG datasets are defined in **`src/core/cog_catalog.yaml`** (kept separate from the Zarr
+`dataset_catalog.yaml` to keep each file focused; the downloader merges both at load
+time). Currently available:
+
+| Category   | Subcategory(ies)                                  | Tiled | Spatial Res. |
+| ---------- | ------------------------------------------------- | ----- | ------------ |
+| topography | cop_dem                                           | yes   | ~30 m        |
+| landcover  | esa_worldcover_2021                               | yes   | ~10 m        |
+| soil       | wc_33kpa_b000cm … b200cm (6 depths)               | no    | ~250 m       |
+| soil       | wc_1500kpa_b000cm … b200cm (6 depths)             | no    | ~250 m       |
+| soil       | ksat_b000cm, b030cm, b060cm, b100cm               | no    | ~1 km        |
+
+A COG entry adds these fields on top of the standard ones:
+
+| Field       | Meaning                                                                       |
+| ----------- | ----------------------------------------------------------------------------- |
+| `format`    | `cog` routes the entry to the COG reader (omit / `zarr` for Zarr datasets).   |
+| `container` | Azure container holding the COGs (defaults to the downloader's container).    |
+| `tiled`     | `false` ⇒ `path` is one `.tif`; `true` ⇒ `path` is a prefix of many tiles.    |
+| `anon`      | `true` to read the COG container with anonymous (public) access.              |
+| `temporal`  | `false` for COGs (no time dimension; temporal subsetting is skipped).         |
+
+When `tiled: true`, the reader reads all tile extents in parallel and mosaics only the
+tiles whose bounds intersect the catchment. `eumtype`/`eumunit` are not needed for COG
+entries (those drive DFS2 output).
 
 ---
 
