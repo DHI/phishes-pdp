@@ -20,10 +20,13 @@ import adlfs
 import geopandas as gpd
 import rioxarray  # noqa: F401 - enables .rio accessor on xarray objects
 import xarray as xr
+from shapely.ops import unary_union
 
 from .utils import build_dataset_path, get_grid_resolution, remove_path_with_retry
 from ..analysis import load_catchment, validate_catchment_gdf, reproject_catchment
 from . import dfsio
+from . import cogio
+from . import geoparquetio
 
 
 class PDPDataDownloader:
@@ -49,8 +52,14 @@ class PDPDataDownloader:
     DEFAULT_AZURE_CREDENTIAL = "sp=rl&st=2026-02-09T10:22:14Z&se=2034-12-31T18:37:14Z&spr=https&sv=2024-11-04&sr=c&sig=buOnKjOpmc%2BDZw7lnyWhMf4z5cTGVKqYHzXRnA8OTBM%3D"
 
     DEFAULT_OUTPUT_FORMAT = "nc"
-    SUPPORTED_OUTPUT_FORMATS = {"nc", "zarr", "dfs2"}
+    # Raster outputs flow through the xarray pipeline; vector (GeoParquet) outputs
+    # flow through GeoPandas. Both sets are accepted by output_format validation.
+    RASTER_OUTPUT_FORMATS = {"nc", "zarr", "dfs2", "tif"}
+    VECTOR_OUTPUT_FORMATS = {"parquet", "shp"}
+    SUPPORTED_OUTPUT_FORMATS = RASTER_OUTPUT_FORMATS | VECTOR_OUTPUT_FORMATS
     CATALOG_FILE = Path(__file__).parent.joinpath("dataset_catalog.yaml")
+    COG_CATALOG_FILE = Path(__file__).parent.joinpath("cog_catalog.yaml")
+    GEOPARQUET_CATALOG_FILE = Path(__file__).parent.joinpath("geoparquet_catalog.yaml")
 
     def __init__(
         self,
@@ -134,11 +143,26 @@ class PDPDataDownloader:
             print(f"Output format remains: {self.output_format}")
 
     def _load_catalog(self) -> Dict:
-        """Load dataset catalog from YAML file."""
+        """Load the dataset catalog, merging the COG and GeoParquet catalogs into it.
+
+        Zarr time-series datasets live in ``dataset_catalog.yaml``, COG raster
+        layers in ``cog_catalog.yaml``, and GeoParquet vector layers in
+        ``geoparquet_catalog.yaml``; all are merged per-category so they share a
+        single namespace for ``download_dataset(category, subcategory)``.
+        """
         if not self.CATALOG_FILE.exists():
             raise FileNotFoundError(f"Dataset catalog not found: {self.CATALOG_FILE}")
         with open(self.CATALOG_FILE, "r") as f:
-            return yaml.safe_load(f)
+            catalog = yaml.safe_load(f) or {}
+
+        for extra_catalog in (self.COG_CATALOG_FILE, self.GEOPARQUET_CATALOG_FILE):
+            if extra_catalog.exists():
+                with open(extra_catalog, "r") as f:
+                    entries = yaml.safe_load(f) or {}
+                for category, subcategories in entries.items():
+                    catalog.setdefault(category, {}).update(subcategories)
+
+        return catalog
 
     def _setup_azure_connection(self, credential: Optional[str] = None):
         """
@@ -271,21 +295,186 @@ class PDPDataDownloader:
             The opened remote dataset (lazy-loaded).
         """
         dataset_info = self.get_dataset_info(category, subcategory)
-        azure_path = f"{self.azure_container}/{dataset_info['path']}"
 
         print(f"Opening remote dataset: {category} --> {subcategory}")
 
+        if dataset_info.get("format", "zarr") == "cog":
+            return self._open_cog_dataset(dataset_info)
+
+        azure_path = f"{self.azure_container}/{dataset_info['path']}"
         try:
             store = self.fs.get_mapper(azure_path)
-            try:
-                ds = xr.open_zarr(store, consolidated=True)
-            except Exception:
-                ds = xr.open_zarr(store, consolidated=False)
+            ds = self._open_zarr_store(store)
         except Exception as e:
             print(f"ERROR: Failed to open dataset: {e}")
             raise
 
         return ds
+
+    @staticmethod
+    def _open_zarr_store(store) -> xr.Dataset:
+        """Open a Zarr store, tolerating stores whose metadata mixes Zarr v2/v3.
+
+        Some stores carry both a Zarr v2 ``.zmetadata`` and a stray v3
+        ``zarr.json`` group marker. zarr-python then reads the (array-less) v3
+        group and returns an *empty* dataset without raising, so a plain
+        consolidated/non-consolidated fallback silently yields no variables.
+        Try consolidated, non-consolidated, then an explicit ``zarr_format=2``
+        read, and take the first result that actually exposes data variables.
+        """
+        attempts = (
+            {"consolidated": True},
+            {"consolidated": False},
+            {"consolidated": False, "zarr_format": 2},
+        )
+        last_err = None
+        for kwargs in attempts:
+            try:
+                ds = xr.open_zarr(store, **kwargs)
+            except Exception as e:  # noqa: BLE001 - try the next strategy
+                last_err = e
+                continue
+            if len(ds.data_vars) > 0:
+                return ds
+        if last_err is not None:
+            raise last_err
+        raise ValueError("Opened Zarr store contains no data variables")
+
+    def _open_cog_dataset(self, dataset_info: Dict) -> xr.Dataset:
+        """
+        Open a COG dataset (single file or tiled mosaic) from Azure Blob Storage.
+
+        Parameters
+        ----------
+        dataset_info : dict
+            Catalog entry with ``path``, ``crs``, ``variable``, optional
+            ``container`` (defaults to the downloader's container), ``tiled``,
+            and ``anon`` (use anonymous access for the COG container).
+
+        Returns
+        -------
+        xarray.Dataset
+            Dataset with ``y``/``x`` dimensions and CRS set.
+        """
+        container = dataset_info.get("container", self.azure_container)
+
+        # Catchment bounds in the dataset CRS, used to select intersecting tiles.
+        catchment_reproj = reproject_catchment(self.catchment, dataset_info["crs"])
+        bbox = tuple(catchment_reproj.total_bounds)
+
+        # Resolve the list of tile URIs. For a tiled mosaic we list the prefix via the
+        # filesystem; for a single file we use its path directly. The blobs are read by
+        # GDAL/rasterio from their HTTPS URLs (range reads) rather than streamed through
+        # the filesystem object, which is much faster for many tiles.
+        if dataset_info.get("tiled", False):
+            fs = self._cog_filesystem(dataset_info)
+            prefix = f"{container}/{dataset_info['path']}".rstrip("/")
+            blob_paths = sorted(fs.glob(prefix + "/**/*.tif"))
+            if not blob_paths:
+                raise FileNotFoundError(f"No .tif tiles found under prefix: {prefix}")
+        else:
+            blob_paths = [f"{container}/{dataset_info['path']}"]
+
+        anon = dataset_info.get("anon", False)
+        uris = [self._blob_url(p, anon=anon) for p in blob_paths]
+
+        try:
+            return cogio.open_cog(
+                uris,
+                variable=dataset_info["variable"],
+                crs=dataset_info["crs"],
+                bbox=bbox,
+            )
+        except Exception as e:
+            print(f"ERROR: Failed to open COG dataset: {e}")
+            raise
+
+    def _blob_url(self, blob_path: str, anon: bool = False) -> str:
+        """Build an HTTPS blob URL (with SAS token unless anonymous) for GDAL/vsicurl."""
+        url = f"https://{self.azure_account}.blob.core.windows.net/{blob_path}"
+        if not anon and self.azure_credential:
+            url += "?" + self.azure_credential.lstrip("?")
+        return url
+
+    def _cog_filesystem(self, dataset_info: Dict):
+        """Return the filesystem used to list tiles for a COG dataset.
+
+        COG containers may use different credentials than the default Zarr
+        container. When the catalog entry sets ``anon: true``, use a cached
+        anonymous filesystem; otherwise reuse the main (SAS-authenticated) one.
+        """
+        if not dataset_info.get("anon", False):
+            return self.fs
+        if getattr(self, "_anon_fs", None) is None:
+            self._anon_fs = adlfs.AzureBlobFileSystem(account_name=self.azure_account, anon=True)
+        return self._anon_fs
+
+    def _download_geoparquet(self, category: str, subcategory: str) -> Path:
+        """
+        Download a GeoParquet (vector) dataset clipped to the catchment.
+
+        Vector data is a GeoDataFrame, not a raster, so it bypasses the xarray
+        ``open_dataset``/``process_dataset``/``save_dataset`` pipeline: this method
+        reads, spatially filters (keeping intersecting features whole), and writes
+        the result as GeoParquet or Shapefile in one pass.
+
+        Parameters
+        ----------
+        category : str
+            Dataset category (e.g., 'soil').
+        subcategory : str
+            Dataset subcategory (e.g., 'lucas_2018_bulk_density').
+
+        Returns
+        -------
+        Path
+            Path to the saved vector dataset.
+        """
+        info = self.get_dataset_info(category, subcategory)
+        container = info.get("container", self.azure_container)
+
+        # Catchment bounds and geometry in the dataset CRS.
+        catchment_reproj = reproject_catchment(self.catchment, info["crs"])
+        bbox = tuple(catchment_reproj.total_bounds)
+        geom = unary_union(catchment_reproj.geometry)
+
+        fs = self._cog_filesystem(info)
+        blob_path = f"{container}/{info['path']}"
+
+        try:
+            gdf = geoparquetio.open_geoparquet(
+                blob_path,
+                mask_geometry=geom,
+                mask_crs=info["crs"],
+                bbox=bbox,
+                crs=info["crs"],
+                filesystem=fs,
+            )
+        except Exception as e:
+            print(f"ERROR: Failed to open GeoParquet dataset: {e}")
+            raise
+
+        # Vector data can only be written as a vector format; if the downloader's
+        # output_format is a raster format, fall back to GeoParquet.
+        if self.output_format in self.VECTOR_OUTPUT_FORMATS:
+            fmt = self.output_format
+        else:
+            fmt = "parquet"
+            print(
+                f"Output format '{self.output_format}' is raster-only; "
+                f"writing vector dataset as '{fmt}' instead."
+            )
+
+        output_path = build_dataset_path(self.output_base, category, subcategory, fmt)
+        remove_path_with_retry(output_path)
+
+        print(f"Writing output to: {output_path}")
+        geoparquetio.write_geoparquet(gdf, output_path, fmt)
+
+        self._log_download(category, subcategory, info, output_path, bbox, None)
+
+        print(f"Download complete: {output_path.relative_to(self.output_base)}")
+        return output_path
 
     def process_dataset(
         self,
@@ -384,6 +573,19 @@ class PDPDataDownloader:
                 eumtype=dataset_info.get("eumtype"),
                 eumunit=dataset_info.get("eumunit"),
             )
+        elif self.output_format == "tif":
+            cogio.write_cog(
+                ds,
+                output_path,
+                crs=dataset_info["crs"],
+                varname=dataset_info.get("variable"),
+            )
+        elif self.output_format in self.VECTOR_OUTPUT_FORMATS:
+            raise ValueError(
+                f"Output format '{self.output_format}' is vector-only and cannot be "
+                f"used for the raster dataset {category}/{subcategory}. "
+                f"Use one of {sorted(self.RASTER_OUTPUT_FORMATS)}."
+            )
         else:
             ds.to_netcdf(output_path, mode="w", engine="netcdf4")
 
@@ -426,6 +628,11 @@ class PDPDataDownloader:
         """
         print(f"Starting download: {category} --> {subcategory}")
         print("This may take a few minutes depending on the data size and your connection.")
+
+        # Vector (GeoParquet) datasets use a dedicated GeoPandas path rather than
+        # the xarray open/process/save pipeline used for raster datasets.
+        if self.get_dataset_info(category, subcategory).get("format") == "geoparquet":
+            return self._download_geoparquet(category, subcategory)
 
         ds = self.open_dataset(category, subcategory)
         ds = self.process_dataset(ds, category, subcategory, time_range, variables)
@@ -489,6 +696,12 @@ class PDPDataDownloader:
 
             # Clean up and restore standard coordinate names
             ds = ds.drop_vars("spatial_ref", errors="ignore").rename({"y": "lat", "x": "lon"})
+
+            # The clip is the spatial subset; return it directly. Falling through to the
+            # slice-based selection below would re-subset and, for rasters with descending
+            # latitude (e.g. COG DEM tiles), collapse to the nearest-neighbor fallback grid.
+            print(f"Subset shape: {dict(ds.sizes)}")
+            return ds
 
         elif self.buffer_cells > 0:
             x_coord = ds[x_dim]
