@@ -16,6 +16,28 @@ def test_get_grid_resolution_default_for_single_value():
     assert utils.get_grid_resolution(np.array([42.0]), default=0.5) == 0.5
 
 
+def test_regularize_axis_snaps_rounded_grid():
+    # A 0.05-deg grid rounded to 2 decimals: an occasional 0.06 step appears.
+    coords = np.round(np.arange(35.0, 36.0, 0.05), 2)
+    coords[3:] += 0.01  # inject a rounding jump
+    out = utils.regularize_axis(coords)
+    diffs = np.diff(out)
+    assert np.allclose(diffs, diffs[0])  # now exactly equidistant
+    assert out[0] == pytest.approx(coords[0])
+    assert out[-1] == pytest.approx(coords[-1])
+
+
+def test_regularize_axis_leaves_irregular_grid_untouched():
+    coords = np.array([0.0, 0.05, 0.10, 0.60, 0.65])  # a real 0.5 jump
+    out = utils.regularize_axis(coords)
+    assert np.array_equal(out, coords)
+
+
+def test_regularize_axis_short_axis_returned_as_is():
+    coords = np.array([1.0, 2.0])
+    assert np.array_equal(utils.regularize_axis(coords), coords)
+
+
 def test_remove_path_with_retry_missing_path(tmp_path):
     assert utils.remove_path_with_retry(tmp_path / "does-not-exist") is False
 
@@ -67,6 +89,24 @@ def test_open_dataset_any_dfs2(monkeypatch, tmp_path):
 
     ds = utils.open_dataset_any(dfs_file)
     assert "lat" in ds.dims and "lon" in ds.dims
+
+
+def test_open_dataset_any_tif(monkeypatch, tmp_path):
+    import rioxarray
+
+    tif_file = tmp_path / "a.tif"
+    tif_file.write_bytes(b"")
+
+    class FakeDA:
+        def rename(self, name):
+            self.name = name
+            return self
+
+        def to_dataset(self, name):
+            return f"tif_ds:{name}"
+
+    monkeypatch.setattr(rioxarray, "open_rasterio", lambda p, masked=True: FakeDA())
+    assert utils.open_dataset_any(tif_file) == "tif_ds:band_data"
 
 
 def test_open_dataset_any_unsupported(tmp_path):
