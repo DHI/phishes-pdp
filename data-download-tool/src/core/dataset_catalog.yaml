@@ -59,6 +59,96 @@ climate:
     eumtype: Wind_speed
     eumunit: meter_per_sec
     data_value_type: Instantaneous
+  era5_soil_temperature_level_1:
+    path: climate/era5_soil_temperature_level_1/ERA5_soil_temperature_level_1.zarr
+    display_name: ERA5 soil temperature level 1
+    description: ERA5 soil temperature level 1 (0-7 cm)
+    variable: stl1
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Temperature
+    eumunit: degree_Celsius
+    data_value_type: Instantaneous
+  era5_soil_temperature_level_2:
+    path: climate/era5_soil_temperature_level_2/ERA5_soil_temperature_level_2.zarr
+    display_name: ERA5 soil temperature level 2
+    description: ERA5 soil temperature level 2 (7-28 cm)
+    variable: stl2
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Temperature
+    eumunit: degree_Celsius
+    data_value_type: Instantaneous
+  era5_soil_temperature_level_3:
+    path: climate/era5_soil_temperature_level_3/ERA5_soil_temperature_level_3.zarr
+    display_name: ERA5 soil temperature level 3
+    description: ERA5 soil temperature level 3 (28-100 cm)
+    variable: stl3
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Temperature
+    eumunit: degree_Celsius
+    data_value_type: Instantaneous
+  era5_soil_temperature_level_4:
+    path: climate/era5_soil_temperature_level_4/ERA5_soil_temperature_level_4.zarr
+    display_name: ERA5 soil temperature level 4
+    description: ERA5 soil temperature level 4 (100-289 cm)
+    variable: stl4
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Temperature
+    eumunit: degree_Celsius
+    data_value_type: Instantaneous
+  eta_mod16a2:
+    path: climate/eta_mod16a2/ETa_MOD16A2.zarr
+    display_name: MOD16A2 actual evapotranspiration
+    description: MOD16A2 actual evapotranspiration (ET), monthly
+    variable: ET
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Evaporation
+    eumunit: millimeter
+    data_value_type: StepAccumulated
+  pet_mod16a2:
+    path: climate/pet_mod16a2/PET_MOD16A2.zarr
+    display_name: MOD16A2 potential evapotranspiration
+    description: MOD16A2 potential evapotranspiration (PET), monthly
+    variable: PET
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Evaporation
+    eumunit: millimeter
+    data_value_type: StepAccumulated
+  gleam_eta:
+    path: climate/gleam_eta/GLEAM_ETa.zarr
+    display_name: GLEAM actual evapotranspiration
+    description: GLEAM v4.3a actual evapotranspiration (E), daily
+    variable: E
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Evaporation
+    eumunit: millimeter
+    data_value_type: StepAccumulated
+  ssebop_eta:
+    path: climate/ssebop_eta/SSEBop_ETa.zarr
+    display_name: SSEBop actual evapotranspiration
+    description: SSEBop actual evapotranspiration (ETa), global V6.1
+    variable: ETa
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Evaporation
+    eumunit: millimeter
+    data_value_type: StepAccumulated
+  modis_snowcover:
+    path: climate/modis_snowcover/MODIS_snowcover.zarr
+    display_name: MODIS 8-day snow cover
+    description: MODIS 8-day CMG snow cover (0.05 degree)
+    variable: Eight_Day_CMG_Snow_Cover
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Snow_Cover_Percentage
+    eumunit: percent
+    data_value_type: Instantaneous
 
 # Cloud Optimized GeoTIFF (COG) datasets live in cog_catalog.yaml and are merged
 # into this catalog at load time. Add static raster layers there, not here.

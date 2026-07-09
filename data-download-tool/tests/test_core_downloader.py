@@ -72,6 +72,36 @@ def test_init_rejects_bad_inputs(monkeypatch, tmp_path):
         PDPDataDownloader(catchment=_catchment_gdf(), output_base=tmp_path, output_format="bad")
 
 
+def test_open_zarr_store_skips_empty_and_uses_zarr_v2(monkeypatch):
+    # Mimics a store whose stray v3 metadata yields an empty dataset until an
+    # explicit zarr_format=2 read exposes the data (the ssebop_eta case).
+    empty = xr.Dataset()
+    full = xr.Dataset({"ETa": ("x", [1.0, 2.0])})
+    calls = []
+
+    def fake_open_zarr(store, **kwargs):
+        calls.append(kwargs)
+        if kwargs.get("consolidated") is True:
+            raise ValueError("no consolidated metadata")
+        if kwargs.get("zarr_format") == 2:
+            return full
+        return empty
+
+    monkeypatch.setattr("src.core.downloader.xr.open_zarr", fake_open_zarr)
+    ds = PDPDataDownloader._open_zarr_store(object())
+    assert list(ds.data_vars) == ["ETa"]
+    assert {"consolidated": False, "zarr_format": 2} in calls
+
+
+def test_open_zarr_store_raises_when_all_strategies_fail(monkeypatch):
+    def fake_open_zarr(store, **kwargs):
+        raise ValueError("boom")
+
+    monkeypatch.setattr("src.core.downloader.xr.open_zarr", fake_open_zarr)
+    with pytest.raises(ValueError, match="boom"):
+        PDPDataDownloader._open_zarr_store(object())
+
+
 def test_set_output_format_and_get_dataset_info(tmp_path):
     d = _new_downloader(tmp_path)
     d.set_output_format("zarr")
@@ -149,17 +179,20 @@ def test_open_dataset_tries_non_consolidated(monkeypatch, tmp_path):
             return p
 
     d.fs = FakeFS()
-    calls = {"n": 0}
+    calls = []
 
-    def fake_open_zarr(store, consolidated=True):
-        calls["n"] += 1
-        if calls["n"] == 1:
+    def fake_open_zarr(store, **kwargs):
+        calls.append(kwargs)
+        if kwargs.get("consolidated") is True:
             raise RuntimeError("fail first")
-        return {"store": store, "consolidated": consolidated}
+        return xr.Dataset({"rain": ("x", [1.0])})
 
     monkeypatch.setattr("src.core.downloader.xr.open_zarr", fake_open_zarr)
     ds = d.open_dataset("climate", "rain")
-    assert ds["consolidated"] is False
+    assert list(ds.data_vars) == ["rain"]
+    # First (consolidated) attempt raised; second (non-consolidated) succeeded.
+    assert calls[0] == {"consolidated": True}
+    assert calls[1] == {"consolidated": False}
 
 
 def test_process_dataset_calls_subset_methods(monkeypatch, tmp_path):

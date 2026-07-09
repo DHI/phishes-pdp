@@ -16,7 +16,7 @@ from mikeio import ItemInfo
 import xarray as xr
 import numpy as np
 
-from .utils import get_grid_resolution, guess_data_variable
+from .utils import get_grid_resolution, guess_data_variable, regularize_axis
 
 
 def dfs_from_xr(
@@ -53,14 +53,19 @@ def dfs_from_xr(
     if isinstance(da, xr.Dataset):
         da = da[guess_data_variable(da)]
 
-    if 1 in [np.ma.count(da["lon"].values), np.ma.count(da["lat"].values)]:
-        dx = res or get_grid_resolution(da["lon"], default=0.1)
-        dy = res or get_grid_resolution(da["lat"], default=0.1)
+    # Snap near-equidistant axes (e.g. coordinates rounded to a few decimals)
+    # to an exactly uniform grid; DFS2 requires equidistant x/y.
+    lon = regularize_axis(da["lon"])
+    lat = regularize_axis(da["lat"])
+
+    if 1 in [np.ma.count(lon), np.ma.count(lat)]:
+        dx = res or get_grid_resolution(lon, default=0.1)
+        dy = res or get_grid_resolution(lat, default=0.1)
         bbox = (
-            np.min(da["lon"].values) - dx / 2,
-            np.min(da["lat"].values) - dy / 2,
-            np.max(da["lon"].values),
-            np.max(da["lat"].values),
+            np.min(lon) - dx / 2,
+            np.min(lat) - dy / 2,
+            np.max(lon),
+            np.max(lat),
         )
     else:
         bbox = None
@@ -68,8 +73,8 @@ def dfs_from_xr(
         dy = None
 
     geom = mikeio.spatial.Grid2D(
-        x=da["lon"].values,
-        y=da["lat"].values,
+        x=lon,
+        y=lat,
         projection="LONG/LAT",
         dx=dx,
         dy=dy,
