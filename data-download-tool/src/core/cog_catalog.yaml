@@ -219,3 +219,268 @@ soil:
     variable: ksat
     temporal: false
     crs: EPSG:4326
+  # SoilGrids 250m (ISRIC), by property and depth.
+  sg_bdod_0_5cm:
+    path: soil/SoilGrids250m_ISRIC/bdod/SG_bdod_250m_0_5cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids bulk density, 0-5 cm
+    description: SoilGrids 250m bulk density of fine earth (bdod), 0-5 cm depth
+    variable: bdod
+    temporal: false
+    crs: EPSG:4326
+  sg_bdod_5_15cm:
+    path: soil/SoilGrids250m_ISRIC/bdod/SG_bdod_250m_5_15cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids bulk density, 5-15 cm
+    description: SoilGrids 250m bulk density of fine earth (bdod), 5-15 cm depth
+    variable: bdod
+    temporal: false
+    crs: EPSG:4326
+  sg_bdod_15_30cm:
+    path: soil/SoilGrids250m_ISRIC/bdod/SG_bdod_250m_15_30cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids bulk density, 15-30 cm
+    description: SoilGrids 250m bulk density of fine earth (bdod), 15-30 cm depth
+    variable: bdod
+    temporal: false
+    crs: EPSG:4326
+  sg_bdod_30_60cm:
+    path: soil/SoilGrids250m_ISRIC/bdod/SG_bdod_250m_30_60cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids bulk density, 30-60 cm
+    description: SoilGrids 250m bulk density of fine earth (bdod), 30-60 cm depth
+    variable: bdod
+    temporal: false
+    crs: EPSG:4326
+  sg_bdod_60_100cm:
+    path: soil/SoilGrids250m_ISRIC/bdod/SG_bdod_250m_60_100cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids bulk density, 60-100 cm
+    description: SoilGrids 250m bulk density of fine earth (bdod), 60-100 cm depth
+    variable: bdod
+    temporal: false
+    crs: EPSG:4326
+  sg_bdod_100_200cm:
+    path: soil/SoilGrids250m_ISRIC/bdod/SG_bdod_250m_100_200cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids bulk density, 100-200 cm
+    description: SoilGrids 250m bulk density of fine earth (bdod), 100-200 cm depth
+    variable: bdod
+    temporal: false
+    crs: EPSG:4326
+  sg_clay_0_5cm:
+    path: soil/SoilGrids250m_ISRIC/clay/SG_clay_250m_0_5cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids clay content, 0-5 cm
+    description: SoilGrids 250m clay content, 0-5 cm depth
+    variable: clay
+    temporal: false
+    crs: EPSG:4326
+  sg_clay_5_15cm:
+    path: soil/SoilGrids250m_ISRIC/clay/SG_clay_250m_5_15cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids clay content, 5-15 cm
+    description: SoilGrids 250m clay content, 5-15 cm depth
+    variable: clay
+    temporal: false
+    crs: EPSG:4326
+  sg_clay_15_30cm:
+    path: soil/SoilGrids250m_ISRIC/clay/SG_clay_250m_15_30cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids clay content, 15-30 cm
+    description: SoilGrids 250m clay content, 15-30 cm depth
+    variable: clay
+    temporal: false
+    crs: EPSG:4326
+  sg_clay_30_60cm:
+    path: soil/SoilGrids250m_ISRIC/clay/SG_clay_250m_30_60cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids clay content, 30-60 cm
+    description: SoilGrids 250m clay content, 30-60 cm depth
+    variable: clay
+    temporal: false
+    crs: EPSG:4326
+  sg_clay_60_100cm:
+    path: soil/SoilGrids250m_ISRIC/clay/SG_clay_250m_60_100cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids clay content, 60-100 cm
+    description: SoilGrids 250m clay content, 60-100 cm depth
+    variable: clay
+    temporal: false
+    crs: EPSG:4326
+  sg_clay_100_200cm:
+    path: soil/SoilGrids250m_ISRIC/clay/SG_clay_250m_100_200cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids clay content, 100-200 cm
+    description: SoilGrids 250m clay content, 100-200 cm depth
+    variable: clay
+    temporal: false
+    crs: EPSG:4326
+  sg_sand_0_5cm:
+    path: soil/SoilGrids250m_ISRIC/sand/SG_sand_250m_0_5cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids sand content, 0-5 cm
+    description: SoilGrids 250m sand content, 0-5 cm depth
+    variable: sand
+    temporal: false
+    crs: EPSG:4326
+  sg_sand_5_15cm:
+    path: soil/SoilGrids250m_ISRIC/sand/SG_sand_250m_5_15cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids sand content, 5-15 cm
+    description: SoilGrids 250m sand content, 5-15 cm depth
+    variable: sand
+    temporal: false
+    crs: EPSG:4326
+  sg_sand_15_30cm:
+    path: soil/SoilGrids250m_ISRIC/sand/SG_sand_250m_15_30cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids sand content, 15-30 cm
+    description: SoilGrids 250m sand content, 15-30 cm depth
+    variable: sand
+    temporal: false
+    crs: EPSG:4326
+  sg_sand_30_60cm:
+    path: soil/SoilGrids250m_ISRIC/sand/SG_sand_250m_30_60cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids sand content, 30-60 cm
+    description: SoilGrids 250m sand content, 30-60 cm depth
+    variable: sand
+    temporal: false
+    crs: EPSG:4326
+  sg_sand_60_100cm:
+    path: soil/SoilGrids250m_ISRIC/sand/SG_sand_250m_60_100cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids sand content, 60-100 cm
+    description: SoilGrids 250m sand content, 60-100 cm depth
+    variable: sand
+    temporal: false
+    crs: EPSG:4326
+  sg_sand_100_200cm:
+    path: soil/SoilGrids250m_ISRIC/sand/SG_sand_250m_100_200cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids sand content, 100-200 cm
+    description: SoilGrids 250m sand content, 100-200 cm depth
+    variable: sand
+    temporal: false
+    crs: EPSG:4326
+  sg_silt_0_5cm:
+    path: soil/SoilGrids250m_ISRIC/silt/SG_silt_250m_0_5cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids silt content, 0-5 cm
+    description: SoilGrids 250m silt content, 0-5 cm depth
+    variable: silt
+    temporal: false
+    crs: EPSG:4326
+  sg_silt_5_15cm:
+    path: soil/SoilGrids250m_ISRIC/silt/SG_silt_250m_5_15cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids silt content, 5-15 cm
+    description: SoilGrids 250m silt content, 5-15 cm depth
+    variable: silt
+    temporal: false
+    crs: EPSG:4326
+  sg_silt_15_30cm:
+    path: soil/SoilGrids250m_ISRIC/silt/SG_silt_250m_15_30cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids silt content, 15-30 cm
+    description: SoilGrids 250m silt content, 15-30 cm depth
+    variable: silt
+    temporal: false
+    crs: EPSG:4326
+  sg_silt_30_60cm:
+    path: soil/SoilGrids250m_ISRIC/silt/SG_silt_250m_30_60cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids silt content, 30-60 cm
+    description: SoilGrids 250m silt content, 30-60 cm depth
+    variable: silt
+    temporal: false
+    crs: EPSG:4326
+  sg_silt_60_100cm:
+    path: soil/SoilGrids250m_ISRIC/silt/SG_silt_250m_60_100cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids silt content, 60-100 cm
+    description: SoilGrids 250m silt content, 60-100 cm depth
+    variable: silt
+    temporal: false
+    crs: EPSG:4326
+  sg_silt_100_200cm:
+    path: soil/SoilGrids250m_ISRIC/silt/SG_silt_250m_100_200cm_mean_EU.tif
+    container: cogs
+    format: cog
+    tiled: false
+    anon: true
+    display_name: SoilGrids silt content, 100-200 cm
+    description: SoilGrids 250m silt content, 100-200 cm depth
+    variable: silt
+    temporal: false
+    crs: EPSG:4326

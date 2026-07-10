@@ -150,5 +150,49 @@ climate:
     eumunit: percent
     data_value_type: Instantaneous
 
+soil_moisture:
+  clms_ssm:
+    path: soil_moisture/clms_ssm/CLMS_SSM.zarr
+    display_name: CLMS surface soil moisture
+    description: Copernicus Land surface soil moisture (SSM), degree of saturation
+    variable: SSM
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Percentage
+    eumunit: percent
+    data_value_type: Instantaneous
+  smap_spl3sma:
+    path: soil_moisture/smap_spl3sma/SMAP_SPL3SMA.zarr
+    display_name: SMAP L3 surface soil moisture
+    description: SMAP L3 Radar global daily surface soil moisture (0-5 cm), volumetric
+    variable: Surface_Soil_Moisture
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Volumetric_Water_Content
+    eumunit: "__"
+    data_value_type: Instantaneous
+
+vegetation:
+  clms_fapar:
+    path: vegetation/clms_fapar/CLMS_FAPAR.zarr
+    display_name: CLMS FAPAR
+    description: Copernicus Land fraction of absorbed photosynthetically active radiation
+    variable: FAPAR
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Fraction
+    eumunit: "__"
+    data_value_type: Instantaneous
+  clms_lai:
+    path: vegetation/clms_lai/CLMS_LAI.zarr
+    display_name: CLMS Leaf Area Index
+    description: Copernicus Land leaf area index (LAI)
+    variable: LAI
+    temporal: true
+    crs: EPSG:4326
+    eumtype: Leaf_Area_Index
+    eumunit: "__"
+    data_value_type: Instantaneous
+
 # Cloud Optimized GeoTIFF (COG) datasets live in cog_catalog.yaml and are merged
 # into this catalog at load time. Add static raster layers there, not here.
