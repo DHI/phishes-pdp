@@ -70,8 +70,9 @@ This command will:
 
 Choose the notebook based on your task:
 
-- `notebooks/plant_growth_module.ipynb`: Main workflow for template-driven land use and soil profile map generation.
+- `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb`: Main workflow for template-driven land use and soil profile map generation.
 - `notebooks/pgm_soil_profile_setup.ipynb`: Soil profile setup workflow that parses soil profile text files and generates per-cell wilting point and field capacity DFS2 maps.
+- `notebooks/pgm_initial_condition_updater.ipynb`: Splits a 3D UZ water-quality result (`.dfs3`) into per-layer DFS2 files and injects them into a MIKE SHE `.she` file as per-layer initial conditions (see [docs/initial_condition_updater.md](docs/initial_condition_updater.md)).
 
 ### Option 1: Using VS Code (Recommended)
 
@@ -94,7 +95,7 @@ Choose the notebook based on your task:
    - If your workspace root is a parent folder, VS Code won't look inside nested subdirectories for virtual environments, so the kernel won't be found
 
 2. **Open the notebook:**
-   - In the VS Code Explorer, navigate to either `notebooks/plant_growth_module.ipynb` or `notebooks/pgm_soil_profile_setup.ipynb` and click to open it
+   - In the VS Code Explorer, navigate to either `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb` or `notebooks/pgm_soil_profile_setup.ipynb` and click to open it
 
 3. **Select the Python kernel:**
    - Click on the kernel selector in the top-right corner of the notebook
@@ -113,7 +114,7 @@ Choose the notebook based on your task:
    - Press **`Ctrl + Shift + P`** → Type "Run All Cells" → Press Enter
 
 5. **Workflow:**
-   - For `notebooks/plant_growth_module.ipynb`:
+   - For `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb`:
      - **Step 0**: Edit file paths in the configuration cell
      - **Step 0.1**: Run setup and validation
      - **Step 1**: Load land use + soil profile data and create mappings
@@ -133,12 +134,12 @@ Choose the notebook based on your task:
 
 ```powershell
 # Windows PowerShell
-uv run jupyter notebook notebooks/plant_growth_module.ipynb
+uv run jupyter notebook notebooks/pgm_initial_condition_dfs2_map_generator.ipynb
 ```
 
 ```bash
 # macOS/Linux
-uv run jupyter notebook notebooks/plant_growth_module.ipynb
+uv run jupyter notebook notebooks/pgm_initial_condition_dfs2_map_generator.ipynb
 ```
 
 #### Method B: Activate environment first
@@ -147,14 +148,14 @@ uv run jupyter notebook notebooks/plant_growth_module.ipynb
 
 ```powershell
 .venv\Scripts\Activate.ps1
-jupyter notebook notebooks/plant_growth_module.ipynb
+jupyter notebook notebooks/pgm_initial_condition_dfs2_map_generator.ipynb
 ```
 
 **macOS/Linux:**
 
 ```bash
 source .venv/bin/activate
-jupyter notebook notebooks/plant_growth_module.ipynb
+jupyter notebook notebooks/pgm_initial_condition_dfs2_map_generator.ipynb
 ```
 
 **To run cells in Jupyter:**
@@ -174,10 +175,12 @@ plant-growth-module/
 │       ├── pgm_helper.py              # Backward-compatible helper facade
 │       ├── template_maps.py           # Main template-based mapping workflow
 │       ├── soil_profile_setup.py      # Soil profile parsing and Task 4 outputs
+│       ├── forcing_repository.py      # Forcing pulled via data-download-tool
 │       └── common_utils.py            # Shared DFS2 and utility helpers
 ├── notebooks/
-│   ├── plant_growth_module.ipynb      # Main template workflow notebook
-│   └── pgm_soil_profile_setup.ipynb   # Soil profile setup workflow notebook
+│   ├── pgm_initial_condition_dfs2_map_generator.ipynb  # Main template workflow notebook
+│   ├── pgm_soil_profile_setup.ipynb        # Soil profile setup workflow notebook
+│   ├── pgm_forcing_generator.ipynb         # Forcing generation notebook
 ├── pyproject.toml                      # Project dependencies
 └── README.md                           # This file
 ```
@@ -188,7 +191,7 @@ plant-growth-module/
 
 ### 1. Main Template Workflow
 
-- Notebook: `notebooks/plant_growth_module.ipynb`
+- Notebook: `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb`
 - Use this when generating variable maps from template CSV files and land use/soil profile classification inputs.
 - Typical outputs: one DFS2 map per variable/species mapping rule.
 
