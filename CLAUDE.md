@@ -38,11 +38,12 @@ Pulls clipped raster **and vector** subsets from a remote datastore (Azure-backe
 
 Three workflows, three notebooks:
 
-### Workflow A — Template-driven maps (`template_maps.py`, `plant_growth_module.ipynb`)
+### Workflow A — Template-driven maps (`template_maps.py`, `pgm_initial_condition_dfs2_map_generator.ipynb`)
 
 Maps `species/profile → parameter value → spatial DFS2` via `code_to_species` and `code_to_profile` lookup dicts.
 
 - **`STATE_VARIABLE_SCOPE`** (template_maps.py:20-42) is a **hardcoded dict** routing each variable name to either the `landuse` or `soilprofile` grid. `LAI_2D, RD_2D, BCa_2D…` → landuse. `SOC, NH4, NO3, S_NO3…` → soilprofile. A row's `TEMPLATE` column can override this per-row.
+- **Landuse and soilprofile are independent, optional scopes.** Each scope needs a DFS2 grid + a classification CSV; leave a scope's inputs blank (empty string `""`, `None`, or empty `Path`) to skip it, but **at least one scope is required** and a provided scope needs *both* its grid and template (`_is_provided` in template_maps.py gates this). `validate_paths` (now takes optional `soilprofile_dfs2`/`sp_template`), `load_spatial_grids`, and `load_classification_mappings` all skip a missing scope (returning `None` grids / empty mapping dicts); `process_template_file` skips any variable whose scope grid wasn't loaded.
 - **Column auto-detection** (`find_col` in common_utils.py:26-31) accepts case-insensitive aliases — `SPECIESID/SPECIES/ID/CLASS`, `VALUE/VAL/AMOUNT`, `CONSTANT/VARIABLE/KEY/NAME/PARAM/PARAMETER`, etc. Lists live at the top of `template_maps.py`. `confirm_columns()` prompts the user unless `AUTO_CONFIRM=True`.
 - **`Apply=0` zero-fill**: optional `APPLY` column in `LU_template.csv`. Values `0/false/no/n` force that species to 0 in every landuse-scope map (use for water/urban classes).
 - **Soil-profile lookup is fuzzy** (template_maps.py:316-329) — tries normalized name, raw code, `int(code)`, `float(code)`. Lets users mix `SP1`/`1`/`1.0` freely, but means renaming silently can mis-match.
@@ -64,6 +65,17 @@ MIKE SHE "Task 4". Parses PreProcessor `*.txt` files into per-cell wilting-point
 - **`forcing_repository.py`** — pulls forcing via `data-download-tool` at runtime. Three-stage import strategy (site-packages → `importlib.metadata`+`direct_url.json` → `sys.path` scan) that loads DDT source into a synthetic `_phishes_data_downloader_runtime` package. **Why it's like this:** DDT's source layout (`src/core/`, `src/analysis/`) is not a proper Python package — there's no `data_download_tool` namespace. `_is_valid_src_root` validates by probing exactly `core/downloader.py` + `analysis/catchment.py`; moving either file will break PGM imports.
 - **Requires a `pgm_forcings:` section in DDT's `dataset_catalog.yaml`** that maps PGM forcing keys (precipitation, temperature, …) to DDT `(category, subcategory, source_variable)` plus a target `output_filename`. **As of writing this, the catalog does NOT have that section** — `load_pgm_forcing_library()` will raise until it's added.
 
+### Workflow D — Initial condition updater (`initial_condition_updater.py`, `pgm_initial_condition_updater.ipynb`)
+
+Re-injects a 3D UZ water-quality (WQ) result into a MIKE SHE `.she` (PFS) file as **per-layer 2D initial conditions** for a hotstart. Two stages, both in the one notebook:
+
+1. **Split** (`split_dfs3_to_layers`) — reads a 3D UZ result `.dfs3`, keeps items whose name contains `item_filter` (default `"(matrix phase)"`), and writes one `Layer_<k>.dfs2` per vertical layer (single timestep — int index, default `-1`, or an exact timestamp). **`reverse_z=True` (default)** writes `Layer_1.dfs2` as the *top* of the column (dfs3 layer index `nz-1`), so `.she [Layer_1]` maps **directly** to `Layer_1.dfs2`. The physical dfs2 files are required by the model.
+2. **Update** (`update_initial_conditions`) — edits **only** `MIKESHE_FLOWMODEL → Unsatzone → Initial_Conditions → Initial_Concentration → Species_k` (scoped strictly there; `[Layer_N]` names are reused by the Saturated Zone). For every species matched **by name** (dfs2 item `"UZ … (matrix phase), <Name>"` → `Species_k.Name`; only the `UZ concentration`/`UZ fixed(undef)` groups map, giving a 1:1 species↔item mapping), it replaces the `[Layer_N]` sections with one per layer: `DistributionType=1`, all three counters (`MzSEPfsListItemCount`, `NumberOfLayers`, `[Layer_N]` count) set to N, and each layer's `LayerData2DWQ → DFS_2D_DATA_FILE` pointing at `Layer_k.dfs2` (item = the species' 1-based index). Mapping is direct `[Layer_k] ← Layer_k.dfs2`. `LowerLevel` is left at the cloned template's `0` (**unused** for the dfs2-per-layer case — layers map by order, not depth). `FILE_NAME` is written **relative to the output `.she`** as `|.\<stem>_splitted\Layer_k.dfs2|`.
+
+- The layer template is discovered generically (`_find_template_layer` — first species with a `Layer_1` carrying `LowerLevel` + `LayerData2DWQ`), so any matching `.she`/`.dfs3` pair works; no species name is hardcoded.
+- `backup_she` writes a timestamped copy of the original before editing (belt-and-braces; the notebook also writes to a *new* `.she`, leaving the input untouched).
+- Writing uses **mikeio's `PfsDocument` round-trip** (`mikeio.read_pfs` → mutate → `doc.write`). Verified: only `Initial_Concentration` changes and the file re-reads cleanly. If MIKE SHE ever rejects the reformatted PFS, the fallback is a surgical text-splice (see the plan notes). Installed `mikeio` is 3.x (`PfsDocument` API).
+
 ### Cross-module dependency
 
 `plant-growth-module/pyproject.toml` declares:
@@ -74,7 +86,7 @@ So PGM resolves DDT from **`main` on GitHub**, not from the local sibling folder
 
 ### Legacy facade
 
-`pgm_helper.py` is a flat re-export of everything from the four real modules. Older notebook cells still import from it — keep the re-exports in sync when adding new public names.
+`pgm_helper.py` is a flat re-export of everything from the five real modules (`common_utils`, `template_maps`, `soil_profile_setup`, `forcing_repository`, `initial_condition_updater`). Older notebook cells still import from it — keep the re-exports in sync when adding new public names.
 
 ## Common commands
 
