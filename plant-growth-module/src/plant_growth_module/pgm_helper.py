@@ -7,6 +7,12 @@ This module re-exports helpers from focused modules:
 """
 
 from .common_utils import confirm_columns, find_col, generate_dfs2_map
+from .initial_condition_updater import (
+    backup_she,
+    build_species_item_index,
+    split_dfs3_to_layers,
+    update_initial_conditions,
+)
 from .forcing_repository import (
     build_forcing_download_plan,
     download_forcing_dfs2_series,
@@ -49,10 +55,14 @@ __all__ = [
     "VAL_COLS",
     "VALUE_COLS",
     "ProfileProperty",
+    "backup_she",
     "build_soil_profile_summary",
+    "build_species_item_index",
     "confirm_columns",
     "find_col",
     "generate_dfs2_map",
+    "split_dfs3_to_layers",
+    "update_initial_conditions",
     "build_forcing_download_plan",
     "download_forcing_dfs2_series",
     "get_data_downloader_classes",

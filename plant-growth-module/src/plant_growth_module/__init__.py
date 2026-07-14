@@ -8,6 +8,7 @@ __all__ = [
     "common_utils",
     "template_maps",
     "soil_profile_setup",
+    "initial_condition_updater",
 ]
 
 
