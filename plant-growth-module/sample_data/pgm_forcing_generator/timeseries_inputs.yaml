@@ -1,0 +1,22 @@
+# Per-grid-code timeseries inputs for the native forcing generator.
+#
+# Each entry maps one grid code (as found in the grid-code DFS2) to a time
+# series that is applied to every cell sharing that code.
+#
+# Fields per entry:
+#   grid_code : integer grid code in the grid-code DFS2 (required)
+#   path      : DFS0/CSV file, absolute or relative to the plant-growth-module
+#               root (required)
+#   source    : "dfs0" or "csv" (optional; inferred from the file extension)
+#   item      : 1-based item index for multi-item DFS0 files (optional, default 1)
+#
+# Grid codes that exist in the grid-code DFS2 but are NOT listed here are
+# filled with a constant value of 0 across all timesteps.
+timeseries_inputs:
+  - grid_code: 1
+    path: sample_data/pgm_forcing_generator/example_dfs0_dfs2/DMI_Jutland_2011-2023_item1.csv
+    source: dfs0
+  - grid_code: 5
+    path: sample_data/pgm_forcing_generator/example_dfs0_dfs2/DMI_Jutland_2011-2023.dfs0
+    source: dfs0
+    item: 5
