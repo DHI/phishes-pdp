@@ -176,11 +176,15 @@ plant-growth-module/
 │       ├── template_maps.py           # Main template-based mapping workflow
 │       ├── soil_profile_setup.py      # Soil profile parsing and Task 4 outputs
 │       ├── forcing_repository.py      # Forcing pulled via data-download-tool
+│       ├── initial_condition_updater.py  # 3D UZ WQ -> MIKE SHE .she initial conditions
 │       └── common_utils.py            # Shared DFS2 and utility helpers
 ├── notebooks/
 │   ├── pgm_initial_condition_dfs2_map_generator.ipynb  # Main template workflow notebook
 │   ├── pgm_soil_profile_setup.ipynb        # Soil profile setup workflow notebook
 │   ├── pgm_forcing_generator.ipynb         # Forcing generation notebook
+│   └── pgm_initial_condition_updater.ipynb # 3D UZ WQ initial condition updater
+├── docs/
+│   └── initial_condition_updater.md    # Initial condition updater design & usage
 ├── pyproject.toml                      # Project dependencies
 └── README.md                           # This file
 ```
@@ -204,6 +208,17 @@ plant-growth-module/
   - `output_data/task4_pgm_soil_profile_setup/<run_name>/wilting_point/*.dfs2`
   - `output_data/task4_pgm_soil_profile_setup/<run_name>/field_capacity/*.dfs2`
   - `profile_table.csv` and `summary.csv`
+
+### 3. Initial Condition Updater Workflow
+
+- Notebook: `notebooks/pgm_initial_condition_updater.ipynb`
+- Use this to build MIKE SHE hotstart inputs: split a 3D UZ water-quality result (`.dfs3`) into
+  per-layer DFS2 files and inject them into a `.she` (PFS) file as per-layer initial conditions for
+  every matched WQ species.
+- Inputs: a `.dfs3` result and the matching `.she` model file.
+- Outputs: `Layer_<k>.dfs2` files in `<dfs3-stem>_splitted/`, a timestamped backup of the original
+  `.she`, and an updated `.she`.
+- Details and design rationale: [docs/initial_condition_updater.md](docs/initial_condition_updater.md).
 
 ---
 
