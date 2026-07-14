@@ -27,3 +27,49 @@ soil:
     variable: bulk_density
     temporal: false
     crs: EPSG:4326
+
+  lucas_2018_texture:
+    path: Soil/LUCAS_2018_texture.parquet
+    container: geoparquet
+    format: geoparquet
+    anon: true
+    display_name: LUCAS 2018 Texture (points)
+    description: LUCAS 2018 topsoil texture sample points (coarse/clay/sand/silt, USDA & ISSS classes).
+    variable: texture
+    temporal: false
+    crs: EPSG:4326
+
+  # SGU (Geological Survey of Sweden) layers, SWEREF99 TM. The catchment mask is
+  # reprojected into this CRS before feature selection.
+  bedrock_type:
+    path: Soil/bedrock_type.parquet
+    container: geoparquet
+    format: geoparquet
+    anon: true
+    display_name: SGU Bedrock Type (polygons)
+    description: SGU bedrock geology - rock type / lithology polygons (Sweden).
+    variable: bedrock_type
+    temporal: false
+    crs: EPSG:3006
+
+  deformation_zones:
+    path: Soil/deformation_zones.parquet
+    container: geoparquet
+    format: geoparquet
+    anon: true
+    display_name: SGU Deformation Zones (lines)
+    description: SGU deformation zones - fault and shear-zone lines (Sweden).
+    variable: deformation_zone
+    temporal: false
+    crs: EPSG:3006
+
+  jorddjupsobservationer:
+    path: Soil/jorddjupsobservationer.parquet
+    container: geoparquet
+    format: geoparquet
+    anon: true
+    display_name: SGU Soil Depth Observations (points)
+    description: SGU soil-depth (jorddjup) observation points - depth to bedrock (Sweden).
+    variable: soil_depth
+    temporal: false
+    crs: EPSG:3006
