@@ -42,6 +42,18 @@ STATE_VARIABLE_SCOPE = {
 }
 
 
+def _is_provided(value):
+    """Return True if a path-like config value is set (non-empty).
+
+    Treats ``None``, empty/whitespace strings and the empty ``Path`` (which
+    stringifies to ``"."``) as 'not provided', so callers can leave either the
+    land use or the soil profile inputs blank.
+    """
+    if value is None:
+        return False
+    return str(value).strip() not in ("", ".")
+
+
 def split_lu_mapping_by_apply(lu_df, code_col, class_col, apply_col=None):
     """Create LU mapping and collect Apply=0 classes for forced zero-fill."""
     code_to_species = dict(zip(lu_df[code_col], lu_df[class_col]))
@@ -57,117 +69,212 @@ def split_lu_mapping_by_apply(lu_df, code_col, class_col, apply_col=None):
     return code_to_species, zero_classes
 
 
-def load_classification_mappings(lu_template, sp_template, auto_confirm=False):
-    """Load and validate land use/soil profile mappings from CSV templates."""
-    print("\nLoading land use classification...")
-    lu_df = pd.read_csv(lu_template)
+def load_classification_mappings(lu_template="", sp_template="", auto_confirm=False):
+    """Load and validate land use and/or soil profile mappings from CSV templates.
 
-    code_col = find_col(lu_df, VAL_COLS)
-    class_col = find_col(lu_df, CLASS_COLS)
-    apply_col = find_col(lu_df, APPLY_COLS)
+    Either template may be left blank (empty string/None); at least one is
+    required. The scope that is not provided comes back as empty mappings.
+    """
+    have_lu = _is_provided(lu_template)
+    have_sp = _is_provided(sp_template)
 
-    if code_col is None or class_col is None:
-        raise ValueError(
-            "Required columns not found in the land use classification template."
+    if not have_lu and not have_sp:
+        raise ValueError("Provide at least one of lu_template or sp_template")
+
+    code_to_species = {}
+    zero_fill_values = {}
+    code_to_soilprofile = {}
+
+    if have_lu:
+        print("\nLoading land use classification...")
+        lu_df = pd.read_csv(lu_template)
+
+        code_col = find_col(lu_df, VAL_COLS)
+        class_col = find_col(lu_df, CLASS_COLS)
+        apply_col = find_col(lu_df, APPLY_COLS)
+
+        if code_col is None or class_col is None:
+            raise ValueError(
+                "Required columns not found in the land use classification template."
+            )
+
+        confirm_payload = {"Code column": code_col, "Class column": class_col}
+        if apply_col is not None:
+            confirm_payload["Apply column"] = apply_col
+
+        confirmed = confirm_columns(
+            confirm_payload,
+            auto_confirm=auto_confirm,
+            context="Land use classification",
+            multi_files=False,
         )
+        if not confirmed:
+            raise RuntimeError("User cancelled land use mapping")
 
-    confirm_payload = {"Code column": code_col, "Class column": class_col}
-    if apply_col is not None:
-        confirm_payload["Apply column"] = apply_col
-
-    confirmed = confirm_columns(
-        confirm_payload,
-        auto_confirm=auto_confirm,
-        context="Land use classification",
-        multi_files=False,
-    )
-    if not confirmed:
-        raise RuntimeError("User cancelled land use mapping")
-
-    code_to_species, zero_fill_classes = split_lu_mapping_by_apply(
-        lu_df, code_col, class_col, apply_col
-    )
-    zero_fill_values = {class_name: 0.0 for class_name in zero_fill_classes}
-
-    print("\nCode to Species mapping:")
-    for code, species in code_to_species.items():
-        print(f"  {int(code):4d} → {species}")
-
-    if zero_fill_classes:
-        print("\nClasses with Apply=0 (forced to 0 in landuse-based maps):")
-        for class_name in sorted(zero_fill_classes):
-            print(f"  - {class_name}")
-
-    print("\nLoading soil profile classification...")
-    sp_df = pd.read_csv(sp_template)
-    sp_code_col = find_col(sp_df, VAL_COLS)
-    sp_class_col = find_col(sp_df, CLASS_COLS)
-
-    if sp_code_col is None or sp_class_col is None:
-        raise ValueError(
-            "Required columns not found in the soil profile classification template."
+        code_to_species, zero_fill_classes = split_lu_mapping_by_apply(
+            lu_df, code_col, class_col, apply_col
         )
+        zero_fill_values = {class_name: 0.0 for class_name in zero_fill_classes}
 
-    confirmed = confirm_columns(
-        {"Code column": sp_code_col, "Soil profile column": sp_class_col},
-        auto_confirm=auto_confirm,
-        context="Soil profile classification",
-        multi_files=False,
-    )
-    if not confirmed:
-        raise RuntimeError("User cancelled soil profile mapping")
+        print("\nCode to Species mapping:")
+        for code, species in code_to_species.items():
+            print(f"  {int(code):4d} → {species}")
 
-    code_to_soilprofile = dict(zip(sp_df[sp_code_col], sp_df[sp_class_col]))
+        if zero_fill_classes:
+            print("\nClasses with Apply=0 (forced to 0 in landuse-based maps):")
+            for class_name in sorted(zero_fill_classes):
+                print(f"  - {class_name}")
+    else:
+        print("\nNo land use template provided - skipping land use classification.")
 
-    print("\nCode to Soil Profile mapping:")
-    for code, profile_name in code_to_soilprofile.items():
-        print(f"  {int(code):4d} → {profile_name}")
+    if have_sp:
+        print("\nLoading soil profile classification...")
+        sp_df = pd.read_csv(sp_template)
+        sp_code_col = find_col(sp_df, VAL_COLS)
+        sp_class_col = find_col(sp_df, CLASS_COLS)
+
+        if sp_code_col is None or sp_class_col is None:
+            raise ValueError(
+                "Required columns not found in the soil profile classification template."
+            )
+
+        confirmed = confirm_columns(
+            {"Code column": sp_code_col, "Soil profile column": sp_class_col},
+            auto_confirm=auto_confirm,
+            context="Soil profile classification",
+            multi_files=False,
+        )
+        if not confirmed:
+            raise RuntimeError("User cancelled soil profile mapping")
+
+        code_to_soilprofile = dict(zip(sp_df[sp_code_col], sp_df[sp_class_col]))
+
+        print("\nCode to Soil Profile mapping:")
+        for code, profile_name in code_to_soilprofile.items():
+            print(f"  {int(code):4d} → {profile_name}")
+    else:
+        print(
+            "\nNo soil profile template provided - skipping soil profile classification."
+        )
 
     return code_to_species, zero_fill_values, code_to_soilprofile
 
 
-def load_spatial_grids(landuse_dfs2, soilprofile_dfs2):
-    """Load land use and soil profile grids and validate shape compatibility."""
+def load_spatial_grids(landuse_dfs2="", soilprofile_dfs2=""):
+    """Load land use and/or soil profile grids and validate shape compatibility.
+
+    Either grid may be left blank (empty string/None); at least one is required.
+    The omitted side is returned as ``(None, None)`` for its dataset/array pair.
+    """
     import mikeio
     import numpy as np
 
-    print("Loading land use DFS2 file...")
-    landuse_ds = mikeio.Dfs2(landuse_dfs2)
-    landuse_data = landuse_ds.read()[0].to_numpy()
+    have_landuse = _is_provided(landuse_dfs2)
+    have_soilprofile = _is_provided(soilprofile_dfs2)
 
-    print(f"\nLand use grid shape:    {landuse_data.shape}")
-    print(f"Unique land use codes:  {np.unique(landuse_data)}")
+    if not have_landuse and not have_soilprofile:
+        raise ValueError("Provide at least one of landuse_dfs2 or soilprofile_dfs2")
 
-    print("\nLoading soil profile DFS2 file...")
-    soilprofile_ds = mikeio.Dfs2(soilprofile_dfs2)
-    soilprofile_data = soilprofile_ds.read()[0].to_numpy()
+    landuse_ds = landuse_data = None
+    soilprofile_ds = soilprofile_data = None
 
-    print(f"\nSoil profile grid shape:   {soilprofile_data.shape}")
-    print(f"Unique soil profile codes: {np.unique(soilprofile_data)}")
+    if have_landuse:
+        print("Loading land use DFS2 file...")
+        landuse_ds = mikeio.Dfs2(landuse_dfs2)
+        landuse_data = landuse_ds.read()[0].to_numpy()
 
-    if landuse_data.shape != soilprofile_data.shape:
+        print(f"\nLand use grid shape:    {landuse_data.shape}")
+        print(f"Unique land use codes:  {np.unique(landuse_data)}")
+    else:
+        print("No land use DFS2 provided - skipping land use grid.")
+
+    if have_soilprofile:
+        print("\nLoading soil profile DFS2 file...")
+        soilprofile_ds = mikeio.Dfs2(soilprofile_dfs2)
+        soilprofile_data = soilprofile_ds.read()[0].to_numpy()
+
+        print(f"\nSoil profile grid shape:   {soilprofile_data.shape}")
+        print(f"Unique soil profile codes: {np.unique(soilprofile_data)}")
+    else:
+        print("\nNo soil profile DFS2 provided - skipping soil profile grid.")
+
+    if (
+        landuse_data is not None
+        and soilprofile_data is not None
+        and landuse_data.shape != soilprofile_data.shape
+    ):
         raise ValueError("Land use and soil profile grids must have the same shape")
 
     return landuse_ds, landuse_data, soilprofile_ds, soilprofile_data
 
 
-def validate_paths(landuse_dfs2, lu_template, template_files, output_dir):
-    """Validate input paths and create output directory if missing."""
+def validate_paths(
+    landuse_dfs2,
+    lu_template,
+    template_files,
+    output_dir,
+    soilprofile_dfs2="",
+    sp_template="",
+):
+    """Validate input paths and create output directory if missing.
+
+    Land use (``landuse_dfs2`` + ``lu_template``) and soil profile
+    (``soilprofile_dfs2`` + ``sp_template``) are independent, optional scopes:
+    leave a scope blank to skip it, but at least one scope must be provided and
+    each provided scope needs both its grid and its template.
+    """
     errors = []
 
     print("=" * 70)
     print("VALIDATING PATHS")
     print("=" * 70)
 
-    if not landuse_dfs2.exists():
-        errors.append(f"❌ Land use DFS2 not found: {landuse_dfs2}")
-    else:
-        print(f"✓ Land use DFS2:  {landuse_dfs2.name}")
+    have_landuse = _is_provided(landuse_dfs2) or _is_provided(lu_template)
+    have_soilprofile = _is_provided(soilprofile_dfs2) or _is_provided(sp_template)
 
-    if not lu_template.exists():
-        errors.append(f"❌ LU template not found: {lu_template}")
+    if not have_landuse and not have_soilprofile:
+        errors.append(
+            "❌ Provide at least one scope: land use (DFS2 + template) "
+            "or soil profile (DFS2 + template)"
+        )
+
+    if have_landuse:
+        if not _is_provided(landuse_dfs2):
+            errors.append("❌ Land use template set but land use DFS2 is missing")
+        elif not landuse_dfs2.exists():
+            errors.append(f"❌ Land use DFS2 not found: {landuse_dfs2}")
+        else:
+            print(f"✓ Land use DFS2:  {landuse_dfs2.name}")
+
+        if not _is_provided(lu_template):
+            errors.append("❌ Land use DFS2 set but land use template is missing")
+        elif not lu_template.exists():
+            errors.append(f"❌ LU template not found: {lu_template}")
+        else:
+            print(f"✓ LU template:    {lu_template.name}")
     else:
-        print(f"✓ LU template:    {lu_template.name}")
+        print("• Land use scope skipped (no land use inputs provided)")
+
+    if have_soilprofile:
+        if not _is_provided(soilprofile_dfs2):
+            errors.append(
+                "❌ Soil profile template set but soil profile DFS2 is missing"
+            )
+        elif not soilprofile_dfs2.exists():
+            errors.append(f"❌ Soil profile DFS2 not found: {soilprofile_dfs2}")
+        else:
+            print(f"✓ Soil profile DFS2: {soilprofile_dfs2.name}")
+
+        if not _is_provided(sp_template):
+            errors.append(
+                "❌ Soil profile DFS2 set but soil profile template is missing"
+            )
+        elif not sp_template.exists():
+            errors.append(f"❌ SP template not found: {sp_template}")
+        else:
+            print(f"✓ SP template:    {sp_template.name}")
+    else:
+        print("• Soil profile scope skipped (no soil profile inputs provided)")
 
     for i, tpl_path in enumerate(template_files, 1):
         if not tpl_path.exists():
@@ -209,15 +316,23 @@ def process_template_file(
     template_file,
     auto_confirm,
     output_dir,
-    landuse_data,
-    landuse_ds,
-    code_to_species,
-    zero_fill_values,
-    soilprofile_data,
-    soilprofile_ds,
-    code_to_soilprofile,
+    landuse_data=None,
+    landuse_ds=None,
+    code_to_species=None,
+    zero_fill_values=None,
+    soilprofile_data=None,
+    soilprofile_ds=None,
+    code_to_soilprofile=None,
 ):
-    """Process one template CSV file and generate DFS2 maps."""
+    """Process one template CSV file and generate DFS2 maps.
+
+    A scope whose grid was not loaded (``landuse_data``/``soilprofile_data`` is
+    ``None``) is skipped, so a template may target only land use or only soil
+    profile variables.
+    """
+    code_to_species = code_to_species or {}
+    zero_fill_values = zero_fill_values or {}
+    code_to_soilprofile = code_to_soilprofile or {}
     print(f"\n{'=' * 60}")
     print(f"Processing: {template_file.name}")
     print(f"{'=' * 60}")
@@ -293,6 +408,13 @@ def process_template_file(
         id_values_norm = {_norm(k): v for k, v in id_values.items()}
 
         print(f"\n  Generating map: {key_name} (scope={scope})")
+
+        if scope == "landuse" and landuse_data is None:
+            print("    ⚠ No land use grid loaded; skipping this landuse map")
+            continue
+        if scope == "soilprofile" and soilprofile_data is None:
+            print("    ⚠ No soil profile grid loaded; skipping this soilprofile map")
+            continue
 
         if scope == "landuse":
             species_values = id_values
