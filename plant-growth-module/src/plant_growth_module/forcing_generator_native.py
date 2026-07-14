@@ -8,6 +8,7 @@ from typing import Any
 import mikeio
 import numpy as np
 import pandas as pd
+import yaml
 
 
 def to_abs_path(module_root: Path, path_value: Path | str) -> Path:
@@ -15,6 +16,49 @@ def to_abs_path(module_root: Path, path_value: Path | str) -> Path:
     if p.is_absolute():
         return p.resolve()
     return module_root.joinpath(p).resolve()
+
+
+def load_timeseries_inputs(
+    module_root: Path, config_path: Path | str
+) -> list[dict[str, Any]]:
+    """Load per-grid-code timeseries input entries from a YAML config file.
+
+    The YAML may either be a top-level list of entries or a mapping with a
+    ``timeseries_inputs:`` key holding the list. Each entry needs at least
+    ``grid_code`` and ``path``; ``source`` and ``item`` are optional. Grid
+    codes present in the grid DFS2 but absent from this list are zero-filled
+    by ``run_native_setup``.
+    """
+    cfg_path = to_abs_path(module_root, config_path)
+    if not cfg_path.exists():
+        raise FileNotFoundError(f"Timeseries config file not found: {cfg_path}")
+
+    with open(cfg_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+
+    if isinstance(data, dict):
+        entries = data.get("timeseries_inputs", [])
+    elif isinstance(data, list):
+        entries = data
+    else:
+        entries = []
+
+    if not isinstance(entries, list):
+        raise ValueError(
+            f"'timeseries_inputs' in {cfg_path} must be a list of entries."
+        )
+
+    for i, entry in enumerate(entries):
+        if not isinstance(entry, dict):
+            raise ValueError(
+                f"Entry {i} in {cfg_path} must be a mapping, got {type(entry).__name__}."
+            )
+        if "grid_code" not in entry or "path" not in entry:
+            raise ValueError(
+                f"Entry {i} in {cfg_path} must define both 'grid_code' and 'path'."
+            )
+
+    return entries
 
 
 def normalize_daily_if_needed(series: pd.Series) -> pd.Series:
@@ -138,9 +182,14 @@ def run_native_setup(
             raise ValueError(f"Duplicate timeseries mapping for grid code {code}.")
         ts_by_code[code] = read_timeseries_input(module_root, entry)
 
+    if not ts_by_code:
+        raise ValueError(
+            "No timeseries inputs provided; at least one grid code must have a series."
+        )
+
+    # Grid codes present in the grid DFS2 but without a provided timeseries are
+    # not an error: they are filled with a constant 0 across all timesteps.
     missing_codes = [code for code in unique_codes if code not in ts_by_code]
-    if missing_codes:
-        raise ValueError(f"Missing timeseries for grid code(s) {missing_codes}.")
 
     common_index = sorted({ts for series in ts_by_code.values() for ts in series.index})
     common_index = pd.DatetimeIndex(common_index)
@@ -156,6 +205,9 @@ def run_native_setup(
     for code, aligned in aligned_by_code.items():
         mask = grid_codes == code
         output[:, mask] = aligned.to_numpy(dtype=np.float32)[:, None]
+
+    for code in missing_codes:
+        output[:, grid_codes == code] = 0.0
 
     output_path = to_abs_path(module_root, output_grid)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -177,6 +229,7 @@ def run_native_setup(
         "n_timesteps": len(common_index),
         "start_time": common_index.min(),
         "end_time": common_index.max(),
+        "zero_filled_grid_codes": missing_codes,
     }
 
 
