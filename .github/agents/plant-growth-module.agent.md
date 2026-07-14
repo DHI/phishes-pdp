@@ -15,8 +15,12 @@ Your job is to implement, review, and verify changes for the Python package and 
 
 - Code under `plant-growth-module/src/plant_growth_module/`
 - Tests under `plant-growth-module/tests/`
-- Notebook workflow in `plant-growth-module/notebooks/plant_growth_module.ipynb`
+- Notebook workflows in `plant-growth-module/notebooks/` (`pgm_initial_condition_dfs2_map_generator.ipynb`, `pgm_soil_profile_setup.ipynb`, `pgm_forcing_generator.ipynb`, `pgm_initial_condition_updater.ipynb`)
 - Docs directly related to module behavior and usage
+
+For the `.she`/PFS initial-condition updater (`initial_condition_updater.py`,
+`pgm_initial_condition_updater.ipynb`), prefer the dedicated **PGM Initial Condition Updater
+Engineer** agent.
 
 ## Domain Constraints
 
