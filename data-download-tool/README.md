@@ -160,8 +160,11 @@ data-download-tool/
 │   │   ├── downloader.py           # Data downloader
 │   │   ├── dfsio.py                # DFS file I/O utilities
 │   │   ├── cogio.py                # COG (GeoTIFF) read/write utilities
+│   │   ├── geoparquetio.py         # GeoParquet (vector) read/write utilities
 │   │   ├── dataset_catalog.yaml    # Zarr datasets definition
-│   │   └── cog_catalog.yaml        # COG (GeoTIFF) datasets definition
+│   │   ├── cog_catalog.yaml        # COG (GeoTIFF) datasets definition
+│   │   ├── geoparquet_catalog.yaml # GeoParquet (vector) datasets definition
+│   │   └── partner_data_catalog.yaml # Partner zip bundles definition
 │   ├── analysis/                   # Analysis modules
 │   │   ├── __init__.py             # Package exports
 │   │   ├── catchment.py            # Catchment processing & validation
@@ -253,6 +256,29 @@ A COG entry adds these fields on top of the standard ones:
 When `tiled: true`, the reader reads all tile extents in parallel and mosaics only the
 tiles whose bounds intersect the catchment. `eumtype`/`eumunit` are not needed for COG
 entries (those drive DFS2 output).
+
+### GeoParquet (vector) datasets
+
+Static vector layers (points/lines/polygons) are served as GeoParquet from the
+`geoparquet` Azure container. They are downloaded with `output_format = "parquet"`
+(GeoParquet) or `"shp"` (Shapefile) and keep every feature intersecting the catchment
+whole (no geometry truncation). Defined in **`src/core/geoparquet_catalog.yaml`**
+(`format: geoparquet`), merged into the catalog at load time.
+
+### Partner data (zip bundles)
+
+Externally-shared partner/open datasets are served as **zip bundles** from the public
+`external-shared-open-data` Azure container. Contents are mixed/arbitrary (shapefiles,
+CSVs, Word metadata), so they are **downloaded whole and as-is** — no extraction and no
+catchment clipping. `output_format` is ignored; the `.zip` is delivered verbatim. Defined
+in **`src/core/partner_data_catalog.yaml`** (`format: zip`, `container:
+external-shared-open-data`, `anon: true`), merged into the catalog at load time.
+Currently available:
+
+| Category | Subcategory                | Source                 | Contents (zip)                                     |
+| -------- | -------------------------- | ---------------------- | -------------------------------------------------- |
+| partner  | czech_globe_ms4            | Czech Globe            | Basin shapefiles (EPSG:3035) + metadata            |
+| partner  | copenhagen_university_ms4  | Copenhagen University  | Shapefile + 30-yr precip/evap/percolation CSVs     |
 
 ---
 

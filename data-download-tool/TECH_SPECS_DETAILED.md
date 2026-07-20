@@ -175,7 +175,15 @@ Functions
   the public `cogs` container. COG datasets are defined in `cog_catalog.yaml` (merged
   into the main catalog at load time) with `format: cog`, optional `container`/`anon`,
   and `tiled` for single-file vs mosaic. COG layers are static (`temporal: false`).
-- Local outputs: NetCDF (.nc), Zarr (directory), DFS2 (.dfs2), GeoTIFF/COG (.tif)
+- GeoParquet (vector) layers in the `geoparquet` container, defined in
+  `geoparquet_catalog.yaml` (`format: geoparquet`); merged at load time and downloaded
+  as `.parquet`/`.shp`.
+- Partner zip bundles in the public `external-shared-open-data` container, defined in
+  `partner_data_catalog.yaml` (`format: zip`, `container: external-shared-open-data`,
+  `anon: true`); merged at load time. Mixed/arbitrary contents downloaded whole and
+  as-is (no extraction, no catchment clipping); `output_format` is ignored.
+- Local outputs: NetCDF (.nc), Zarr (directory), DFS2 (.dfs2), GeoTIFF/COG (.tif),
+  GeoParquet (.parquet), Shapefile (.shp), partner bundles (.zip)
 - Logs: JSON with a downloads array
 
 Log entry schema
