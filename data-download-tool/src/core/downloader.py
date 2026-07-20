@@ -60,6 +60,7 @@ class PDPDataDownloader:
     CATALOG_FILE = Path(__file__).parent.joinpath("dataset_catalog.yaml")
     COG_CATALOG_FILE = Path(__file__).parent.joinpath("cog_catalog.yaml")
     GEOPARQUET_CATALOG_FILE = Path(__file__).parent.joinpath("geoparquet_catalog.yaml")
+    PARTNER_CATALOG_FILE = Path(__file__).parent.joinpath("partner_data_catalog.yaml")
 
     def __init__(
         self,
@@ -143,11 +144,12 @@ class PDPDataDownloader:
             print(f"Output format remains: {self.output_format}")
 
     def _load_catalog(self) -> Dict:
-        """Load the dataset catalog, merging the COG and GeoParquet catalogs into it.
+        """Load the dataset catalog, merging the COG, GeoParquet, and partner catalogs into it.
 
         Zarr time-series datasets live in ``dataset_catalog.yaml``, COG raster
-        layers in ``cog_catalog.yaml``, and GeoParquet vector layers in
-        ``geoparquet_catalog.yaml``; all are merged per-category so they share a
+        layers in ``cog_catalog.yaml``, GeoParquet vector layers in
+        ``geoparquet_catalog.yaml``, and partner zip bundles in
+        ``partner_data_catalog.yaml``; all are merged per-category so they share a
         single namespace for ``download_dataset(category, subcategory)``.
         """
         if not self.CATALOG_FILE.exists():
@@ -155,7 +157,11 @@ class PDPDataDownloader:
         with open(self.CATALOG_FILE, "r") as f:
             catalog = yaml.safe_load(f) or {}
 
-        for extra_catalog in (self.COG_CATALOG_FILE, self.GEOPARQUET_CATALOG_FILE):
+        for extra_catalog in (
+            self.COG_CATALOG_FILE,
+            self.GEOPARQUET_CATALOG_FILE,
+            self.PARTNER_CATALOG_FILE,
+        ):
             if extra_catalog.exists():
                 with open(extra_catalog, "r") as f:
                     entries = yaml.safe_load(f) or {}
@@ -476,6 +482,59 @@ class PDPDataDownloader:
         print(f"Download complete: {output_path.relative_to(self.output_base)}")
         return output_path
 
+    def _download_zip(self, category: str, subcategory: str) -> Path:
+        """
+        Download a partner zip bundle whole and as-is.
+
+        Partner datasets in the ``external-shared-open-data`` container are zip
+        files with mixed/arbitrary contents (shapefiles, CSVs, metadata). They are
+        not gridded or vector-clippable, so this method bypasses every processing
+        pipeline: it copies the ``.zip`` blob to the output folder unchanged, with
+        no extraction and no catchment clipping. The downloader's ``output_format``
+        is ignored; the file is always written as ``.zip``.
+
+        Parameters
+        ----------
+        category : str
+            Dataset category (e.g., 'partner').
+        subcategory : str
+            Dataset subcategory (e.g., 'czech_globe_ms4').
+
+        Returns
+        -------
+        Path
+            Path to the downloaded zip file.
+        """
+        info = self.get_dataset_info(category, subcategory)
+        container = info.get("container", self.azure_container)
+
+        fs = self._cog_filesystem(info)
+        blob_path = f"{container}/{info['path']}"
+
+        if self.output_format != "zip":
+            print(
+                f"Output format '{self.output_format}' is ignored for zip entries; "
+                "the partner bundle is delivered verbatim as '.zip'."
+            )
+
+        output_path = build_dataset_path(self.output_base, category, subcategory, "zip")
+        remove_path_with_retry(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        print(f"Downloading zip bundle to: {output_path}")
+        try:
+            fs.get(blob_path, str(output_path))
+        except Exception as e:
+            print(f"ERROR: Failed to download zip bundle: {e}")
+            raise
+
+        self._log_download(
+            category, subcategory, info, output_path, tuple(self.catchment.total_bounds), None
+        )
+
+        print(f"Download complete: {output_path.relative_to(self.output_base)}")
+        return output_path
+
     def process_dataset(
         self,
         ds: xr.Dataset,
@@ -629,9 +688,13 @@ class PDPDataDownloader:
         print(f"Starting download: {category} --> {subcategory}")
         print("This may take a few minutes depending on the data size and your connection.")
 
-        # Vector (GeoParquet) datasets use a dedicated GeoPandas path rather than
-        # the xarray open/process/save pipeline used for raster datasets.
-        if self.get_dataset_info(category, subcategory).get("format") == "geoparquet":
+        # Non-raster datasets bypass the xarray open/process/save pipeline: partner
+        # zip bundles are copied whole, and vector (GeoParquet) layers use a
+        # dedicated GeoPandas path.
+        fmt = self.get_dataset_info(category, subcategory).get("format")
+        if fmt == "zip":
+            return self._download_zip(category, subcategory)
+        if fmt == "geoparquet":
             return self._download_geoparquet(category, subcategory)
 
         ds = self.open_dataset(category, subcategory)
