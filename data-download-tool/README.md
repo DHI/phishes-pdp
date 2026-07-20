@@ -22,9 +22,11 @@ And generates:
 - ✅ Polygon-based spatial extraction (only download what you need)
 - ✅ Zarr format for efficient cloud-optimized data access
 - ✅ Cloud Optimized GeoTIFF (COG) layers for static rasters (single file or tiled mosaic)
+- ✅ GeoParquet (vector) layers, clipped by keeping intersecting features whole
+- ✅ Partner data as zip bundles, downloaded whole and as-is
 - ✅ Optional DFS2 and GeoTIFF (`.tif`) export
 - ✅ Automatic catchment CRS (Coordinate Reference System) reprojection
-- ✅ Support for multiple dataset categories (climate, soil, topography, landuse, hydrology)
+- ✅ Support for multiple dataset categories (climate, soil, topography, landcover, partner, …)
 - ✅ Area-weighted basin averaging and time series analysis
 - ✅ European coverage for all datasets
 
@@ -202,13 +204,19 @@ Configure these settings in the notebook when initializing the downloader:
 - **`output_base`**: Base directory for downloaded data
 - **`time_range`**: Tuple of start and end dates (e.g., `('2015-01-01', '2020-12-31')`)
 - **`buffer_cells`**: Buffer in grid cells around catchment (default: 1)
-- **`output_format`**: Output format - `"nc"` (NetCDF), `"zarr"`, `"dfs2"`, or `"tif"` (GeoTIFF/COG)
+- **`output_format`**: Output format — `"nc"` (NetCDF), `"zarr"`, `"dfs2"`, or `"tif"` (GeoTIFF/COG) for raster datasets; `"parquet"` (GeoParquet) or `"shp"` (Shapefile) for vector datasets
 - **`mask_on_catchment`**: If `True`, clips data to exact catchment boundary
 
 > **COG (GeoTIFF) layers** are static rasters (no time dimension). Use
 > `output_format = "tif"` and `time_range = None` for them. They are read from a
 > separate Azure container and may be either a single `.tif` or an externally tiled
 > mosaic; see the catalog notes below.
+>
+> **GeoParquet (vector) layers** are static too; set `output_format = "parquet"` or
+> `"shp"` (a raster format falls back to GeoParquet).
+>
+> **Partner data (zip bundles)** ignore `output_format` entirely — the `.zip` is
+> downloaded whole and as-is (no extraction, no clipping); see the catalog notes below.
 
 ---
 
