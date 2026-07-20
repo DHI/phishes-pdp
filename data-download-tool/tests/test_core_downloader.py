@@ -116,6 +116,8 @@ def test_load_catalog(tmp_path, monkeypatch):
     catalog.write_text("climate:\n  rain:\n    description: Rain\n", encoding="utf-8")
     monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
     monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", tmp_path / "no_cog.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "GEOPARQUET_CATALOG_FILE", tmp_path / "no_gpq.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "PARTNER_CATALOG_FILE", tmp_path / "no_partner.yaml")
     d = _new_downloader(tmp_path)
     loaded = PDPDataDownloader._load_catalog(d)
     assert "climate" in loaded
@@ -131,6 +133,8 @@ def test_load_catalog_merges_cog_catalog(tmp_path, monkeypatch):
     )
     monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
     monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", cog)
+    monkeypatch.setattr(PDPDataDownloader, "GEOPARQUET_CATALOG_FILE", tmp_path / "no_gpq.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "PARTNER_CATALOG_FILE", tmp_path / "no_partner.yaml")
     d = _new_downloader(tmp_path)
     loaded = PDPDataDownloader._load_catalog(d)
     assert "climate" in loaded
@@ -468,9 +472,74 @@ def test_load_catalog_merges_geoparquet_catalog(tmp_path, monkeypatch):
     monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
     monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", tmp_path / "no_cog.yaml")
     monkeypatch.setattr(PDPDataDownloader, "GEOPARQUET_CATALOG_FILE", gpq)
+    monkeypatch.setattr(PDPDataDownloader, "PARTNER_CATALOG_FILE", tmp_path / "no_partner.yaml")
     d = _new_downloader(tmp_path)
     loaded = PDPDataDownloader._load_catalog(d)
     assert loaded["soil"]["lucas"]["format"] == "geoparquet"
+
+
+def test_load_catalog_merges_partner_catalog(tmp_path, monkeypatch):
+    catalog = tmp_path / "dataset_catalog.yaml"
+    catalog.write_text("climate:\n  rain:\n    description: Rain\n", encoding="utf-8")
+    partner = tmp_path / "partner_data_catalog.yaml"
+    partner.write_text(
+        "partner:\n  czech_globe_ms4:\n    format: zip\n    description: CG bundle\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
+    monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", tmp_path / "no_cog.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "GEOPARQUET_CATALOG_FILE", tmp_path / "no_gpq.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "PARTNER_CATALOG_FILE", partner)
+    d = _new_downloader(tmp_path)
+    loaded = PDPDataDownloader._load_catalog(d)
+    assert loaded["partner"]["czech_globe_ms4"]["format"] == "zip"
+
+
+def _zip_entry():
+    # Blob names in the partner container contain spaces; keep one here to assert
+    # the whole-blob copy path passes them through unchanged.
+    return {
+        "path": "MS4-CG data for PDP.zip",
+        "container": "external-shared-open-data",
+        "format": "zip",
+        "anon": True,
+        "temporal": False,
+        "description": "Czech Globe MS4 bundle",
+        "variable": "partner_bundle",
+    }
+
+
+def test_download_dataset_routes_to_zip(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    d.dataset_catalog["partner"] = {"czech_globe_ms4": _zip_entry()}
+    d.output_format = "nc"  # ignored for zip entries
+
+    captured = {}
+
+    class _FakeFS:
+        def get(self, rpath, lpath):
+            captured["rpath"] = rpath
+            captured["lpath"] = lpath
+
+    monkeypatch.setattr(d, "_cog_filesystem", lambda info: _FakeFS())
+
+    out_path = tmp_path / "data" / "partner" / "czech_globe_ms4" / "czech_globe_ms4.zip"
+
+    def fake_build(base, cat, sub, fmt):
+        captured["fmt"] = fmt
+        return out_path
+
+    monkeypatch.setattr("src.core.downloader.build_dataset_path", fake_build)
+    monkeypatch.setattr("src.core.downloader.remove_path_with_retry", lambda p: True)
+    monkeypatch.setattr(d, "_log_download", lambda *a, **k: None)
+
+    result = d.download_dataset("partner", "czech_globe_ms4")
+
+    assert result == out_path
+    assert captured["fmt"] == "zip"
+    assert captured["rpath"] == "external-shared-open-data/MS4-CG data for PDP.zip"
+    assert captured["lpath"] == str(out_path)
+    assert out_path.parent.exists()  # parent dir created before download
 
 
 def test_download_dataset_pipeline(monkeypatch, tmp_path):
