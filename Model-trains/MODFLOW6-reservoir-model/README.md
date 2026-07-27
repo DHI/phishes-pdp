@@ -1,6 +1,6 @@
 # PHISHES
 
-PHISHES is a Python-based groundwater flow and solute transport modelling framework built on top of iMOD and MODFLOW 6. It generates, runs, and post-processes groundwater flow and transport simulations from TOML configuration files.
+This model train is a Python-based groundwater flow and solute transport modelling framework built on top of iMOD and MODFLOW 6. It generates, runs, and post-processes groundwater flow and transport simulations from TOML configuration files.
 
 ## Project structure
 
