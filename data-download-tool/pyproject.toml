@@ -40,6 +40,8 @@ dependencies = [
     "fsspec>=2023.1.0",
     "azure-storage-blob>=12.28.0",
     "azure-identity>=1.12.0",
+    # Credentials for access-restricted datasets (.env)
+    "python-dotenv>=1.0.0",
     # Visualization
     "matplotlib>=3.6.0",
     "cartopy>=0.21.0",
