@@ -14,6 +14,15 @@
 #   anon: true         -> read the container with anonymous (public) access
 #   temporal: false    -> static bundle; temporal subsetting is skipped
 # OUTPUT_FORMAT is ignored for zip entries; the .zip is delivered verbatim.
+#
+# Access-restricted bundles live under the "restricted_partner" category below, in a
+# SAS-protected container. They add:
+#   anon: false                    -> not publicly readable
+#   credential_env: <VAR_NAME>     -> read the SAS token from this environment variable
+#                                     (set it in a .env file; see .env.example)
+# Restricted entries stay fully visible in the catalog listing - the name and
+# description are public - but downloading raises PermissionError unless the token is
+# present. Nothing about the bundle contents is exposed by the catalog.
 
 partner:
   czech_globe_ms4:
@@ -33,5 +42,19 @@ partner:
     anon: true
     display_name: Copenhagen University MS4 data (zip)
     description: Copenhagen University MS4 partner bundle - shapefile plus 30-year annual precipitation/evaporation/percolation CSVs and metadata.
+    variable: partner_bundle
+    temporal: false
+
+restricted_partner:
+  czech_globe_ms4_full:
+    path: "MS4-CG data for PDP.zip"
+    container: external-shared-after-end
+    format: zip
+    anon: false
+    credential_env: PDP_AFTER_END_SAS
+    display_name: Czech Globe MS4 data - full (restricted)
+    description: >-
+      Restricted Czech Globe MS4 bundle. Requires a SAS token for the
+      external-shared-after-end container; set PDP_AFTER_END_SAS in your .env file.
     variable: partner_bundle
     temporal: false

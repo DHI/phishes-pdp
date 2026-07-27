@@ -11,12 +11,15 @@ Date: January 2026
 """
 
 import json
+import os
+import shutil
 import yaml
 from pathlib import Path
-from typing import Optional, List, Dict, Tuple, Union
+from typing import Any, Optional, List, Dict, Tuple, Union
 from datetime import datetime
 
 import adlfs
+from dotenv import find_dotenv, load_dotenv
 import geopandas as gpd
 import rioxarray  # noqa: F401 - enables .rio accessor on xarray objects
 import xarray as xr
@@ -41,9 +44,13 @@ class PDPDataDownloader:
     - Download logging and metadata
 
     Environment Variables:
-    - AZURE_ACCOUNT: Storage account name (default: phishesdatastore)
-    - AZURE_CONTAINER: Blob container name (default: zarr)
-    - AZURE_CREDENTIAL: SAS token for authentication
+    Open datasets need no configuration; the account, container and read-only SAS
+    token for them are built in. Access-restricted catalog entries declare a
+    ``credential_env`` field naming the environment variable that must hold the SAS
+    token for their container (e.g. ``PDP_AFTER_END_SAS``). Those variables are read
+    from the process environment, which is populated from a ``.env`` file on init if
+    one is found; see ``.env.example``. Already-exported variables take precedence
+    over the ``.env`` file.
     """
 
     # Azure Storage Configuration
@@ -113,6 +120,11 @@ class PDPDataDownloader:
 
         # Load dataset catalog
         self.dataset_catalog = self._load_catalog()
+
+        # Populate the environment from a .env file, if one is discoverable from the
+        # working directory upwards. Restricted catalog entries read their SAS token
+        # from there. override=False so an already-exported variable (shell, CI) wins.
+        load_dotenv(find_dotenv(usecwd=True), override=False)
 
         # Load or use provided catchment
         if isinstance(catchment, gpd.GeoDataFrame):
@@ -284,6 +296,49 @@ class PDPDataDownloader:
         except KeyError:
             raise ValueError(f"Dataset not found: {category}/{subcategory}")
 
+    def dataset_requires_token(self, category: str, subcategory: str) -> Optional[str]:
+        """
+        Return the environment variable gating this dataset, or None if it is open.
+
+        Parameters
+        ----------
+        category : str
+            Dataset category (e.g., 'restricted_partner').
+        subcategory : str
+            Dataset subcategory (e.g., 'czech_globe_ms4_full').
+
+        Returns
+        -------
+        str or None
+            Name of the environment variable that must hold the SAS token, or None
+            for datasets that need no user-supplied credential.
+        """
+        return self.get_dataset_info(category, subcategory).get("credential_env") or None
+
+    def is_dataset_accessible(self, category: str, subcategory: str) -> bool:
+        """
+        Check whether this dataset can be downloaded with the current credentials.
+
+        Purely local: reads the catalog and the environment, never the network, so
+        restricted datasets stay listable even when their token is missing.
+
+        Parameters
+        ----------
+        category : str
+            Dataset category.
+        subcategory : str
+            Dataset subcategory.
+
+        Returns
+        -------
+        bool
+            True if the dataset is open, or its required token is set.
+        """
+        env_var = self.dataset_requires_token(category, subcategory)
+        if env_var is None:
+            return True
+        return bool(os.environ.get(env_var, "").strip())
+
     def open_dataset(self, category: str, subcategory: str) -> xr.Dataset:
         """
         Open a remote dataset from Azure Blob Storage.
@@ -373,7 +428,7 @@ class PDPDataDownloader:
         # GDAL/rasterio from their HTTPS URLs (range reads) rather than streamed through
         # the filesystem object, which is much faster for many tiles.
         if dataset_info.get("tiled", False):
-            fs = self._cog_filesystem(dataset_info)
+            fs = self._dataset_filesystem(dataset_info)
             prefix = f"{container}/{dataset_info['path']}".rstrip("/")
             blob_paths = sorted(fs.glob(prefix + "/**/*.tif"))
             if not blob_paths:
@@ -382,7 +437,8 @@ class PDPDataDownloader:
             blob_paths = [f"{container}/{dataset_info['path']}"]
 
         anon = dataset_info.get("anon", False)
-        uris = [self._blob_url(p, anon=anon) for p in blob_paths]
+        credential = self._dataset_credential(dataset_info)
+        uris = [self._blob_url(p, anon=anon, credential=credential) for p in blob_paths]
 
         try:
             return cogio.open_cog(
@@ -395,25 +451,70 @@ class PDPDataDownloader:
             print(f"ERROR: Failed to open COG dataset: {e}")
             raise
 
-    def _blob_url(self, blob_path: str, anon: bool = False) -> str:
+    def _blob_url(
+        self, blob_path: str, anon: bool = False, credential: Optional[str] = None
+    ) -> str:
         """Build an HTTPS blob URL (with SAS token unless anonymous) for GDAL/vsicurl."""
         url = f"https://{self.azure_account}.blob.core.windows.net/{blob_path}"
-        if not anon and self.azure_credential:
-            url += "?" + self.azure_credential.lstrip("?")
+        if credential is None:
+            credential = self.azure_credential
+        if not anon and credential:
+            url += "?" + credential.lstrip("?")
         return url
 
-    def _cog_filesystem(self, dataset_info: Dict):
-        """Return the filesystem used to list tiles for a COG dataset.
+    def _dataset_filesystem(self, dataset_info: Dict):
+        """Return the filesystem to read a catalog entry with, honouring its access mode.
 
-        COG containers may use different credentials than the default Zarr
-        container. When the catalog entry sets ``anon: true``, use a cached
-        anonymous filesystem; otherwise reuse the main (SAS-authenticated) one.
+        Containers other than the default Zarr one may use different credentials.
+        Three modes, in precedence order:
+
+        - ``credential_env: <VAR>`` -> SAS token supplied by the user through that
+          environment variable (typically via a ``.env`` file). Access-restricted.
+        - ``anon: true`` -> cached anonymous filesystem (public container).
+        - neither -> the main filesystem with the built-in read-only SAS token.
         """
+        env_var = dataset_info.get("credential_env")
+        if env_var:
+            return self._env_credential_filesystem(env_var, dataset_info)
         if not dataset_info.get("anon", False):
             return self.fs
         if getattr(self, "_anon_fs", None) is None:
             self._anon_fs = adlfs.AzureBlobFileSystem(account_name=self.azure_account, anon=True)
         return self._anon_fs
+
+    def _dataset_credential(self, dataset_info: Dict) -> Optional[str]:
+        """Return the SAS token for a catalog entry, or None for anonymous access."""
+        env_var = dataset_info.get("credential_env")
+        if env_var:
+            return self._require_token(env_var, dataset_info)
+        if dataset_info.get("anon", False):
+            return None
+        return self.azure_credential
+
+    def _require_token(self, env_var: str, dataset_info: Dict) -> str:
+        """Read a restricted dataset's SAS token from the environment, or explain how to set it."""
+        token = os.environ.get(env_var, "").strip()
+        if not token:
+            name = dataset_info.get("display_name", "This dataset")
+            container = dataset_info.get("container", self.azure_container)
+            raise PermissionError(
+                f"'{name}' is access-restricted. "
+                f"Set {env_var} in a .env file next to your notebook (or export it) with the "
+                f"SAS token for container '{container}'. See .env.example. "
+                f"Contact the data owner to request a token."
+            )
+        return token.lstrip("?")
+
+    def _env_credential_filesystem(self, env_var: str, dataset_info: Dict):
+        """Return a cached filesystem authenticated with a SAS token from the environment."""
+        token = self._require_token(env_var, dataset_info)
+        env_filesystems: Dict[str, Any] = getattr(self, "_env_fs", None) or {}
+        if env_var not in env_filesystems:
+            env_filesystems[env_var] = adlfs.AzureBlobFileSystem(
+                account_name=self.azure_account, sas_token=token
+            )
+            self._env_fs = env_filesystems
+        return env_filesystems[env_var]
 
     def _download_geoparquet(self, category: str, subcategory: str) -> Path:
         """
@@ -444,7 +545,7 @@ class PDPDataDownloader:
         bbox = tuple(catchment_reproj.total_bounds)
         geom = unary_union(catchment_reproj.geometry)
 
-        fs = self._cog_filesystem(info)
+        fs = self._dataset_filesystem(info)
         blob_path = f"{container}/{info['path']}"
 
         try:
@@ -493,6 +594,10 @@ class PDPDataDownloader:
         no extraction and no catchment clipping. The downloader's ``output_format``
         is ignored; the file is always written as ``.zip``.
 
+        Entries in a restricted container (``credential_env`` set) resolve their SAS
+        token from the environment first, so a missing token raises ``PermissionError``
+        before anything is written.
+
         Parameters
         ----------
         category : str
@@ -508,7 +613,7 @@ class PDPDataDownloader:
         info = self.get_dataset_info(category, subcategory)
         container = info.get("container", self.azure_container)
 
-        fs = self._cog_filesystem(info)
+        fs = self._dataset_filesystem(info)
         blob_path = f"{container}/{info['path']}"
 
         if self.output_format != "zip":
@@ -523,9 +628,21 @@ class PDPDataDownloader:
 
         print(f"Downloading zip bundle to: {output_path}")
         try:
-            fs.get(blob_path, str(output_path))
+            # Stream the blob rather than fs.get(): fsspec's get() expands the remote
+            # path first, which needs *list* permission on the container. A restricted
+            # bundle's SAS token may be read-only (sp=r), so copy the bytes directly.
+            with fs.open(blob_path, "rb") as remote, open(output_path, "wb") as local:
+                shutil.copyfileobj(remote, local)
         except Exception as e:
             print(f"ERROR: Failed to download zip bundle: {e}")
+            if info.get("credential_env"):
+                print(
+                    f"If this is an authorization error, check that {info['credential_env']} "
+                    f"holds a current SAS token with read access to '{container}' "
+                    "(tokens expire)."
+                )
+            # Never leave a partial file behind for the next run to mistake for a download.
+            remove_path_with_retry(output_path)
             raise
 
         self._log_download(
