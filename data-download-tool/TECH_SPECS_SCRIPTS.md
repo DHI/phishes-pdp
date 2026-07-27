@@ -59,7 +59,7 @@ class PDPDataDownloader:
         self,
         script_names: Optional[List[str]] = None,
         categories: Optional[List[str]] = None,
-        output_dir: Optional[Union[str, Path]] = None
+        output_dir: Optional[Union[str, Path]] = None,
     ) -> Dict[str, Path]:
         """
         Download processing scripts.
@@ -85,7 +85,7 @@ class PDPDataDownloader:
 
 ```python
 # In notebook after downloading datasets
-downloader.download_scripts(categories=['preprocessing', 'analysis'])
+downloader.download_scripts(categories=["preprocessing", "analysis"])
 # Output: scripts/ folder with copies of all preprocessing/analysis scripts
 ```
 
