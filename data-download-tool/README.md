@@ -295,9 +295,9 @@ Some datasets are not public. They live in a SAS-protected container and their c
 entry declares `anon: false` plus **`credential_env`** — the name of the environment
 variable that must hold the SAS token for that container:
 
-| Category             | Subcategory           | Container                   | Token variable       |
-| -------------------- | --------------------- | --------------------------- | -------------------- |
-| restricted\_partner  | czech\_globe\_ms4\_full | external-shared-after-end   | `PDP_AFTER_END_SAS`  |
+| Category           | Subcategory             | Container                 | Token variable      |
+| ------------------ | ----------------------- | ------------------------- | ------------------- |
+| restricted_partner | czech_globe_ms4_full    | external-shared-after-end | `PDP_AFTER_END_SAS` |
 
 Restricted datasets are **always listed** — their name and description are public, and the
 catalog reveals nothing about the bundle contents. Only the download is gated.
