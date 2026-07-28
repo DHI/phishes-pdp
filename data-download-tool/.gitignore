@@ -41,6 +41,8 @@ uv.lock
 # Configuration files with credentials
 config.py
 secrets.py
+.env
+!.env.example
 
 # Azure credentials
 *.key
