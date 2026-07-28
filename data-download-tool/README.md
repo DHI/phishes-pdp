@@ -166,7 +166,7 @@ data-download-tool/
 │   │   ├── dataset_catalog.yaml    # Zarr datasets definition
 │   │   ├── cog_catalog.yaml        # COG (GeoTIFF) datasets definition
 │   │   ├── geoparquet_catalog.yaml # GeoParquet (vector) datasets definition
-│   │   └── partner_data_catalog.yaml # Partner zip bundles definition
+│   │   └── partner_data_catalog.yaml # Partner zip bundles (public + restricted)
 │   ├── analysis/                   # Analysis modules
 │   │   ├── __init__.py             # Package exports
 │   │   ├── catchment.py            # Catchment processing & validation
@@ -178,6 +178,7 @@ data-download-tool/
 │   └── shp/                        # Catchment shapefiles
 │       └── catchment_template/     # Example catchment
 ├── pyproject.toml                  # Project dependencies
+├── .env.example                    # Template for restricted-dataset SAS tokens
 ├── README.md                       # This file
 ├── TECH_SPECS_OVERVIEW.md          # Technical overview
 └── TECH_SPECS_DETAILED.md          # Technical details
@@ -288,6 +289,41 @@ Currently available:
 | partner  | czech_globe_ms4            | Czech Globe            | Basin shapefiles (EPSG:3035) + metadata            |
 | partner  | copenhagen_university_ms4  | Copenhagen University  | Shapefile + 30-yr precip/evap/percolation CSVs     |
 
+### Access-restricted datasets
+
+Some datasets are not public. They live in a SAS-protected container and their catalog
+entry declares `anon: false` plus **`credential_env`** — the name of the environment
+variable that must hold the SAS token for that container:
+
+| Category           | Subcategory             | Container                 | Token variable      |
+| ------------------ | ----------------------- | ------------------------- | ------------------- |
+| restricted_partner | czech_globe_ms4_full    | external-shared-after-end | `PDP_AFTER_END_SAS` |
+
+Restricted datasets are **always listed** — their name and description are public, and the
+catalog reveals nothing about the bundle contents. Only the download is gated.
+
+To get access:
+
+1. Request the SAS token from the data owner.
+2. Copy `.env.example` to `.env` and fill in the variable:
+
+   ```dotenv
+   PDP_AFTER_END_SAS=sp=r&st=...&sig=...
+   ```
+
+   A read-only token (`sp=r`) is enough — the bundle is streamed straight from its known
+   blob path, so the token does not need *list* permission on the container.
+
+3. Run the notebook. The downloader loads the nearest `.env` on init (searching upwards
+   from the working directory); a variable already exported in your shell takes
+   precedence over the file.
+
+`.env` is gitignored — never commit it. Without a token, the Step 6 listing still shows
+the dataset marked 🔒 and `download_dataset()` raises `PermissionError` before writing
+anything. Check access programmatically with
+`downloader.is_dataset_accessible(category, subcategory)`, and see which variable an
+entry needs with `downloader.dataset_requires_token(category, subcategory)`.
+
 ---
 
 ## 🔧 Troubleshooting
@@ -301,7 +337,17 @@ Cannot connect to PDP datastore
 ```
 
 - Check internet connection
-- Credentials are built into the downloader
+- Credentials for open datasets are built into the downloader
+
+**Access Denied:**
+
+```
+PermissionError: '<dataset>' is access-restricted. Set PDP_AFTER_END_SAS in a .env file ...
+```
+
+- The dataset needs a SAS token you do not have set — see
+  [Access-restricted datasets](#access-restricted-datasets)
+- Copy `.env.example` to `.env`, fill in the named variable, and restart the kernel
 
 **Catchment CRS Error:**
 
