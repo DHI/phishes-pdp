@@ -19,7 +19,6 @@ from typing import Any, Optional, List, Dict, Tuple, Union
 from datetime import datetime
 
 import adlfs
-from dotenv import find_dotenv, load_dotenv
 import geopandas as gpd
 import rioxarray  # noqa: F401 - enables .rio accessor on xarray objects
 import xarray as xr
@@ -30,6 +29,15 @@ from ..analysis import load_catchment, validate_catchment_gdf, reproject_catchme
 from . import dfsio
 from . import cogio
 from . import geoparquetio
+
+try:
+    # Optional convenience: read restricted-dataset tokens from a .env file. Tokens can
+    # always be exported directly, so a missing python-dotenv only disables .env lookup.
+    from dotenv import find_dotenv, load_dotenv
+except ImportError:  # pragma: no cover - exercised via the _DOTENV_AVAILABLE flag
+    find_dotenv = load_dotenv = None
+
+_DOTENV_AVAILABLE = load_dotenv is not None
 
 
 class PDPDataDownloader:
@@ -121,10 +129,7 @@ class PDPDataDownloader:
         # Load dataset catalog
         self.dataset_catalog = self._load_catalog()
 
-        # Populate the environment from a .env file, if one is discoverable from the
-        # working directory upwards. Restricted catalog entries read their SAS token
-        # from there. override=False so an already-exported variable (shell, CI) wins.
-        load_dotenv(find_dotenv(usecwd=True), override=False)
+        self._load_env_file()
 
         # Load or use provided catchment
         if isinstance(catchment, gpd.GeoDataFrame):
@@ -154,6 +159,19 @@ class PDPDataDownloader:
             print(f"Output format set to: {self.output_format}")
         else:
             print(f"Output format remains: {self.output_format}")
+
+    @staticmethod
+    def _load_env_file():
+        """Populate the environment from the nearest .env file, if one is discoverable.
+
+        Restricted catalog entries read their SAS token from the environment. The search
+        runs upwards from the working directory, and ``override=False`` means a variable
+        already exported in the shell or CI wins over the file. A no-op when
+        ``python-dotenv`` is not installed - export the variable instead.
+        """
+        if not _DOTENV_AVAILABLE:
+            return
+        load_dotenv(find_dotenv(usecwd=True), override=False)
 
     def _load_catalog(self) -> Dict:
         """Load the dataset catalog, merging the COG, GeoParquet, and partner catalogs into it.
@@ -497,10 +515,17 @@ class PDPDataDownloader:
         if not token:
             name = dataset_info.get("display_name", "This dataset")
             container = dataset_info.get("container", self.azure_container)
+            where = (
+                "in a .env file next to your notebook (or export it)"
+                if _DOTENV_AVAILABLE
+                # Without python-dotenv installed, .env files are never read.
+                else "as an exported environment variable (python-dotenv is not installed, "
+                "so .env files are not read)"
+            )
             raise PermissionError(
                 f"'{name}' is access-restricted. "
-                f"Set {env_var} in a .env file next to your notebook (or export it) with the "
-                f"SAS token for container '{container}'. See .env.example. "
+                f"Set {env_var} {where} with the SAS token for container "
+                f"'{container}'. See .env.example. "
                 f"Contact the data owner to request a token."
             )
         return token.lstrip("?")

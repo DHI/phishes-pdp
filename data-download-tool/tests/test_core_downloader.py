@@ -619,6 +619,39 @@ def test_dataset_filesystem_missing_token_raises(monkeypatch, tmp_path, recordin
     assert not recording_adlfs.instances  # no connection attempted
 
 
+def test_load_env_file_is_noop_without_dotenv(monkeypatch):
+    """python-dotenv is an optional convenience; tokens can be exported directly."""
+    monkeypatch.setattr("src.core.downloader._DOTENV_AVAILABLE", False)
+    monkeypatch.setattr("src.core.downloader.load_dotenv", None)
+    PDPDataDownloader._load_env_file()  # must not raise
+
+
+def test_load_env_file_uses_dotenv_when_available(monkeypatch):
+    calls = {}
+    monkeypatch.setattr("src.core.downloader._DOTENV_AVAILABLE", True)
+    monkeypatch.setattr("src.core.downloader.find_dotenv", lambda usecwd: "/tmp/.env")
+    monkeypatch.setattr(
+        "src.core.downloader.load_dotenv",
+        lambda path, override: calls.update(path=path, override=override),
+    )
+    PDPDataDownloader._load_env_file()
+    # Exported variables must win over the file.
+    assert calls == {"path": "/tmp/.env", "override": False}
+
+
+def test_missing_token_message_mentions_export_without_dotenv(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    monkeypatch.delenv("PDP_AFTER_END_SAS", raising=False)
+    monkeypatch.setattr("src.core.downloader._DOTENV_AVAILABLE", False)
+
+    with pytest.raises(PermissionError) as excinfo:
+        d._dataset_filesystem(_restricted_zip_entry())
+
+    message = str(excinfo.value)
+    assert "python-dotenv is not installed" in message
+    assert "PDP_AFTER_END_SAS" in message
+
+
 def test_dataset_filesystem_blank_token_raises(monkeypatch, tmp_path, recording_adlfs):
     d = _new_downloader(tmp_path)
     monkeypatch.setenv("PDP_AFTER_END_SAS", "   ")
