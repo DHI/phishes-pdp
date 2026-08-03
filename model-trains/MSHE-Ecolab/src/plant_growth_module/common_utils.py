@@ -59,9 +59,7 @@ def confirm_columns(column_dict, auto_confirm=False, context="", multi_files=Tru
         print("❌ Operation cancelled by user.")
         raise RuntimeError("User cancelled operation")
 
-    print(
-        f"⚠ Invalid input '{user_input}'. Skipping{' ' + context if context else ''}..."
-    )
+    print(f"⚠ Invalid input '{user_input}'. Skipping{' ' + context if context else ''}...")
     return False
 
 

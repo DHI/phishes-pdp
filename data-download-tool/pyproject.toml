@@ -3,7 +3,7 @@ name = "phishes-data-downloader"
 version = "1.0.0"
 description = "PHISHES Digital Platform - Data Download Module for soil science datasets"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 license = { text = "MIT" }
 authors = [{ name = "PHISHES Team" }]
 keywords = ["soil science", "geospatial", "azure", "zarr", "data download"]
@@ -53,11 +53,11 @@ dependencies = [
 
 [project.optional-dependencies]
 jupyter = ["jupyter>=1.0.0", "ipywidgets>=8.0.0"]
-dev = ["pytest>=9.0.3", "ruff>=0.1.0"]
+dev = ["pytest>=9.0.3", "ruff==0.16.0"]
 all = ["phishes-data-downloader[jupyter,dev]"]
 
 [dependency-groups]
-dev = ["pytest>=9.0.3", "ruff>=0.1.0"]
+dev = ["pytest>=9.0.3", "ruff==0.16.0"]
 
 [project.scripts]
 phishes-setup = "setup_folder_structure:main"
@@ -79,6 +79,12 @@ packages = ["src"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+# Notebooks are linted (advisorily) by `nbqa ruff` in the Notebooks
+# workflow, and are deliberately not auto-formatted: `ruff format` joins
+# cell code up to the 100-char limit, which reads badly in a narrow cell,
+# and notebook churn obscures real review diffs.
+extend-exclude = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N"]

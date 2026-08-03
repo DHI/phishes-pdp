@@ -37,9 +37,18 @@ Check the following boxes and configure as described:
   - Search and add the following status checks (these match the job names in the workflow):
     - `Lint and Test (model-trains/MSHE-Ecolab)`
     - `Lint and Test (data-download-tool)`
+    - `File Size Check (10 MB)`
+    - `Secret Scan (trufflehog)`
+    - `Dependency Audit (model-trains/MSHE-Ecolab)`
+    - `Dependency Audit (data-download-tool)`
     - `Basic PR Check`
     - `Code Quality Checks`
     - `Security Scanning`
+
+  Do **not** add the advisory checks (`Format (advisory)`,
+  `Markdown Lint (advisory)`, `Notebook Lint (advisory)`) as required.
+  They are deliberately non-blocking so that a trailing space cannot stop
+  an external contribution; requiring them defeats the purpose.
 
 #### Additional protections
 - ✅ **Require conversation resolution before merging**
