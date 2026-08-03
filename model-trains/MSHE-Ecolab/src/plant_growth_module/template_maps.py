@@ -67,9 +67,7 @@ def load_classification_mappings(lu_template, sp_template, auto_confirm=False):
     apply_col = find_col(lu_df, APPLY_COLS)
 
     if code_col is None or class_col is None:
-        raise ValueError(
-            "Required columns not found in the land use classification template."
-        )
+        raise ValueError("Required columns not found in the land use classification template.")
 
     confirm_payload = {"Code column": code_col, "Class column": class_col}
     if apply_col is not None:
@@ -104,9 +102,7 @@ def load_classification_mappings(lu_template, sp_template, auto_confirm=False):
     sp_class_col = find_col(sp_df, CLASS_COLS)
 
     if sp_code_col is None or sp_class_col is None:
-        raise ValueError(
-            "Required columns not found in the soil profile classification template."
-        )
+        raise ValueError("Required columns not found in the soil profile classification template.")
 
     confirmed = confirm_columns(
         {"Code column": sp_code_col, "Soil profile column": sp_class_col},
@@ -276,12 +272,7 @@ def process_template_file(
         scope = STATE_VARIABLE_SCOPE.get(str(key_name).strip())
         if template_col is not None:
             scope_values = (
-                subset[template_col]
-                .dropna()
-                .astype(str)
-                .str.strip()
-                .str.lower()
-                .unique()
+                subset[template_col].dropna().astype(str).str.strip().str.lower().unique()
             )
             if len(scope_values) > 0:
                 scope = scope_values[0]

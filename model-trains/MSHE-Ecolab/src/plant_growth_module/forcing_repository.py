@@ -135,9 +135,7 @@ def _import_data_downloader_modules():
         src_dir = _get_installed_data_downloader_src_dir()
         if src_dir is not None:
             try:
-                downloader_mod, catchment_mod = (
-                    _import_data_downloader_via_runtime_package(src_dir)
-                )
+                downloader_mod, catchment_mod = _import_data_downloader_via_runtime_package(src_dir)
                 return downloader_mod, catchment_mod
             except (ImportError, ModuleNotFoundError, OSError, AttributeError):
                 # Fall back to a clear user-facing import error below.
@@ -186,9 +184,7 @@ def load_pgm_forcing_library():
     pgm_forcings = catalog.get("pgm_forcings")
 
     if not isinstance(pgm_forcings, dict) or not pgm_forcings:
-        raise ValueError(
-            "data-download-tool catalog must define top-level 'pgm_forcings' mapping."
-        )
+        raise ValueError("data-download-tool catalog must define top-level 'pgm_forcings' mapping.")
 
     required_fields = {
         "item_name",
@@ -208,9 +204,7 @@ def load_pgm_forcing_library():
 
         missing = sorted(required_fields - set(meta.keys()))
         if missing:
-            raise ValueError(
-                f"pgm_forcings.{forcing_key} missing fields: {', '.join(missing)}"
-            )
+            raise ValueError(f"pgm_forcings.{forcing_key} missing fields: {', '.join(missing)}")
 
         validated[forcing_key] = dict(meta)
 
@@ -263,9 +257,7 @@ def _resolve_catchment_input(
         return Path(catchment_shapefile)
 
     if extent is None:
-        raise ValueError(
-            "Provide either catchment_shapefile or extent=[minx, miny, maxx, maxy]."
-        )
+        raise ValueError("Provide either catchment_shapefile or extent=[minx, miny, maxx, maxy].")
 
     _, create_catchment_from_extent = get_data_downloader_classes()
     return create_catchment_from_extent(extent=extent, crs=extent_crs)
@@ -284,9 +276,7 @@ def download_forcing_dfs2_series(
 ):
     """Download and standardize forcing DFS2 grid series using data-download-tool."""
     if not time_range or len(time_range) != 2:
-        raise ValueError(
-            "time_range must be a tuple/list with two values: (start_date, end_date)"
-        )
+        raise ValueError("time_range must be a tuple/list with two values: (start_date, end_date)")
 
     plan = build_forcing_download_plan(include_optional=include_optional)
 
@@ -296,7 +286,8 @@ def download_forcing_dfs2_series(
             f"Required forcing datasets missing from data-download-tool catalog: {missing_names}"
         )
 
-    PDPDataDownloader, _ = get_data_downloader_classes()
+    # Binds a class, not a value, so PascalCase is correct here.
+    PDPDataDownloader, _ = get_data_downloader_classes()  # noqa: N806
     catchment_input = _resolve_catchment_input(
         catchment_shapefile=catchment_shapefile,
         extent=extent,

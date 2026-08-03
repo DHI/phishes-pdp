@@ -98,9 +98,7 @@ def _find_profile_txt_files(
 
 def _extract_cell_ranges(text: str) -> list[tuple[str, int, int]]:
     """Parse contiguous cell ranges from UZ table-like rows in profile text files."""
-    row_pat = re.compile(
-        r"^\s*(?P<cell>\d+)\s+[-+]?\d*\.\d+\s+[-+]?\d*\.\d+\s+(?P<soil>\S+)\s*$"
-    )
+    row_pat = re.compile(r"^\s*(?P<cell>\d+)\s+[-+]?\d*\.\d+\s+[-+]?\d*\.\d+\s+(?P<soil>\S+)\s*$")
 
     rows: list[tuple[int, str]] = []
     current_soil: str | None = None
@@ -166,9 +164,7 @@ def _extract_properties_by_section(text: str) -> dict[str, ProfileProperty]:
             section_starts.append((idx, m.group("soil").strip()))
 
     for i, (start_idx, soil_name) in enumerate(section_starts):
-        end_idx = (
-            section_starts[i + 1][0] if i + 1 < len(section_starts) else len(lines)
-        )
+        end_idx = section_starts[i + 1][0] if i + 1 < len(section_starts) else len(lines)
         section = lines[start_idx:end_idx]
 
         wp = None
@@ -310,9 +306,7 @@ def parse_soil_profile_texts(
         print(f"[OK] Parsed grid code {grid_code}: {txt_file.name}")
 
     profile_table = pd.concat(rows, ignore_index=True)
-    profile_table = profile_table.sort_values(["grid_code", "cell_index"]).reset_index(
-        drop=True
-    )
+    profile_table = profile_table.sort_values(["grid_code", "cell_index"]).reset_index(drop=True)
     max_cell_index = int(profile_table["cell_index"].max())
 
     profile_table.to_csv(profile_table_csv_path, index=False)
@@ -350,9 +344,7 @@ def generate_soil_property_dfs2_outputs(
     if profile_grid.ndim == 3:
         profile_grid = profile_grid[0]
 
-    unique_grid_codes = sorted(
-        int(v) for v in np.unique(profile_grid[~np.isnan(profile_grid)])
-    )
+    unique_grid_codes = sorted(int(v) for v in np.unique(profile_grid[~np.isnan(profile_grid)]))
     missing_grid_codes = [gc for gc in unique_grid_codes if gc not in parsed_by_grid]
     if missing_grid_codes:
         raise ValueError(
@@ -424,14 +416,10 @@ def generate_soil_property_dfs2_outputs(
     return pd.DataFrame(written)
 
 
-def build_soil_profile_summary(
-    output_index: pd.DataFrame, summary_csv_path: Path
-) -> pd.DataFrame:
+def build_soil_profile_summary(output_index: pd.DataFrame, summary_csv_path: Path) -> pd.DataFrame:
     """Build summary table and persist as CSV."""
     summary = output_index.copy()
     summary["wp_exists"] = summary["wilting_point_dfs2"].map(lambda p: Path(p).exists())
-    summary["fc_exists"] = summary["field_capacity_dfs2"].map(
-        lambda p: Path(p).exists()
-    )
+    summary["fc_exists"] = summary["field_capacity_dfs2"].map(lambda p: Path(p).exists())
     summary.to_csv(summary_csv_path, index=False)
     return summary

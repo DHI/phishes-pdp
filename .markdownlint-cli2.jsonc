@@ -14,6 +14,9 @@
     "MD034": false,
     "MD036": false,
     "MD040": false,
+    // Stub READMEs for not-yet-implemented model trains are prose, and
+    // demanding a top-level heading on them is friction with no payoff.
+    "MD041": false,
     "MD051": false
   },
   "globs": ["**/*.md"],
