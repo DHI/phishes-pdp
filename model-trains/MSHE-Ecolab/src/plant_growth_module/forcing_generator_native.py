@@ -61,27 +61,19 @@ def read_timeseries_input(module_root: Path, entry: dict[str, Any]) -> pd.Series
         time_col = entry.get("time_col", "time")
         value_col = entry.get("value_col", "value")
         if time_col not in df.columns or value_col not in df.columns:
-            raise ValueError(
-                f"CSV {ts_path} must contain columns '{time_col}' and '{value_col}'."
-            )
+            raise ValueError(f"CSV {ts_path} must contain columns '{time_col}' and '{value_col}'.")
 
         index = pd.to_datetime(df[time_col], errors="coerce").dt.tz_localize(None)
         if index.isna().any():
-            raise ValueError(
-                f"CSV {ts_path} has invalid timestamps in column '{time_col}'."
-            )
+            raise ValueError(f"CSV {ts_path} has invalid timestamps in column '{time_col}'.")
 
         values = pd.to_numeric(df[value_col], errors="coerce")
         if values.isna().any():
-            raise ValueError(
-                f"CSV {ts_path} has non-numeric values in column '{value_col}'."
-            )
+            raise ValueError(f"CSV {ts_path} has non-numeric values in column '{value_col}'.")
 
         series = pd.Series(values.to_numpy(dtype=float), index=index)
     else:
-        raise ValueError(
-            f"Unsupported source '{source}' for {ts_path}. Use 'dfs0' or 'csv'."
-        )
+        raise ValueError(f"Unsupported source '{source}' for {ts_path}. Use 'dfs0' or 'csv'.")
 
     if series.empty:
         raise ValueError(f"Timeseries input is empty: {ts_path}")
@@ -90,9 +82,7 @@ def read_timeseries_input(module_root: Path, entry: dict[str, Any]) -> pd.Series
     return normalize_daily_if_needed(series)
 
 
-def resolve_item_info(
-    name: str, eum_type_name: str, eum_unit_name: str
-) -> mikeio.ItemInfo:
+def resolve_item_info(name: str, eum_type_name: str, eum_unit_name: str) -> mikeio.ItemInfo:
     try:
         eum_type = getattr(mikeio.EUMType, eum_type_name)
     except AttributeError as exc:
@@ -125,9 +115,7 @@ def run_native_setup(
     elif grid_data.ndim == 2:
         grid_codes = grid_data.astype(np.int32)
     else:
-        raise ValueError(
-            f"Unexpected grid dimensions for {grid_path}: {grid_data.shape}"
-        )
+        raise ValueError(f"Unexpected grid dimensions for {grid_path}: {grid_data.shape}")
 
     unique_codes = sorted(int(code) for code in np.unique(grid_codes))
 
@@ -215,9 +203,7 @@ def export_first_dfs0_item_to_csv(
                 e
                 for e in timeseries_inputs
                 if str(e.get("source", "dfs0")).strip().lower() == "dfs0"
-                and to_abs_path(module_root, e["path"])
-                .suffix.lower()
-                .startswith(".dfs")
+                and to_abs_path(module_root, e["path"]).suffix.lower().startswith(".dfs")
             ),
             None,
         )
