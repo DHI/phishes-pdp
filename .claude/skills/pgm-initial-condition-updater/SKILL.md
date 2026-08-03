@@ -55,8 +55,12 @@ function; ruff line length 100. Notebooks stay orchestrators — put logic in `s
 ```powershell
 cd model-trains/MSHE-Ecolab
 uv run pytest tests/test_initial_condition_updater.py
-uvx ruff check . ; uvx ruff format --check .
+uv run ruff check . ; uv run ruff format --check .
 ```
+
+Always `uv run ruff`, never `uvx ruff` or a system-wide ruff: the module pins `ruff==0.16.0`, while
+`uvx` fetches the latest release, which enforces a different rule set and disagrees with CI.
+`ruff check` is blocking in CI; `ruff format` is advisory.
 
 Round-trip sanity: after `doc.write`, `mikeio.read_pfs(out)` must succeed and the `SaturatedZone`
 subtree (`to_dict()`) must be unchanged. Definitive check: open the output `.she` in MIKE Zero.

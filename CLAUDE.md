@@ -146,17 +146,26 @@ Three invariants keep the gates honest — breaking any of them reintroduces a c
 
 ## Agent routing (`.github/agents/`)
 
-- `phishes-pdp.agent.md` — root coordinator: cross-module, CI, governance.
-- `data-download-tool.agent.md` — DDT source/tests/notebook.
-- `plant-growth-module.agent.md` — PGM source/tests/notebooks.
+- `phishes-pdp.agent.md` — root coordinator: cross-module, CI, governance. Delegates to the three below.
+- `data-download-tool.agent.md` — DDT source/tests/notebook/catalogs.
+- `plant-growth-module.agent.md` — PGM source/tests/notebooks (Workflows A–C).
+- `pgm-initial-condition-updater.agent.md` — Workflow D only: `initial_condition_updater.py`, its notebook, tests and design doc.
 
 Prefer the matching agent for module-scoped work.
+
+**Duplicated copies.** DDT and MSHE-Ecolab each carry a module-scoped copy of their own agent at
+`<module>/.github/agents/<name>.agent.md`. The content matches the root copy except that paths are
+module-relative instead of repo-relative. They drift easily — update both halves together, and note
+that only the root `.github/agents/` copies are picked up repo-wide.
+
+There is also a skill at `.claude/skills/pgm-initial-condition-updater/SKILL.md` covering Workflow D.
 
 ## Gotchas
 
 - **DFS2 timestep warning**: mikeio prints `Time step is 0.0 seconds...` for every static-map write. Both `common_utils.py` and `soil_profile_setup.py` have a `_suppress_mikeio_static_timestep_warning()` helper applied via `warnings.catch_warnings()`. Use it when adding new DFS2 write code; don't disable warnings globally.
 - **DFS2 axis regularization**: DFS2 grids must be equidistant, but some sources store lat/lon rounded to a few decimals (e.g. `modis_snowcover` on a 0.05° grid), producing occasional off-by-a-decimal steps that mikeio rejects. `utils.regularize_axis` snaps a *near*-equidistant axis (within `rtol` of its median step) to an exact `linspace`; genuinely irregular grids pass through unchanged and still raise. Applied in `dfsio.dfs_from_xr`.
 - **Sample data is load-bearing**: tests in both modules read from `<module>/sample_data/`. Don't rename/move without updating fixtures.
-- **Direct pushes to `main` are blocked.** PRs require code-owner approval (`@DHI/phishes-maintainers` per `.github/CODEOWNERS`). All CI checks must pass.
+- **Direct pushes to `main` are blocked.** PRs require code-owner approval (`@DHI/phishes-maintainers` per `.github/CODEOWNERS`). All *blocking* CI checks must pass; advisory ones (format, markdown, notebook lint) never block.
 - **PGM↔DDT runtime import is brittle by design**: probes `core/downloader.py` and `analysis/catchment.py` paths directly. Restructuring DDT's `src/` layout will break PGM's `forcing_repository.py`.
-- **Catalog YAML drives behavior, not Python constants**: dataset selection, EUM units, value-accumulation type, and (eventually) PGM forcing routing all come from `dataset_catalog.yaml`. Check it before grepping for hardcoded dataset names.
+- **Catalog YAML drives behavior, not Python constants**: dataset selection, EUM units, value-accumulation type, and (eventually) PGM forcing routing come from the four catalogs in `src/core/` (`dataset_catalog.yaml`, `cog_catalog.yaml`, `geoparquet_catalog.yaml`, `partner_data_catalog.yaml`), merged per-category at load time. Check them before grepping for hardcoded dataset names.
+- **Docs duplicated in two places**: DDT and MSHE-Ecolab each keep a module-scoped copy of their agent file under `<module>/.github/agents/`. Same content, module-relative paths. Update both halves together.
