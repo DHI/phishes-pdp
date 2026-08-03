@@ -10,9 +10,7 @@ from plant_growth_module import soil_profile_setup
 from plant_growth_module import template_maps
 
 
-def _write_profile_text(
-    path: Path, soil_a: str = "Soil_A", soil_b: str = "Soil_B"
-) -> None:
+def _write_profile_text(path: Path, soil_a: str = "Soil_A", soil_b: str = "Soil_B") -> None:
     text = "\n".join(
         [
             f"1 0.10 0.20 {soil_a}",
@@ -41,9 +39,7 @@ def test_soil_normalize_name():
 
 
 def test_extract_grid_code_from_multiple_naming_patterns():
-    assert (
-        soil_profile_setup._extract_grid_code(Path("PreProcessed_SoilProf12.txt")) == 12
-    )
+    assert soil_profile_setup._extract_grid_code(Path("PreProcessed_SoilProf12.txt")) == 12
     assert soil_profile_setup._extract_grid_code(Path("profile_7_report.txt")) == 7
     assert soil_profile_setup._extract_grid_code(Path("grid-code_15_result.txt")) == 15
 
@@ -69,9 +65,7 @@ def test_find_profile_txt_files_uses_given_pattern(tmp_path):
     a.write_text("x", encoding="utf-8")
     b.write_text("x", encoding="utf-8")
 
-    files, patterns = soil_profile_setup._find_profile_txt_files(
-        tmp_path, "*SoilProf*.txt"
-    )
+    files, patterns = soil_profile_setup._find_profile_txt_files(tmp_path, "*SoilProf*.txt")
     assert patterns == ["*SoilProf*.txt"]
     assert files == [a]
 
@@ -244,9 +238,7 @@ def test_generate_soil_property_dfs2_outputs_success(monkeypatch, tmp_path):
         def to_dfs(self, path):
             written_paths.append(Path(path))
 
-    monkeypatch.setattr(
-        soil_profile_setup.mikeio, "read", lambda _: FakeReadDataset(profile_grid)
-    )
+    monkeypatch.setattr(soil_profile_setup.mikeio, "read", lambda _: FakeReadDataset(profile_grid))
     monkeypatch.setattr(soil_profile_setup.mikeio, "DataArray", FakeWriteDA)
     monkeypatch.setattr(soil_profile_setup.mikeio, "ItemInfo", lambda name: name)
 
@@ -304,18 +296,14 @@ def test_generate_soil_property_dfs2_outputs_missing_grid_code(monkeypatch, tmp_
         def __getitem__(self, index):
             return self._da
 
-    monkeypatch.setattr(
-        soil_profile_setup.mikeio, "read", lambda _: FakeReadDataset(profile_grid)
-    )
+    monkeypatch.setattr(soil_profile_setup.mikeio, "read", lambda _: FakeReadDataset(profile_grid))
 
     with pytest.raises(ValueError):
         soil_profile_setup.generate_soil_property_dfs2_outputs(
             preprocessed_dfs2=preprocessed,
             profile_grid_item_hint="Profile Grid",
             parsed_by_grid={
-                1: pd.DataFrame(
-                    {"wilting_point": [0.1], "field_capacity": [0.3]}, index=[1]
-                )
+                1: pd.DataFrame({"wilting_point": [0.1], "field_capacity": [0.3]}, index=[1])
             },
             max_cell_index=1,
             wp_output_dir=tmp_path.joinpath("wp"),
@@ -360,9 +348,7 @@ def test_generate_soil_property_dfs2_outputs_duplicate_cell_row(monkeypatch, tmp
         def to_dfs(self, path):
             pass
 
-    monkeypatch.setattr(
-        soil_profile_setup.mikeio, "read", lambda _: FakeReadDataset(profile_grid)
-    )
+    monkeypatch.setattr(soil_profile_setup.mikeio, "read", lambda _: FakeReadDataset(profile_grid))
     monkeypatch.setattr(soil_profile_setup.mikeio, "DataArray", FakeWriteDA)
     monkeypatch.setattr(soil_profile_setup.mikeio, "ItemInfo", lambda name: name)
 
@@ -405,8 +391,8 @@ def test_load_classification_mappings_success(tmp_path):
     ).to_csv(lu, index=False)
     pd.DataFrame({"CODE": [10], "CLASS": ["SP1"]}).to_csv(sp, index=False)
 
-    code_to_species, zero_fill, code_to_soilprofile = (
-        template_maps.load_classification_mappings(lu, sp, auto_confirm=True)
+    code_to_species, zero_fill, code_to_soilprofile = template_maps.load_classification_mappings(
+        lu, sp, auto_confirm=True
     )
 
     assert code_to_species[1] == "Oak"
@@ -450,9 +436,7 @@ def test_load_spatial_grids_success_and_shape_mismatch(monkeypatch):
 
     monkeypatch.setattr(mikeio, "Dfs2", FakeDfs2)
 
-    lu_ds, lu_data, sp_ds, sp_data = template_maps.load_spatial_grids(
-        "lu.dfs2", "sp_ok.dfs2"
-    )
+    lu_ds, lu_data, sp_ds, sp_data = template_maps.load_spatial_grids("lu.dfs2", "sp_ok.dfs2")
     assert lu_data.shape == sp_data.shape
     assert str(lu_ds.path) == "lu.dfs2"
     assert str(sp_ds.path) == "sp_ok.dfs2"
@@ -552,9 +536,7 @@ def test_process_template_file_unknown_scope_skips(monkeypatch, tmp_path):
     ).to_csv(tpl, index=False)
 
     calls = []
-    monkeypatch.setattr(
-        template_maps, "generate_dfs2_map", lambda *args, **kwargs: calls.append(1)
-    )
+    monkeypatch.setattr(template_maps, "generate_dfs2_map", lambda *args, **kwargs: calls.append(1))
 
     count = template_maps.process_template_file(
         template_file=tpl,
