@@ -1,7 +1,6 @@
 # Data Download Tool - Process and Validation Specification
 
-Version: 1.0
-Last Updated: 2026-02-24
+Version: 1.1
 
 ## Objective / Rationale
 
@@ -17,11 +16,16 @@ Current implementation notes:
 ```mermaid
 flowchart LR
   A[Ingest: user config + catchment] --> B[Quality checks: CRS, AOI, size]
-  B --> C[Remote open: Azure Zarr]
-  C --> D[Spatial subset or clip]
-  D --> E[Temporal subset if requested]
-  E --> F[Format conversion: NetCDF/Zarr/DFS2]
-  F --> G[Write outputs + log entry]
+  B --> C[Catalog lookup + access check]
+  C --> D{format?}
+  D -->|zarr| E[Remote open Zarr] --> F[Spatial subset or clip] --> G[Temporal subset if requested] --> H[Convert: NetCDF/Zarr/DFS2/GeoTIFF]
+  D -->|cog| I[Read tile extents, window-read + merge] --> J[Write GeoTIFF]
+  D -->|geoparquet| K[Read with bbox pushdown, keep features whole] --> L[Write Parquet/Shapefile]
+  D -->|zip| M[Stream blob whole, no clip]
+  H --> N[Write outputs + log entry]
+  J --> N
+  L --> N
+  M --> N
 ```
 
 ### Numbered Pipeline Steps (implemented)
@@ -36,30 +40,41 @@ flowchart LR
 - Inputs: catchment geometry
 - Outputs: validated geometry, rejected with error if AOI overlap or size limits fail
 
-1. Catalog lookup and remote open
+1. Catalog lookup, access check, and remote open
 
 - Inputs: selected dataset category/subcategory
-- Outputs: catalog metadata and remotely opened Azure Zarr dataset
+- Outputs: catalog metadata (merged from the four catalogs) and a filesystem for the entry —
+  built-in SAS, anonymous for public containers, or built from the entry's `credential_env`
+  variable. A missing or blank token raises `PermissionError` here, before anything is written.
+- Then, per the entry's `format`: a remotely opened Zarr dataset, COG tile handles, a GeoParquet
+  reader, or a blob stream for a zip bundle
 
 1. Spatial subset / optional clip
 
 - Inputs: opened dataset and catchment bounds/geometry
-- Outputs: spatially subset dataset (with optional catchment mask)
+- Outputs: for Zarr, a spatially subset dataset (with optional catchment mask); for COG, only the
+  tiles intersecting the catchment, window-read and merged; for GeoParquet, every feature
+  intersecting the catchment kept **whole**, with no geometry truncation
+- Zip bundles skip this step entirely — they are never clipped
 
 1. Temporal subset (optional)
 
 - Inputs: subset dataset and optional time range
-- Outputs: time-filtered dataset for temporal products
+- Outputs: time-filtered dataset for temporal products. Static layers (COG, GeoParquet, zip) declare
+  `temporal: false` and skip this step
 
 1. Format conversion
 
-- Inputs: xarray Dataset
-- Outputs: NetCDF (.nc), Zarr (directory), or DFS2 (.dfs2)
+- Inputs: xarray Dataset, or a GeoDataFrame for vector layers
+- Outputs: NetCDF (.nc), Zarr (directory), DFS2 (.dfs2) or GeoTIFF (.tif) for rasters; GeoParquet
+  (.parquet) or Shapefile (.shp) for vectors. Zip bundles are written verbatim and ignore
+  `output_format`
 
 1. Write outputs and append log
 
 - Inputs: converted output and run metadata
 - Outputs: file written to `data/{category}/{subcategory}/` and entry appended to `logs/download_log.json`
+- A failed whole-blob copy removes the partial file
 
 ## Folder Structure (Implemented)
 
@@ -88,6 +103,8 @@ For each pipeline stage, specify file format, variable names, units, time resolu
 
 ### Catalog Entry (YAML)
 
+Zarr time series (`dataset_catalog.yaml`):
+
 ```yaml
 climate:
   era5_precipitation:
@@ -99,6 +116,37 @@ climate:
     crs: EPSG:4326
     eumtype: Rainfall
     eumunit: millimeter
+    data_value_type: StepAccumulated
+```
+
+Static COG raster (`cog_catalog.yaml`) — `tiled: true` makes `path` a tile prefix:
+
+```yaml
+topography:
+  cop_dem:
+    path: topography/cop_dem/
+    display_name: Copernicus DEM
+    format: cog
+    container: cogs
+    anon: true
+    tiled: true
+    temporal: false
+    crs: EPSG:4326
+```
+
+Access-restricted zip bundle (`partner_data_catalog.yaml`) — only the download is gated; the entry
+itself stays listable:
+
+```yaml
+restricted_partner:
+  czech_globe_ms4_full:
+    path: Czech Globe MS4 full.zip
+    display_name: Czech Globe MS4 (full)
+    format: zip
+    container: external-shared-after-end
+    anon: false
+    credential_env: PDP_AFTER_END_SAS
+    temporal: false
 ```
 
 ### Download Log Entry (JSON)
@@ -120,13 +168,14 @@ climate:
 
 - Ingest: Shapefile or GeoJSON; CRS metadata required; manual extent uses EPSG code
 - Quality checks: Geometry and CRS; AOI overlap threshold; size limits in km2
-- Spatial subset: Zarr dataset with lat/lon or x/y dims; CRS from catalog
-- Temporal subset: Time dimension named time/date/t; ISO 8601 date strings
-- Format conversion: NetCDF, Zarr (v2), DFS2; variable names from catalog
+- Access check: `credential_env` variable present and non-blank for restricted entries
+- Spatial subset: Zarr dataset with lat/lon or x/y dims, or COG tiles, or GeoParquet features; CRS from catalog
+- Temporal subset: Time dimension named time/date/t; ISO 8601 date strings; skipped for static layers
+- Format conversion: NetCDF, Zarr (v2), DFS2, GeoTIFF for rasters; GeoParquet or Shapefile for vectors; verbatim for zip. Variable names from catalog
 
 ### 4.3 Upstream Tool Inputs
 
-No upstream tools are required by the downloader. If future preprocessing tools are added (for example, QA or resampling), their outputs should match the Zarr catalog schema above.
+No upstream tools are required by the downloader. If future preprocessing tools are added (for example, QA or resampling), their outputs should match the relevant catalog schema above.
 
 ## Dependencies
 
@@ -153,12 +202,15 @@ How missing data, corrupt files, or unexpected formats are handled:
 
 - Missing catalog entry: ValueError with dataset not found
 - Azure access errors: ConnectionError after connection test fails
+- Missing/blank `credential_env` variable: PermissionError naming the variable and container, raised before anything is written
 - Spatial subset failure: fallback to full dataset with warning
 - Output path locked: remove_path_with_retry retries with backoff
+- Interrupted whole-blob (zip) copy: partial file removed
 
 Expected failure modes and recovery strategies:
 
 - SAS token expired -> retry with new token; alert user to update credentials
+- Restricted dataset without a token -> PermissionError; user requests the token and sets it in `.env` (see `.env.example`)
 - No AOI overlap -> abort with validation error
 - Empty spatial subset -> fallback to nearest-neighbor selection
 
