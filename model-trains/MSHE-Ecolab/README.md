@@ -50,7 +50,7 @@ And generates:
 Navigate to the project directory and create the virtual environment with all dependencies:
 
 ```bash
-cd "plant-growth-module"
+cd "model-trains/MSHE-Ecolab"
 uv sync --link-mode copy
 ```
 
@@ -80,17 +80,17 @@ Choose the notebook based on your task:
 
 1. **Open the correct folder in VS Code:**
 
-   > ⚠️ **Critical:** You must open the `plant-growth-module` folder itself as the workspace root in VS Code. If you open a higher-level parent folder (e.g., the repository root), VS Code **will not detect** the `.venv` Python environment and the Jupyter kernel will not appear in the kernel picker.
+   > ⚠️ **Critical:** You must open the `model-trains/MSHE-Ecolab` folder itself as the workspace root in VS Code. If you open a higher-level parent folder (e.g., the repository root), VS Code **will not detect** the `.venv` Python environment and the Jupyter kernel will not appear in the kernel picker.
 
    **How to open the correct folder:**
    - Launch VS Code
    - Go to **File → Open Folder…** (or press `Ctrl + K`, `Ctrl + O`)
-   - Browse to and select the `plant-growth-module` folder, then click **Select Folder**
-   - Verify the VS Code Explorer sidebar shows `plant-growth-module` as the top-level folder
+   - Browse to and select the `model-trains/MSHE-Ecolab` folder, then click **Select Folder**
+   - Verify the VS Code Explorer sidebar shows `MSHE-Ecolab` as the top-level folder
 
    **Why this matters:**
    - VS Code discovers Python environments (`.venv/`) relative to the opened workspace root
-   - The `.venv` created by `uv sync` lives inside `plant-growth-module/.venv/`
+   - The `.venv` created by `uv sync` lives inside `model-trains/MSHE-Ecolab/.venv/`
    - If your workspace root is a parent folder, VS Code won't look inside nested subdirectories for virtual environments, so the kernel won't be found
 
 2. **Open the notebook:**
@@ -167,7 +167,7 @@ jupyter notebook notebooks/plant_growth_module.ipynb
 ## 📁 Project Structure
 
 ```
-plant-growth-module/
+model-trains/MSHE-Ecolab/
 ├── src/
 │   └── plant_growth_module/
 │       ├── __init__.py                # Package entry point
