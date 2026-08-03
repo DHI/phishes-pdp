@@ -94,9 +94,7 @@ def load_classification_mappings(lu_template="", sp_template="", auto_confirm=Fa
         apply_col = find_col(lu_df, APPLY_COLS)
 
         if code_col is None or class_col is None:
-            raise ValueError(
-                "Required columns not found in the land use classification template."
-            )
+            raise ValueError("Required columns not found in the land use classification template.")
 
         confirm_payload = {"Code column": code_col, "Class column": class_col}
         if apply_col is not None:
@@ -153,9 +151,7 @@ def load_classification_mappings(lu_template="", sp_template="", auto_confirm=Fa
         for code, profile_name in code_to_soilprofile.items():
             print(f"  {int(code):4d} → {profile_name}")
     else:
-        print(
-            "\nNo soil profile template provided - skipping soil profile classification."
-        )
+        print("\nNo soil profile template provided - skipping soil profile classification.")
 
     return code_to_species, zero_fill_values, code_to_soilprofile
 
@@ -257,18 +253,14 @@ def validate_paths(
 
     if have_soilprofile:
         if not _is_provided(soilprofile_dfs2):
-            errors.append(
-                "❌ Soil profile template set but soil profile DFS2 is missing"
-            )
+            errors.append("❌ Soil profile template set but soil profile DFS2 is missing")
         elif not soilprofile_dfs2.exists():
             errors.append(f"❌ Soil profile DFS2 not found: {soilprofile_dfs2}")
         else:
             print(f"✓ Soil profile DFS2: {soilprofile_dfs2.name}")
 
         if not _is_provided(sp_template):
-            errors.append(
-                "❌ Soil profile DFS2 set but soil profile template is missing"
-            )
+            errors.append("❌ Soil profile DFS2 set but soil profile template is missing")
         elif not sp_template.exists():
             errors.append(f"❌ SP template not found: {sp_template}")
         else:
@@ -391,12 +383,7 @@ def process_template_file(
         scope = STATE_VARIABLE_SCOPE.get(str(key_name).strip())
         if template_col is not None:
             scope_values = (
-                subset[template_col]
-                .dropna()
-                .astype(str)
-                .str.strip()
-                .str.lower()
-                .unique()
+                subset[template_col].dropna().astype(str).str.strip().str.lower().unique()
             )
             if len(scope_values) > 0:
                 scope = scope_values[0]
