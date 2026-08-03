@@ -232,7 +232,7 @@ model-trains/MSHE-Ecolab/
 ├── sample_data/
 │   ├── plant_growth_module/                # Templates, land use / soil profile DFS2, example model
 │   ├── soil-profile-setup/                 # PreProcessor .txt + .DFS2 for Workflow B
-│   └── pgm_forcing_generator/              # Example DFS0/CSV + timeseries_inputs.yaml
+│   └── pgm_forcing_generator/              # Example DFS0/CSV + multi-forcing timeseries_inputs.yaml
 ├── docs/
 │   └── initial_condition_updater.md         # Workflow D design & usage
 ├── .python-version                          # Pinned interpreter (3.11), matches CI
@@ -274,10 +274,14 @@ model-trains/MSHE-Ecolab/
 - Notebook: `notebooks/pgm_forcing_generator.ipynb`
 - Sources: `forcing_generator_native.py` (local time series) and `forcing_repository.py` (downloaded)
 - Two paths:
-  - **Native** — convert local DFS0/CSV time series into DFS2 forcing grids. Per-grid-code inputs
-    are declared in a YAML file (see `sample_data/pgm_forcing_generator/timeseries_inputs.yaml`).
-    Grid codes present in the grid DFS2 but absent from the YAML are **zero-filled**, not an error;
-    only an entirely empty input set raises.
+  - **Native** — convert local DFS0/CSV time series into DFS2 forcing grids. **One YAML file
+    declares any number of forcings** (see `sample_data/pgm_forcing_generator/timeseries_inputs.yaml`):
+    each named entry under `timeseries_inputs:` carries its own output DFS2, item name, EUM
+    type/unit and per-grid-code series, and inherits anything it does not set from a `defaults:`
+    block. The notebook loops over them and writes one DFS2 per forcing, so adding a forcing is a
+    YAML edit, not a notebook edit — the notebook holds no per-forcing settings at all.
+    Grid codes present in the grid DFS2 but absent from a forcing are **zero-filled**, not an
+    error; only an entirely empty input set raises.
   - **Repository** — pull forcing (precipitation, temperature, PET, solar radiation) through the
     shared [data-download-tool](../../data-download-tool/README.md) at runtime.
     ⚠️ **Not yet usable:** this path needs a top-level `pgm_forcings:` section in the download tool's
