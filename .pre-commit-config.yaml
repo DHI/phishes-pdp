@@ -1,1 +1,36 @@
-repos: []
+# Local equivalent of the blocking CI checks. Run `pip install pre-commit &&
+# pre-commit install` once, and formatting/whitespace issues get fixed before
+# they ever reach a pull request.
+#
+# This matters most for fork contributors: a pull request from a fork runs with
+# a read-only token, so nothing in CI can fix their branch for them. These
+# hooks are the only automatic fixer they get.
+#
+# Versions are pinned deliberately. The `ruff` rev here must match the `ruff==`
+# pin in data-download-tool/pyproject.toml and
+# model-trains/MSHE-Ecolab/pyproject.toml so local and CI results cannot
+# diverge. Bump all three together.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.0
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      # Fixes the MD009 and MD047 findings Markdown Lint reports.
+      - id: trailing-whitespace
+        # sample_data holds MIKE SHE PreProcessor output parsed by fixed column
+        # position; notebook JSON is already handled by the ruff hooks.
+        exclude: (^|/)sample_data/|\.ipynb$
+      - id: end-of-file-fixer
+        exclude: (^|/)sample_data/|\.ipynb$
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        # Matches the 10 MB ceiling enforced by the File Size Check job.
+        args: [--maxkb=10240]
