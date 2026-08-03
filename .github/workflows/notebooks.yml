@@ -9,8 +9,10 @@ permissions:
   contents: read
 
 jobs:
+  # Advisory. Notebook idioms (a bare expression to display a value, imports
+  # after a setup cell) legitimately trip general-purpose Python rules.
   notebook-lint:
-    name: Notebook Lint (nbqa)
+    name: Notebook Lint (advisory)
     runs-on: ubuntu-latest
 
     steps:
@@ -22,12 +24,40 @@ jobs:
         with:
           python-version: "3.11"
 
+      # Pinned to the same ruff the modules pin, so notebooks and source are
+      # judged by one ruleset that cannot shift under a new ruff release.
       - name: Install tooling
         run: |
           python -m pip install --upgrade pip
-          python -m pip install nbqa ruff
+          python -m pip install "nbqa==1.9.1" "ruff==0.16.0"
 
+      # E402 (import not at top of file) does not apply to notebooks: cells run
+      # in order and a mid-notebook import is normal.
+      #
+      # This same flag used to break the job, and it is worth recording why it
+      # is safe now. Previously ruff was unpinned and no module declared
+      # [tool.ruff], so ruff's broad default rule set applied — including
+      # RUF100. `--extend-ignore=E402` disabled E402, which made the notebooks'
+      # own `# noqa: E402` comments redundant, which tripped RUF100: the flag
+      # manufactured the failure it was meant to prevent. Both modules now pin
+      # ruff and declare select = ["E","F","W","I","N"], so RUF100 cannot fire
+      # regardless of what this flag suppresses.
       - name: Lint notebooks (if any)
+        id: nb
+        continue-on-error: true
         if: ${{ hashFiles('**/*.ipynb') != '' }}
+        run: python -m nbqa ruff . --extend-ignore=E402
+
+      - name: Report
+        if: steps.nb.outcome == 'failure'
         run: |
-          python -m nbqa ruff . --extend-ignore=E402,I001
+          {
+            echo "### Notebook lint suggestions"
+            echo
+            echo "Advisory only — this does not block the merge. To reproduce:"
+            echo
+            echo '```bash'
+            echo "pip install 'nbqa==1.9.1' 'ruff==0.16.0'"
+            echo "python -m nbqa ruff ."
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

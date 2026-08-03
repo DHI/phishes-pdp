@@ -116,20 +116,33 @@ uv run pytest                            # all tests
 uv run pytest tests/test_X.py::test_y    # single test
 uv run pytest --cov-report=html          # HTML coverage (PGM)
 
-ruff check .
-ruff format --check .                    # CI uses --check; drop it locally to fix
+uv run ruff check .                      # always `uv run`, never a system ruff
+uv run ruff format .                     # CI checks this but does not block on it
 
 uv run jupyter notebook notebooks/<name>.ipynb
 ```
 
-CI (`.github/workflows/ci.yml`) on Python 3.11 runs ruff lint + format check + pytest per module, plus repo-wide `markdownlint-cli2` and a 10 MB max-file-size check. Pre-commit is opt-in (`pip install pre-commit && pre-commit install`).
+**Always `uv run ruff`, never a bare `ruff`.** Each module pins `ruff==0.16.0` in its dev dependencies; a system-wide ruff is a different version enforcing a different rule set, and will disagree with CI.
+
+### CI contract
+
+Checks are split by what a failure means. **Blocking** — the change is wrong: `Lint and Test (<module>)` (ruff lint + pytest, per module), `File Size Check (10 MB)`, `Secret Scan (trufflehog)`, `Dependency Audit (<module>)` (pip-audit + bandit). **Advisory** — the change is untidy; reported in the job summary, never blocks: `Format (advisory)`, `Markdown Lint (advisory)`, `Notebook Lint (advisory)`. Formatting must not block external contributors.
+
+Three invariants keep the gates honest — breaking any of them reintroduces a class of phantom failure we have already had:
+
+1. **Pin every tool.** `ruff==0.16.0` appears in both `pyproject.toml` files and as the `rev` in `.pre-commit-config.yaml`; bump all three together. Unpinned ruff went from a narrow default rule set to a broad one and turned the module red with no code change.
+2. **Never hand-maintain a dependency list in CI.** Jobs run `uv sync`, resolving from `pyproject.toml`. The old `test_deps:` matrix list drifted when geoparquet support added `pyarrow`, failing five tests for an unrelated reason.
+3. **`pip-audit --skip-editable`.** Without it, pip-audit looks up the just-installed editable module on PyPI, does not find it, and exits non-zero on every run.
+4. **Pin the interpreter.** Each module has a `.python-version` of `3.11`, matching CI, and `requires-python = ">=3.10,<3.14"` matching the range README advertises. The bound is load-bearing: with an unbounded `>=3.10`, a fresh `uv sync` picks the newest interpreter present, and on 3.14 the resolve dies building `fiona` from source (`A GDAL API version must be specified`) because no wheel exists for that ABI.
+
+`pre-commit` is the local mirror of the blocking checks and the only auto-fixer available to fork contributors (fork PRs get a read-only token). There is deliberately **no** auto-format workflow: fixing one would need `pull_request_target`, i.e. a write-token workflow running untrusted fork code.
 
 ## Coding conventions (from `.github/agents/*.agent.md`, not enforced by linters)
 
 - Timestamps: `pd.Timestamp`, not `datetime`.
 - Paths: `pathlib.Path` everywhere. **Use `Path.joinpath()`, not the `/` operator.** Refactor `/` to `joinpath()` when touching nearby code.
 - Every method needs a docstring (one-liner is fine).
-- Ruff: line length 100, target py310, `select = ["E","F","W","I","N"]`, `ignore = ["E501","I001"]`.
+- Ruff: line length 100, target py310, `select = ["E","F","W","I","N"]`, `ignore = ["E501","I001"]`. Declared per module in `[tool.ruff]` — DDT and MSHE-Ecolab match, except MSHE-Ecolab also ignores `N999` (its stray root `__init__.py` makes ruff read the hyphenated folder name as the top-level module).
 
 ## Agent routing (`.github/agents/`)
 
