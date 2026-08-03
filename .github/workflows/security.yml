@@ -39,31 +39,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.11"
 
-      - name: Install tooling
-        run: |
-          python -m pip install --upgrade pip
-          pip install pip-audit bandit
+      # Audit the module's own uv environment, resolved from pyproject.toml.
+      #
+      # Two things were wrong with auditing the ambient runner environment
+      # instead. It exited non-zero on every run because pip-audit looked up the
+      # just-installed local module on PyPI and could not find it
+      # ("phishes-data-downloader ... could not be audited") — so the job never
+      # carried any signal. And it reported CVEs in whatever setuptools the
+      # runner image happened to ship, which is not a dependency of either
+      # module. A uv environment seeds no pip/setuptools/wheel, so what is left
+      # is exactly the project's own dependency closure.
+      #
+      # --no-dev scopes this to the runtime closure. The dev group pulls the
+      # jupyter and streamlit stacks, whose deep transitive CVEs are local
+      # tooling rather than deployed surface and are not this repository's to
+      # fix. Blocking a merge on them would mean blocking on jupyter's
+      # dependency tree.
+      - name: Install runtime dependencies
+        working-directory: ${{ matrix.dir }}
+        run: uv sync --no-dev
 
-      - name: Install project (if pyproject exists)
-        if: ${{ hashFiles(format('{0}/pyproject.toml', matrix.dir)) != '' }}
-        run: |
-          pip install -e "${{ matrix.dir }}"
-
-      # --skip-editable is required, not cosmetic. Without it pip-audit tries to
-      # look up the module we just installed with `pip install -e` on PyPI,
-      # where it does not exist, and exits non-zero every single run:
-      #   "phishes-data-downloader ... not found on PyPI and could not be
-      #    audited". The job could never pass, so it carried no signal.
       - name: pip-audit
-        run: |
-          pip-audit --skip-editable
+        working-directory: ${{ matrix.dir }}
+        run: uv run --no-dev --with pip-audit pip-audit --skip-editable
 
       - name: Bandit
-        run: |
-          cd "${{ matrix.dir }}"
-          bandit -r src
+        working-directory: ${{ matrix.dir }}
+        run: uv run --with bandit bandit -r src
