@@ -1,6 +1,25 @@
-# Plant Growth Module (PGM) - DFS2 Map Generator
+# MSHE-Ecolab — MIKE SHE + MIKE ECO Lab Plant Growth Module
 
-A tool for generating spatially distributed DFS2 maps for DHI's ECO Lab Plant Growth Module. This notebook-based application now includes multiple workflows: a main land use and template workflow, plus a soil profile setup workflow for Task 4 outputs.
+Input generation for the **MSHE-Ecolab** model train: DHI's MIKE SHE coupled to the MIKE ECO Lab
+**Plant Growth Module (PGM)**. This project turns land use, soil profile and parameter templates into
+the spatially distributed DFS2 files that MIKE SHE / ECO Lab consume, and can also build forcing
+grids and re-inject simulated state as initial conditions.
+
+## A note on names
+
+Three names refer to the same thing, for historical reasons — all three are correct and none is
+stale:
+
+| Name | What it is |
+| --- | --- |
+| `model-trains/MSHE-Ecolab/` | The **folder** (this project), named after the model train it feeds |
+| `plant_growth_module` | The **Python package** in `src/`, and the `plant-growth-module` distribution name |
+| PGM | The **abbreviation** used in notebook filenames (`pgm_*.ipynb`) and throughout these docs |
+
+This folder was previously `plant-growth-module/` at the repository root. The move to
+`model-trains/MSHE-Ecolab/` was **path-only** — the package, the distribution name and every import
+are unchanged, so `from plant_growth_module import ...` still works exactly as before. See
+[model-trains/README.md](../README.md) for the other model trains.
 
 ## Table of Contents
 
@@ -10,6 +29,7 @@ A tool for generating spatially distributed DFS2 maps for DHI's ECO Lab Plant Gr
 - [Notebook Workflows](#-notebook-workflows)
 - [Project Structure](#-project-structure)
 - [Configuration](#-configuration)
+- [Development](#-development)
 - [Test Coverage](#-test-coverage)
 - [Troubleshooting](#-troubleshooting)
 - [License](#-license)
@@ -22,10 +42,14 @@ The Plant Growth Module processes:
 - **Land use classification** mapping land use codes to plant species names (with optional `Apply` flag)
 - **Soil profile spatial data** (DFS2 format) and soil profile classification
 - **Parameter templates** (CSV files) defining species-specific constants and initial conditions
+- **Local or downloaded time series** for forcing grids
+- **MIKE SHE results** (`.dfs3`) for hotstart initial conditions
 
 And generates:
 
 - **Spatially distributed DFS2 maps** for each parameter
+- **Per-cell wilting point / field capacity DFS2 stacks** from PreProcessor text files
+- **Forcing DFS2 grids** from DFS0/CSV time series or from the shared `data-download-tool`
 - **MIKE SHE-compatible files** ready for integration with ECO Lab
 
 ### Key Features
@@ -35,6 +59,7 @@ And generates:
 - ✅ Validation of all input files before processing
 - ✅ Support for multiple parameter templates
 - ✅ Spatial mapping based on land use and soil profile classification
+- ✅ Land use and soil profile scopes are **independent** — supply either or both
 - ✅ `Apply=0` support to force selected land use classes to zero in generated landuse-based maps
 
 ---
@@ -62,6 +87,20 @@ This command will:
 - Install all required packages (pandas, numpy, mikeio, jupyter, etc.)
 - Set up the development dependencies
 
+**Python version:** this project supports Python 3.10–3.13 and pins `3.11` in `.python-version` to
+match CI. `uv` downloads that interpreter for you. Do not override it — several geospatial
+dependencies publish no wheels for the newest Python and would be built from source against a
+system GDAL.
+
+**Shared dependency:** `pyproject.toml` resolves the forcing repository helper from the
+`data-download-tool` module on GitHub `main`, not from the local sibling folder:
+
+```
+phishes-data-downloader @ git+https://github.com/DHI/phishes-pdp.git@main#subdirectory=data-download-tool
+```
+
+After a `data-download-tool` change is merged, re-run `uv sync --link-mode copy` here to pick it up.
+
 ---
 
 ## 🚀 How to Execute the Notebook
@@ -70,9 +109,14 @@ This command will:
 
 Choose the notebook based on your task:
 
-- `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb`: Main workflow for template-driven land use and soil profile map generation.
-- `notebooks/pgm_soil_profile_setup.ipynb`: Soil profile setup workflow that parses soil profile text files and generates per-cell wilting point and field capacity DFS2 maps.
-- `notebooks/pgm_initial_condition_updater.ipynb`: Splits a 3D UZ water-quality result (`.dfs3`) into per-layer DFS2 files and injects them into a MIKE SHE `.she` file as per-layer initial conditions (see [docs/initial_condition_updater.md](docs/initial_condition_updater.md)).
+| Notebook | Workflow |
+| --- | --- |
+| `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb` | **A** — template-driven land use and soil profile map generation |
+| `notebooks/pgm_soil_profile_setup.ipynb` | **B** — soil profile text files → per-cell wilting point / field capacity DFS2 |
+| `notebooks/pgm_forcing_generator.ipynb` | **C** — DFS0/CSV time series → forcing DFS2 grids |
+| `notebooks/pgm_initial_condition_updater.ipynb` | **D** — 3D UZ water-quality `.dfs3` → per-layer initial conditions in a `.she` file |
+
+Each workflow is described under [Notebook Workflows](#-notebook-workflows) below.
 
 ### Option 1: Using VS Code (Recommended)
 
@@ -81,7 +125,7 @@ Choose the notebook based on your task:
 
 1. **Open the correct folder in VS Code:**
 
-   > ⚠️ **Critical:** You must open the `model-trains/MSHE-Ecolab` folder itself as the workspace root in VS Code. If you open a higher-level parent folder (e.g., the repository root), VS Code **will not detect** the `.venv` Python environment and the Jupyter kernel will not appear in the kernel picker.
+   > ⚠️ **Critical:** You must open the `model-trains/MSHE-Ecolab` folder itself as the workspace root in VS Code. If you open a higher-level parent folder (e.g., the repository root or `model-trains/`), VS Code **will not detect** the `.venv` Python environment and the Jupyter kernel will not appear in the kernel picker.
 
    **How to open the correct folder:**
    - Launch VS Code
@@ -95,11 +139,11 @@ Choose the notebook based on your task:
    - If your workspace root is a parent folder, VS Code won't look inside nested subdirectories for virtual environments, so the kernel won't be found
 
 2. **Open the notebook:**
-   - In the VS Code Explorer, navigate to either `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb` or `notebooks/pgm_soil_profile_setup.ipynb` and click to open it
+   - In the VS Code Explorer, navigate to `notebooks/` and click the notebook for your workflow (see [Notebook Selection](#notebook-selection))
 
 3. **Select the Python kernel:**
    - Click on the kernel selector in the top-right corner of the notebook
-   - Choose the `.venv` environment (e.g., `Python 3.x (.venv)`) created by `uv sync`
+   - Choose the `.venv` environment (e.g., `Python 3.11 (.venv)`) created by `uv sync`
    - If it does not appear, confirm you opened the correct folder (see step 1) and that you ran `uv sync` successfully
 
 4. **Run the notebook:**
@@ -171,37 +215,53 @@ jupyter notebook notebooks/pgm_initial_condition_dfs2_map_generator.ipynb
 model-trains/MSHE-Ecolab/
 ├── src/
 │   └── plant_growth_module/
-│       ├── __init__.py                # Package entry point
-│       ├── pgm_helper.py              # Backward-compatible helper facade
-│       ├── template_maps.py           # Main template-based mapping workflow
-│       ├── soil_profile_setup.py      # Soil profile parsing and Task 4 outputs
-│       ├── forcing_repository.py      # Forcing pulled via data-download-tool
-│       ├── initial_condition_updater.py  # 3D UZ WQ -> MIKE SHE .she initial conditions
-│       └── common_utils.py            # Shared DFS2 and utility helpers
+│       ├── __init__.py                     # Package entry point
+│       ├── pgm_helper.py                   # Backward-compatible helper facade
+│       ├── template_maps.py                # Workflow A: template-based mapping
+│       ├── soil_profile_setup.py           # Workflow B: soil profile parsing, Task 4 outputs
+│       ├── forcing_generator_native.py     # Workflow C: local DFS0/CSV -> forcing DFS2
+│       ├── forcing_repository.py           # Workflow C: forcing pulled via data-download-tool
+│       ├── initial_condition_updater.py    # Workflow D: 3D UZ WQ -> MIKE SHE .she initial conditions
+│       └── common_utils.py                 # Shared DFS2 and utility helpers
 ├── notebooks/
-│   ├── pgm_initial_condition_dfs2_map_generator.ipynb  # Main template workflow notebook
-│   ├── pgm_soil_profile_setup.ipynb        # Soil profile setup workflow notebook
-│   ├── pgm_forcing_generator.ipynb         # Forcing generation notebook
-│   └── pgm_initial_condition_updater.ipynb # 3D UZ WQ initial condition updater
+│   ├── pgm_initial_condition_dfs2_map_generator.ipynb  # Workflow A
+│   ├── pgm_soil_profile_setup.ipynb                    # Workflow B
+│   ├── pgm_forcing_generator.ipynb                     # Workflow C
+│   └── pgm_initial_condition_updater.ipynb             # Workflow D
+├── tests/                                  # pytest suite (also reads sample_data/)
+├── sample_data/
+│   ├── plant_growth_module/                # Templates, land use / soil profile DFS2, example model
+│   ├── soil-profile-setup/                 # PreProcessor .txt + .DFS2 for Workflow B
+│   └── pgm_forcing_generator/              # Example DFS0/CSV + timeseries_inputs.yaml
 ├── docs/
-│   └── initial_condition_updater.md    # Initial condition updater design & usage
-├── pyproject.toml                      # Project dependencies
-└── README.md                           # This file
+│   └── initial_condition_updater.md         # Workflow D design & usage
+├── .python-version                          # Pinned interpreter (3.11), matches CI
+├── pyproject.toml                           # Project dependencies and ruff config
+└── README.md                                # This file
 ```
+
+> **Sample data is load-bearing:** the test suite reads from `sample_data/`. Do not rename or move
+> those files without updating the fixtures in `tests/`.
 
 ---
 
 ## 📓 Notebook Workflows
 
-### 1. Main Template Workflow
+### A. Main Template Workflow
 
 - Notebook: `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb`
+- Source: `template_maps.py`
 - Use this when generating variable maps from template CSV files and land use/soil profile classification inputs.
+- Each variable is routed to the land use grid or the soil profile grid by `STATE_VARIABLE_SCOPE`
+  in `template_maps.py`; a template row's `TEMPLATE` column overrides that per row.
+- The two scopes are independent — provide land use inputs only, soil profile inputs only, or both.
+  A scope you leave blank is skipped, and maps that need it are reported as skipped rather than failing.
 - Typical outputs: one DFS2 map per variable/species mapping rule.
 
-### 2. Soil Profile Setup Workflow
+### B. Soil Profile Setup Workflow
 
 - Notebook: `notebooks/pgm_soil_profile_setup.ipynb`
+- Source: `soil_profile_setup.py`
 - Use this when preparing Task 4 soil profile outputs from preprocessed soil profile text files and profile grid codes.
 - Typical outputs:
   - `output_data/task4_pgm_soil_profile_setup/<run_name>/grid_codes.dfs2`
@@ -209,9 +269,27 @@ model-trains/MSHE-Ecolab/
   - `output_data/task4_pgm_soil_profile_setup/<run_name>/field_capacity/*.dfs2`
   - `profile_table.csv` and `summary.csv`
 
-### 3. Initial Condition Updater Workflow
+### C. Forcing Generation Workflow
+
+- Notebook: `notebooks/pgm_forcing_generator.ipynb`
+- Sources: `forcing_generator_native.py` (local time series) and `forcing_repository.py` (downloaded)
+- Two paths:
+  - **Native** — convert local DFS0/CSV time series into DFS2 forcing grids. Per-grid-code inputs
+    are declared in a YAML file (see `sample_data/pgm_forcing_generator/timeseries_inputs.yaml`).
+    Grid codes present in the grid DFS2 but absent from the YAML are **zero-filled**, not an error;
+    only an entirely empty input set raises.
+  - **Repository** — pull forcing (precipitation, temperature, PET, solar radiation) through the
+    shared [data-download-tool](../../data-download-tool/README.md) at runtime.
+    ⚠️ **Not yet usable:** this path needs a top-level `pgm_forcings:` section in the download tool's
+    `dataset_catalog.yaml` mapping each forcing key to a `(category, subcategory, source_variable)`
+    and an output filename. That section does not exist yet, so `load_pgm_forcing_library()` raises.
+    Use the native path until it is added.
+- Sub-daily series are snapped to midnight when at least 80% of intervals are 23–25 h apart.
+
+### D. Initial Condition Updater Workflow
 
 - Notebook: `notebooks/pgm_initial_condition_updater.ipynb`
+- Source: `initial_condition_updater.py`
 - Use this to build MIKE SHE hotstart inputs: split a 3D UZ water-quality result (`.dfs3`) into
   per-layer DFS2 files and inject them into a `.she` (PFS) file as per-layer initial conditions for
   every matched WQ species.
@@ -230,6 +308,8 @@ model-trains/MSHE-Ecolab/
 
 - ✅ All file paths must be **absolute paths** (full paths)
 - ✅ Column names are **case-insensitive** (uppercase and lowercase letters don't matter)
+- ✅ Land use and soil profile are independent scopes — supply either or both, but each scope needs
+  **both** its DFS2 grid and its classification template
 
 #### 1. Land Use Spatial Data
 
@@ -240,14 +320,15 @@ model-trains/MSHE-Ecolab/
 
 #### 2. Land Use Classification Mapping
 
-**`LandUse_template.csv`** (or similar name)
+**`LU_template.csv`** (or similar name)
 
 - Maps numeric codes from the DFS2 file to plant species names
 - **Required columns** (case-insensitive, one of each type):
   - **Code column**: `CODE`, `VALUE`
   - **Class/Species column**: `CLASS`, `SPECIESID`
 - **Optional column**:
-  - **Apply column**: `APPLY` (set `0` to force all landuse-based variables to zero for that class)
+  - **Apply column**: `APPLY`, `USE`, `ACTIVE` (set `0`, `false`, `no` or `n` to force all
+    landuse-based variables to zero for that class — use it for water and urban classes)
 
 - **Example:**
 
@@ -266,6 +347,9 @@ model-trains/MSHE-Ecolab/
 - **Required columns** (case-insensitive):
   - **Code column**: `CODE`, `VALUE`
   - **Profile column**: `CLASS`, `SPECIESID`
+- Profile lookup is deliberately forgiving: `SP1`, `1` and `1.0` all match the same profile, so you
+  can mix styles between the template and the grid. The flip side is that renaming a profile in only
+  one place mis-matches silently rather than erroring.
 
 #### 4. Parameter Templates
 
@@ -277,8 +361,8 @@ model-trains/MSHE-Ecolab/
   - **Parameter/Variable column**: `CONSTANT`, `VARIABLE`, `KEY`, `NAME`, `PARAM`, `PARAMETER`
   - **Value column**: `VALUE`, `VAL`, `AMOUNT`
 - **Optional columns**:
-  - **Template/scope column**: `TEMPLATE` (values such as `landuse` or `soilprofile`)
-  - **Type column**: `TYPE` (`1` = generate map, `0` = skip)
+  - **Template/scope column**: `TEMPLATE`, `SCOPE`, `SOURCE` (values such as `landuse` or `soilprofile`)
+  - **Type column**: `TYPE`, `MAPTYPE`, `MAP` (`1` = generate map, `0` = skip)
 
 - **Example:**
 
@@ -288,6 +372,8 @@ model-trains/MSHE-Ecolab/
   | Oak_Forest  | RD_max   | 2.0   |
   | Pine_Forest | LAI_max  | 4.8   |
   | Pine_Forest | RD_max   | 1.8   |
+
+Working examples of all four input types live in `sample_data/plant_growth_module/`.
 
 ### Processing Options
 
@@ -300,6 +386,31 @@ Configure these settings in the notebook's configuration cell (Step 0):
 - **`OUTPUT_DIR`**: Specify the output directory path
   - All generated DFS2 files will be saved here
   - Use absolute paths for reliability
+
+---
+
+## 🛠️ Development
+
+Run the blocking checks from **this directory** — they are what CI runs:
+
+```powershell
+uv run ruff check .
+uv run pytest -q
+```
+
+Always use `uv run ruff`, never a system-wide `ruff`. This module pins `ruff==0.16.0`; a different
+version enforces a different rule set and will disagree with CI. Formatting
+(`uv run ruff format .`) is checked but advisory — it never blocks a pull request.
+
+Conventions that linters do not enforce:
+
+- Use `pathlib.Path` and `Path.joinpath()`, not the `/` operator
+- Use `pd.Timestamp`, not `datetime`
+- Every method gets a docstring (a one-liner is fine)
+- Notebooks stay orchestrators; reusable logic belongs in `src/plant_growth_module/`
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the branch, hook and pull request workflow, and
+[CLAUDE.md](../../CLAUDE.md) for the full architectural notes.
 
 ---
 
@@ -342,9 +453,20 @@ Open report:
 - Ensure `mikeio` is compatible with your MIKE Zero version
 - Check that DFS2 files are not corrupted
 
+**`Time step is 0.0 seconds` warning when writing DFS2:**
+
+- Expected and harmless. Static maps have no time dimension, but `mikeio` requires a time axis, so
+  the writers add a single zero-length step. The helpers suppress this specific warning.
+
 **OneDrive sync issues:**
 
 - Always use `uv sync --link-mode copy` when working in OneDrive folders
+
+**Forcing repository import errors:**
+
+- `forcing_repository.py` loads the `data-download-tool` source at runtime and probes for
+  `core/downloader.py` and `analysis/catchment.py`. If those moved, re-run
+  `uv sync --link-mode copy` to refresh the dependency from GitHub `main`.
 
 **Column names not recognized in template files:**
 
@@ -357,13 +479,14 @@ Open report:
   - For example, if you have a column named `PlantType`, rename it to `SPECIESID` or `CLASS`
 
   **Option 2: Add support for new column names in the code**
-  - Open [src/plant_growth_module/pgm_helper.py](src/plant_growth_module/pgm_helper.py)
-  - Find the column name lists (e.g., `CODE_COLS`, `CLASS_COLS`, `SPECIES_COLS`, etc.)
+  - Open [src/plant_growth_module/template_maps.py](src/plant_growth_module/template_maps.py)
+  - Find the column name lists at the top of the file (`VAL_COLS`, `CLASS_COLS`, `APPLY_COLS`,
+    `ID_COLS`, `VALUE_COLS`, `KEY_COLS`, `TEMPLATE_COLS`, `TYPE_COLS`)
   - Add your custom column name to the appropriate list
-  - Example: If your file uses `PlantType`, add it to the `SPECIES_COLS` list
+  - Example: if your file uses `PlantType` for the species, add it to `ID_COLS`
 
 ---
 
 ## 📝 License
 
-This project is part of the PHISHES research initiative.
+This project is part of the PHISHES research initiative. See [LICENSE](../../LICENSE).
