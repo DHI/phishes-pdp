@@ -9,59 +9,99 @@ permissions:
   contents: read
 
 jobs:
+  # Blocking. A failure here means the change is wrong, not untidy.
   lint-test:
     name: Lint and Test (${{ matrix.dir }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - dir: model-trains/MSHE-Ecolab
-            test_deps: "pytest numpy pandas mikeio"
-          - dir: data-download-tool
-            test_deps: "pytest numpy pandas xarray shapely geopandas matplotlib mikeio pyyaml adlfs rioxarray fsspec"
+        dir:
+          - model-trains/MSHE-Ecolab
+          - data-download-tool
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.11"
 
-      - name: Install tooling
-        run: |
-          python -m pip install --upgrade pip
-          pip install ruff pytest
+      # Dependencies come from the module's pyproject.toml, never a list
+      # maintained here. A hand-copied list silently drifts: geoparquet support
+      # landed in data-download-tool, pyarrow was not added to the list, and
+      # five tests then failed for a reason unrelated to the change under test.
+      - name: Install module
+        working-directory: ${{ matrix.dir }}
+        run: uv sync
 
-      - name: Install project (editable, no deps)
-        if: ${{ hashFiles(format('{0}/pyproject.toml', matrix.dir)) != '' }}
-        run: |
-          pip install -e "${{ matrix.dir }}" --no-deps
+      # `uv run` uses the ruff pinned in the module's dev dependencies, so this
+      # is the exact command and version a contributor runs locally.
+      - name: Ruff lint
+        working-directory: ${{ matrix.dir }}
+        run: uv run ruff check .
 
-      - name: Install test dependencies
-        run: |
-          pip install ${{ matrix.test_deps }}
+      - name: Pytest
+        working-directory: ${{ matrix.dir }}
+        run: uv run pytest -q
 
-      - name: Ruff
-        run: |
-          cd "${{ matrix.dir }}"
-          ruff check .
+  # Advisory. Formatting is a maintainer concern; it must never be the reason
+  # an external contributor's pull request is blocked.
+  format-check:
+    name: Format (advisory)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dir:
+          - model-trains/MSHE-Ecolab
+          - data-download-tool
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install module
+        working-directory: ${{ matrix.dir }}
+        run: uv sync
 
       - name: Ruff format (check)
-        run: |
-          cd "${{ matrix.dir }}"
-          ruff format --check .
+        id: fmt
+        continue-on-error: true
+        working-directory: ${{ matrix.dir }}
+        run: uv run ruff format --check .
 
-      - name: Pytest (if tests exist)
-        if: ${{ hashFiles(format('{0}/**/test_*.py', matrix.dir), format('{0}/**/*_test.py', matrix.dir)) != '' }}
+      - name: Report
+        if: steps.fmt.outcome == 'failure'
         run: |
-          cd "${{ matrix.dir }}"
-          pytest -q
+          {
+            echo "### Formatting suggestions for \`${{ matrix.dir }}\`"
+            echo
+            echo "Advisory only — this does not block the merge. To apply:"
+            echo
+            echo '```bash'
+            echo "cd ${{ matrix.dir }}"
+            echo "uv run ruff format ."
+            echo '```'
+            echo
+            echo "Or install the hooks once and never think about it again:"
+            echo
+            echo '```bash'
+            echo "pip install pre-commit && pre-commit install"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
+  # Advisory. Trailing whitespace must not block a contribution; the pre-commit
+  # hooks fix these automatically before the push.
   markdown-lint:
-    name: Markdown Lint
+    name: Markdown Lint (advisory)
     runs-on: ubuntu-latest
 
     steps:
@@ -69,13 +109,29 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install markdownlint
-        run: |
-          npm install -g markdownlint-cli2
+        run: npm install -g markdownlint-cli2@0.18.1
 
       - name: Lint markdown
-        run: |
-          markdownlint-cli2 "**/*.md" "#**/node_modules/**"
+        id: md
+        continue-on-error: true
+        run: markdownlint-cli2 "**/*.md" "#**/node_modules/**"
 
+      - name: Report
+        if: steps.md.outcome == 'failure'
+        run: |
+          {
+            echo "### Markdown suggestions"
+            echo
+            echo "Advisory only — this does not block the merge."
+            echo "Most findings (trailing whitespace, missing final newline) are"
+            echo "fixed automatically by the pre-commit hooks:"
+            echo
+            echo '```bash'
+            echo "pip install pre-commit && pre-commit install"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # Blocking. Guards the repository against accidentally committed model output.
   file-size-check:
     name: File Size Check (10 MB)
     runs-on: ubuntu-latest

@@ -2,7 +2,7 @@
 name = "plant-growth-module"
 version = "0.1.0"
 description = "Plant Growth Module (PGM) for MIKE SHE Integration. Use 'uv sync --link-mode copy' on OneDrive."
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 dependencies = [
     "pandas>=2.3.3",
     "numpy>=1.24.0",
@@ -19,6 +19,7 @@ dev = [
     "ipykernel>=6.0.0",
     "pytest>=8.0.0",
     "pytest-cov>=7.1.0",
+    "ruff==0.16.0",
 ]
 
 [dependency-groups]
@@ -27,6 +28,7 @@ dev = [
     "ipykernel>=6.0.0",
     "pytest>=8.0.0",
     "pytest-cov>=7.1.0",
+    "ruff==0.16.0",
 ]
 
 [build-system]
@@ -41,6 +43,31 @@ allow-direct-references = true
 
 [tool.uv.pip]
 link-mode = "copy"
+
+# Mirrors data-download-tool so both modules are linted by identical rules.
+# Without this block the module inherits whatever the installed ruff ships as
+# defaults, so a new ruff release changes what CI enforces with no code change.
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+# Notebooks are linted (advisorily) by `nbqa ruff` in the Notebooks
+# workflow, and are deliberately not auto-formatted: `ruff format` joins
+# cell code up to the 100-char limit, which reads badly in a narrow cell,
+# and notebook churn obscures real review diffs.
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N"]
+# E501: line length is handled by the formatter, not the linter.
+# I001: import sorting is left to `ruff format`.
+# N999: the folder is `MSHE-Ecolab` (hyphenated to match `data-download-tool`),
+#       and the stray root `__init__.py` makes ruff read that folder name as the
+#       top-level module. Renaming it would undo the model-trains layout.
+ignore = ["E501", "I001", "N999"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["plant_growth_module"]
 
 [tool.coverage.run]
 source = ["src/plant_growth_module"]

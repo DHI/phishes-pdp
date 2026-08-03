@@ -54,9 +54,14 @@ jobs:
         run: |
           pip install -e "${{ matrix.dir }}"
 
+      # --skip-editable is required, not cosmetic. Without it pip-audit tries to
+      # look up the module we just installed with `pip install -e` on PyPI,
+      # where it does not exist, and exits non-zero every single run:
+      #   "phishes-data-downloader ... not found on PyPI and could not be
+      #    audited". The job could never pass, so it carried no signal.
       - name: pip-audit
         run: |
-          pip-audit
+          pip-audit --skip-editable
 
       - name: Bandit
         run: |
