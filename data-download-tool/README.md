@@ -22,9 +22,11 @@ And generates:
 - ✅ Polygon-based spatial extraction (only download what you need)
 - ✅ Zarr format for efficient cloud-optimized data access
 - ✅ Cloud Optimized GeoTIFF (COG) layers for static rasters (single file or tiled mosaic)
+- ✅ GeoParquet (vector) layers, clipped by keeping intersecting features whole
+- ✅ Partner data as zip bundles, downloaded whole and as-is
 - ✅ Optional DFS2 and GeoTIFF (`.tif`) export
 - ✅ Automatic catchment CRS (Coordinate Reference System) reprojection
-- ✅ Support for multiple dataset categories (climate, soil, topography, landuse, hydrology)
+- ✅ Support for multiple dataset categories (climate, soil, topography, landcover, partner, …)
 - ✅ Area-weighted basin averaging and time series analysis
 - ✅ European coverage for all datasets
 
@@ -160,8 +162,11 @@ data-download-tool/
 │   │   ├── downloader.py           # Data downloader
 │   │   ├── dfsio.py                # DFS file I/O utilities
 │   │   ├── cogio.py                # COG (GeoTIFF) read/write utilities
+│   │   ├── geoparquetio.py         # GeoParquet (vector) read/write utilities
 │   │   ├── dataset_catalog.yaml    # Zarr datasets definition
-│   │   └── cog_catalog.yaml        # COG (GeoTIFF) datasets definition
+│   │   ├── cog_catalog.yaml        # COG (GeoTIFF) datasets definition
+│   │   ├── geoparquet_catalog.yaml # GeoParquet (vector) datasets definition
+│   │   └── partner_data_catalog.yaml # Partner zip bundles (public + restricted)
 │   ├── analysis/                   # Analysis modules
 │   │   ├── __init__.py             # Package exports
 │   │   ├── catchment.py            # Catchment processing & validation
@@ -173,6 +178,7 @@ data-download-tool/
 │   └── shp/                        # Catchment shapefiles
 │       └── catchment_template/     # Example catchment
 ├── pyproject.toml                  # Project dependencies
+├── .env.example                    # Template for restricted-dataset SAS tokens
 ├── README.md                       # This file
 ├── TECH_SPECS_OVERVIEW.md          # Technical overview
 └── TECH_SPECS_DETAILED.md          # Technical details
@@ -199,13 +205,19 @@ Configure these settings in the notebook when initializing the downloader:
 - **`output_base`**: Base directory for downloaded data
 - **`time_range`**: Tuple of start and end dates (e.g., `('2015-01-01', '2020-12-31')`)
 - **`buffer_cells`**: Buffer in grid cells around catchment (default: 1)
-- **`output_format`**: Output format - `"nc"` (NetCDF), `"zarr"`, `"dfs2"`, or `"tif"` (GeoTIFF/COG)
+- **`output_format`**: Output format — `"nc"` (NetCDF), `"zarr"`, `"dfs2"`, or `"tif"` (GeoTIFF/COG) for raster datasets; `"parquet"` (GeoParquet) or `"shp"` (Shapefile) for vector datasets
 - **`mask_on_catchment`**: If `True`, clips data to exact catchment boundary
 
 > **COG (GeoTIFF) layers** are static rasters (no time dimension). Use
 > `output_format = "tif"` and `time_range = None` for them. They are read from a
 > separate Azure container and may be either a single `.tif` or an externally tiled
 > mosaic; see the catalog notes below.
+>
+> **GeoParquet (vector) layers** are static too; set `output_format = "parquet"` or
+> `"shp"` (a raster format falls back to GeoParquet).
+>
+> **Partner data (zip bundles)** ignore `output_format` entirely — the `.zip` is
+> downloaded whole and as-is (no extraction, no clipping); see the catalog notes below.
 
 ---
 
@@ -254,6 +266,64 @@ When `tiled: true`, the reader reads all tile extents in parallel and mosaics on
 tiles whose bounds intersect the catchment. `eumtype`/`eumunit` are not needed for COG
 entries (those drive DFS2 output).
 
+### GeoParquet (vector) datasets
+
+Static vector layers (points/lines/polygons) are served as GeoParquet from the
+`geoparquet` Azure container. They are downloaded with `output_format = "parquet"`
+(GeoParquet) or `"shp"` (Shapefile) and keep every feature intersecting the catchment
+whole (no geometry truncation). Defined in **`src/core/geoparquet_catalog.yaml`**
+(`format: geoparquet`), merged into the catalog at load time.
+
+### Partner data (zip bundles)
+
+Externally-shared partner/open datasets are served as **zip bundles** from the public
+`external-shared-open-data` Azure container. Contents are mixed/arbitrary (shapefiles,
+CSVs, Word metadata), so they are **downloaded whole and as-is** — no extraction and no
+catchment clipping. `output_format` is ignored; the `.zip` is delivered verbatim. Defined
+in **`src/core/partner_data_catalog.yaml`** (`format: zip`, `container:
+external-shared-open-data`, `anon: true`), merged into the catalog at load time.
+Currently available:
+
+| Category | Subcategory                | Source                 | Contents (zip)                                     |
+| -------- | -------------------------- | ---------------------- | -------------------------------------------------- |
+| partner  | czech_globe_ms4            | Czech Globe            | Basin shapefiles (EPSG:3035) + metadata            |
+| partner  | copenhagen_university_ms4  | Copenhagen University  | Shapefile + 30-yr precip/evap/percolation CSVs     |
+
+### Access-restricted datasets
+
+Some datasets are not public. They live in a SAS-protected container and their catalog
+entry declares `anon: false` plus **`credential_env`** — the name of the environment
+variable that must hold the SAS token for that container:
+
+| Category           | Subcategory             | Container                 | Token variable      |
+| ------------------ | ----------------------- | ------------------------- | ------------------- |
+| restricted_partner | czech_globe_ms4_full    | external-shared-after-end | `PDP_AFTER_END_SAS` |
+
+Restricted datasets are **always listed** — their name and description are public, and the
+catalog reveals nothing about the bundle contents. Only the download is gated.
+
+To get access:
+
+1. Request the SAS token from the data owner.
+2. Copy `.env.example` to `.env` and fill in the variable:
+
+   ```dotenv
+   PDP_AFTER_END_SAS=sp=r&st=...&sig=...
+   ```
+
+   A read-only token (`sp=r`) is enough — the bundle is streamed straight from its known
+   blob path, so the token does not need *list* permission on the container.
+
+3. Run the notebook. The downloader loads the nearest `.env` on init (searching upwards
+   from the working directory); a variable already exported in your shell takes
+   precedence over the file.
+
+`.env` is gitignored — never commit it. Without a token, the Step 6 listing still shows
+the dataset marked 🔒 and `download_dataset()` raises `PermissionError` before writing
+anything. Check access programmatically with
+`downloader.is_dataset_accessible(category, subcategory)`, and see which variable an
+entry needs with `downloader.dataset_requires_token(category, subcategory)`.
+
 ---
 
 ## 🔧 Troubleshooting
@@ -267,7 +337,17 @@ Cannot connect to PDP datastore
 ```
 
 - Check internet connection
-- Credentials are built into the downloader
+- Credentials for open datasets are built into the downloader
+
+**Access Denied:**
+
+```
+PermissionError: '<dataset>' is access-restricted. Set PDP_AFTER_END_SAS in a .env file ...
+```
+
+- The dataset needs a SAS token you do not have set — see
+  [Access-restricted datasets](#access-restricted-datasets)
+- Copy `.env.example` to `.env`, fill in the named variable, and restart the kernel
 
 **Catchment CRS Error:**
 
