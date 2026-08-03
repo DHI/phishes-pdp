@@ -13,7 +13,7 @@ body:
       description: Which module is affected?
       options:
         - data-download-tool
-        - plant-growth-module
+        - model-trains/MSHE-Ecolab
         - Repository / CI
         - Other
     validations:

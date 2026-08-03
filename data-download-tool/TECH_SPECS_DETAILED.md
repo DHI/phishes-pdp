@@ -1,11 +1,10 @@
 # PHISHES Data Download Tool - Technical Specification (Detailed)
 
-Version: 1.0
-Last Updated: 2026-02-24
+Version: 1.1
 
 ## 1. System Overview
 
-The tool downloads datasets from Azure Blob Storage and subsets them by a user-defined catchment. It produces local NetCDF, Zarr, or DFS2 outputs in a standardized folder structure and logs each download.
+The tool downloads datasets from Azure Blob Storage and subsets them by a user-defined catchment. It handles Zarr time series, COG static rasters, GeoParquet vectors and partner zip bundles, producing local NetCDF, Zarr, DFS2, GeoTIFF, GeoParquet, Shapefile or verbatim zip outputs in a standardized folder structure, and logs each download.
 
 Primary entry points:
 
@@ -83,19 +82,36 @@ CLI (module **main**)
 - Behavior:
   - Downloads a specific dataset or all datasets
 
-### 2.2 src/core/dataset_catalog.yaml
+### 2.2 Catalogs: src/core/*.yaml
+
+Four catalogs, merged per-category by `_load_catalog()`:
+
+| File | Format | `format` value |
+| --- | --- | --- |
+| `dataset_catalog.yaml` | Zarr time series | omitted / `zarr` |
+| `cog_catalog.yaml` | COG static raster | `cog` |
+| `geoparquet_catalog.yaml` | GeoParquet static vector | `geoparquet` |
+| `partner_data_catalog.yaml` | Partner zip bundles (public `partner` and restricted `restricted_partner` categories) | `zip` |
 
 Structure
 
 - Top-level keys: dataset categories (for example climate)
 - Second-level keys: subcategory names
 - Each dataset entry includes:
-  - path (Azure Zarr path)
+  - path (Azure blob path; a tile prefix when `tiled: true`)
   - display_name and description
   - variable (primary variable name)
   - temporal (boolean)
   - crs (spatial reference)
   - eumtype and eumunit (for DFS2 export)
+  - data_value_type (StepAccumulated or Instantaneous; drives temporal aggregation)
+- Format-specific fields:
+  - container (Azure container; defaults to the downloader's container)
+  - anon (read the container with anonymous/public access)
+  - tiled (COG only; false ⇒ single `.tif`, true ⇒ prefix mosaicked over intersecting tiles)
+  - credential_env (name of the environment variable holding a SAS token; see 2.9)
+
+Adding a dataset is normally a catalog-only change — a new YAML entry with no Python edit.
 
 ### 2.3 src/core/utils.py
 
@@ -122,6 +138,24 @@ Functions
   - Converts xarray data to a mikeio.DataArray with Grid2D geometry
 - create_file(da, outfile, varname, eumtype, eumunit, \*\*kwargs)
   - Writes a DFS2 file using mikeio
+
+### 2.4a src/core/cogio.py
+
+Functions
+
+- open_cog(...)
+  - Reads a COG (or a tiled set) via GDAL `/vsicurl`. Tile headers and extents are read in parallel; only tiles whose bounds intersect the catchment bbox are window-read and merged. Helpers: `_read_bounds`, `_intersects`, `_clip_to_bbox`, `_open_single`
+- write_cog(...)
+  - Writes a Cloud Optimized GeoTIFF
+
+### 2.4b src/core/geoparquetio.py
+
+Functions
+
+- open_geoparquet(...)
+  - Reads GeoParquet through the fsspec filesystem with optional bbox pushdown, and uses the spatial index to keep every feature intersecting the catchment **whole** — no geometry truncation
+- write_geoparquet(...)
+  - Writes `.parquet` or `.shp`
 
 ### 2.5 src/core/folder_structure.py
 
@@ -169,6 +203,29 @@ Functions
 - plot_spatial_map(data, catchment=None, ax=None, figsize=(12,8), cmap="viridis", ...)
 - plot_time_series(data, ax=None, figsize=(12,6), label="Basin Average", ...)
 
+### 2.9 Access control (src/core/downloader.py)
+
+Any catalog entry, in any format, may declare `credential_env: <ENV_VAR>`.
+
+- `_dataset_filesystem(dataset_info)` returns the filesystem for an entry: an `adlfs` filesystem
+  built from `os.environ[<ENV_VAR>]` when `credential_env` is set (cached per variable in
+  `self._env_fs`), an anonymous one when `anon: true`, otherwise the built-in SAS filesystem.
+- `_dataset_credential(dataset_info)` supplies the same token to `_blob_url()` for GDAL/vsicurl.
+- A missing or blank variable raises `PermissionError` naming the variable and the container, before
+  anything is written. The token is never logged.
+- `__init__` calls `load_dotenv(find_dotenv(usecwd=True), override=False)`, so tokens come from the
+  nearest `.env` while exported shell/CI variables take precedence.
+- `dataset_requires_token(category, subcategory)` returns the variable name an entry needs;
+  `is_dataset_accessible(category, subcategory)` reports lock status. Neither touches the network.
+- Restricted entries stay fully listable; only downloading is gated.
+
+Format dispatch in `download_dataset`: `_download_zip` for `format: zip` (streams the blob with
+`fs.open()` + `shutil.copyfileobj`, deliberately not `fs.get()`, whose remote path expansion needs
+*list* permission; a failed copy removes the partial file), `_download_geoparquet` for
+`format: geoparquet`, otherwise the raster open → process → save path. `_open_zarr_store` tries
+consolidated → non-consolidated → `zarr_format=2` and takes the first result exposing data
+variables.
+
 ## 3. Data Formats
 
 - Remote storage: Zarr on Azure Blob Storage; Cloud Optimized GeoTIFF (COG) layers in
@@ -182,6 +239,9 @@ Functions
   `partner_data_catalog.yaml` (`format: zip`, `container: external-shared-open-data`,
   `anon: true`); merged at load time. Mixed/arbitrary contents downloaded whole and
   as-is (no extraction, no catchment clipping); `output_format` is ignored.
+- Access-restricted zip bundles in the SAS-protected `external-shared-after-end` container,
+  under the `restricted_partner` category of `partner_data_catalog.yaml` with `anon: false`
+  and `credential_env` (see 2.9).
 - Local outputs: NetCDF (.nc), Zarr (directory), DFS2 (.dfs2), GeoTIFF/COG (.tif),
   GeoParquet (.parquet), Shapefile (.shp), partner bundles (.zip)
 - Logs: JSON with a downloads array
@@ -201,7 +261,9 @@ Log entry schema
 
 - Invalid inputs raise ValueError (catchment size, AOI overlap, format errors)
 - Azure connection failures raise ConnectionError with contextual hints
+- A missing or blank `credential_env` variable raises PermissionError before any file is written
 - Spatial subsetting failures fall back to full dataset with warnings
+- A failed whole-blob (zip) copy removes the partial file rather than leaving it in place
 
 ## 5. Performance Considerations
 
@@ -220,13 +282,14 @@ Log entry schema
 
 See pyproject.toml for declared dependencies and versions.
 
-## 8. Known Documentation Gaps
+## 8. Known Gaps
 
-- pyproject.toml scripts reference setup_folder_structure:main and download_datasets:main, but no such modules exist in src
-- Older docs referenced example_usage.ipynb, while README uses notebooks/data_download_tool.ipynb
+- pyproject.toml scripts reference setup_folder_structure:main and download_datasets:main, but no such modules exist in src, so both console entry points are broken
+- `[project.urls]` points at `github.com/phishes/data-downloader` rather than `github.com/DHI/phishes-pdp`
+- No top-level `pgm_forcings:` section in the catalog, so MSHE-Ecolab's `load_pgm_forcing_library()` raises until one is added
 
 ## 9. Future Enhancements (Optional)
 
-- Externalize Azure credentials via environment variables
+- Externalize the default Azure credential the way restricted entries already do, via `credential_env`
 - Add unit tests for catchment validation and downloader flows
 - Document catalog extension process for new datasets
