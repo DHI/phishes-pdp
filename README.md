@@ -24,13 +24,13 @@ Most user-facing workflows are provided as Jupyter notebooks in the module folde
 Installations are handled per sub-project. See the module README files for setup steps:
 
 - [data-download-tool/README.md](data-download-tool/README.md)
-- [plant-growth-module/README.md](plant-growth-module/README.md)
+- [model-trains/MSHE-Ecolab/README.md](model-trains/MSHE-Ecolab/README.md)
 
 ## Where can I get help?
 
 - Module-specific documentation:
   - [data-download-tool/README.md](data-download-tool/README.md)
-  - [plant-growth-module/README.md](plant-growth-module/README.md)
+  - [model-trains/MSHE-Ecolab/README.md](model-trains/MSHE-Ecolab/README.md)
 - Repository design: [REPOSITORY_DESIGN.md](REPOSITORY_DESIGN.md)
 
 ## 📦 What this repository contains
@@ -39,8 +39,8 @@ Installations are handled per sub-project. See the module README files for setup
 
 Generates spatially distributed DFS2 maps for DHI’s ECO Lab Plant Growth Module using land-use data and species parameters.
 
-- Location: [plant-growth-module/](plant-growth-module/)
-- Documentation: [plant-growth-module/README.md](plant-growth-module/README.md)
+- Location: [model-trains/MSHE-Ecolab/](model-trains/MSHE-Ecolab/)
+- Documentation: [model-trains/MSHE-Ecolab/README.md](model-trains/MSHE-Ecolab/README.md)
 
 ### Data Download Tool
 
@@ -59,7 +59,10 @@ phishes-pdp/
 ├── .github/
 ├── images/
 ├── data-download-tool/
-└── plant-growth-module/
+└── model-trains/
+    ├── MSHE-Ecolab/                        # MIKE SHE + ECO Lab Plant Growth Module
+    ├── MSHE-Daisy/
+    └── HYDRUS-PHREEQC-MODFLOW2005-MT3D/
 ```
 
 ## 📚 Documentation
@@ -67,7 +70,7 @@ phishes-pdp/
 - Repository-level design: [REPOSITORY_DESIGN.md](REPOSITORY_DESIGN.md)
 - Module technical details:
   - [data-download-tool/README.md](data-download-tool/README.md)
-  - [plant-growth-module/README.md](plant-growth-module/README.md)
+  - [model-trains/MSHE-Ecolab/README.md](model-trains/MSHE-Ecolab/README.md)
 
 ---
 

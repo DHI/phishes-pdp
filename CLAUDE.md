@@ -12,7 +12,7 @@ A two-module pipeline that produces inputs for **DHI MIKE SHE + ECO Lab Plant Gr
 catchment shp/extent  ─►  data-download-tool  ─►  forcing DFS2 (precip, temp, PET, SSRD)
                                                             │
 land-use DFS2 + LU CSV    ┐                                 ▼
-soil-profile DFS2 + SP CSV ┼─►  plant-growth-module  ─►  per-parameter DFS2 maps
+soil-profile DFS2 + SP CSV ┼─►     MSHE-Ecolab       ─►  per-parameter DFS2 maps
 parameter template CSVs    ┘     (template_maps)        (LAI_2D.dfs2, RD_2D.dfs2, SOC.dfs2, …)
                                                             │
 soil-profile *.txt + preprocessed DFS2 ─► (soil_profile_setup) ─► WP_cell##.dfs2, FC_cell##.dfs2
@@ -22,6 +22,20 @@ soil-profile *.txt + preprocessed DFS2 ─► (soil_profile_setup) ─► WP_cel
 ```
 
 Both modules are independent Python projects (own `pyproject.toml`, `.venv`, tests, notebooks). Notebooks are **orchestrators only** — reusable logic lives in `src/`.
+
+### Repository layout
+
+`data-download-tool/` is shared infrastructure and sits at the repo root. Everything downstream of it is a **model train** and lives under `model-trains/`:
+
+```
+data-download-tool/                      # shared: pulls forcing + static layers from the datastore
+model-trains/
+├── MSHE-Ecolab/                         # was plant-growth-module/ — the only implemented train
+├── MSHE-Daisy/                          # README stub only
+└── HYDRUS-PHREEQC-MODFLOW2005-MT3D/     # README stub only
+```
+
+**`MSHE-Ecolab/` was `plant-growth-module/`.** The move was path-only: the Python package inside is still `plant_growth_module`, the distribution is still `plant-growth-module`, and `src/plant_growth_module/` is unchanged. Only the *containing folder* was renamed, so imports and `pyproject.toml` metadata are untouched. When adding a model train, create `model-trains/<train-name>/` as a self-contained project — do not add a second top-level module folder.
 
 ## Module 1: `data-download-tool/`
 
@@ -36,7 +50,7 @@ Pulls clipped raster **and vector** subsets from a remote datastore (Azure-backe
 - **`src/analysis/`** — post-download layer. `catchment.py` loads/validates/reprojects AOI (hard limits: 0.01–500,000 km², ≤1000 features, ≥10% overlap with Europe AOI bbox, points/lines auto-buffered 1 km in EPSG:3035). `timeseries.py` does area-weighted basin averages and anomalies. `visualization.py` has three matplotlib helpers.
 - Driven by `notebooks/data_download_tool.ipynb`.
 
-## Module 2: `plant-growth-module/`
+## Module 2: `model-trains/MSHE-Ecolab/`
 
 Three workflows, three notebooks:
 
@@ -68,7 +82,7 @@ MIKE SHE "Task 4". Parses PreProcessor `*.txt` files into per-cell wilting-point
 
 ### Cross-module dependency
 
-`plant-growth-module/pyproject.toml` declares:
+`model-trains/MSHE-Ecolab/pyproject.toml` declares:
 ```
 phishes-data-downloader @ git+https://github.com/DHI/phishes-pdp.git@main#subdirectory=data-download-tool
 ```
@@ -83,7 +97,7 @@ So PGM resolves DDT from **`main` on GitHub**, not from the local sibling folder
 All commands run **inside a module directory**, not the repo root.
 
 ```powershell
-cd <module>
+cd data-download-tool                    # or: cd model-trains/MSHE-Ecolab
 uv sync --link-mode copy                # --link-mode copy is required on OneDrive
 
 uv run pytest                            # all tests

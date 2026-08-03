@@ -13,9 +13,9 @@ Your job is to implement, review, and verify changes for the Python package and 
 
 ## Scope
 
-- Code under `plant-growth-module/src/plant_growth_module/`
-- Tests under `plant-growth-module/tests/`
-- Notebook workflow in `plant-growth-module/notebooks/plant_growth_module.ipynb`
+- Code under `model-trains/MSHE-Ecolab/src/plant_growth_module/`
+- Tests under `model-trains/MSHE-Ecolab/tests/`
+- Notebook workflow in `model-trains/MSHE-Ecolab/notebooks/plant_growth_module.ipynb`
 - Docs directly related to module behavior and usage
 
 ## Domain Constraints

@@ -17,9 +17,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - LICENSE (MIT)
 - CITATION.cff for academic referencing
 - CODE_OF_CONDUCT.md
+- `model-trains/` parent folder to hold one self-contained project per model train
+- README stubs for the `MSHE-Daisy` and `HYDRUS-PHREEQC-MODFLOW2005-MT3D` trains
 
 ### Changed
 
+- Moved `plant-growth-module/` to `model-trains/MSHE-Ecolab/` (path-only; the
+  `plant_growth_module` package, distribution name and imports are unchanged)
 - Renamed `Task1 Plant_Growth_Module` to `plant-growth-module`
 - Renamed `Task2` to `data-download-tool`
 - Restructured each module: dedicated `.md` technical docs, updated READMEs, renamed notebooks
