@@ -8,7 +8,7 @@ Thank you for your interest in contributing! This guide explains how to get star
 2. **Create a branch** from `main` for your work
 3. **Set up** the module you're working on (see module READMEs):
    - [data-download-tool/README.md](data-download-tool/README.md)
-   - [plant-growth-module/README.md](plant-growth-module/README.md)
+   - [model-trains/MSHE-Ecolab/README.md](model-trains/MSHE-Ecolab/README.md)
 
 ## Development Workflow
 

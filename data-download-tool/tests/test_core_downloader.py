@@ -1,3 +1,4 @@
+import io
 from pathlib import Path
 
 import geopandas as gpd
@@ -116,6 +117,8 @@ def test_load_catalog(tmp_path, monkeypatch):
     catalog.write_text("climate:\n  rain:\n    description: Rain\n", encoding="utf-8")
     monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
     monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", tmp_path / "no_cog.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "GEOPARQUET_CATALOG_FILE", tmp_path / "no_gpq.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "PARTNER_CATALOG_FILE", tmp_path / "no_partner.yaml")
     d = _new_downloader(tmp_path)
     loaded = PDPDataDownloader._load_catalog(d)
     assert "climate" in loaded
@@ -131,6 +134,8 @@ def test_load_catalog_merges_cog_catalog(tmp_path, monkeypatch):
     )
     monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
     monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", cog)
+    monkeypatch.setattr(PDPDataDownloader, "GEOPARQUET_CATALOG_FILE", tmp_path / "no_gpq.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "PARTNER_CATALOG_FILE", tmp_path / "no_partner.yaml")
     d = _new_downloader(tmp_path)
     loaded = PDPDataDownloader._load_catalog(d)
     assert "climate" in loaded
@@ -468,9 +473,287 @@ def test_load_catalog_merges_geoparquet_catalog(tmp_path, monkeypatch):
     monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
     monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", tmp_path / "no_cog.yaml")
     monkeypatch.setattr(PDPDataDownloader, "GEOPARQUET_CATALOG_FILE", gpq)
+    monkeypatch.setattr(PDPDataDownloader, "PARTNER_CATALOG_FILE", tmp_path / "no_partner.yaml")
     d = _new_downloader(tmp_path)
     loaded = PDPDataDownloader._load_catalog(d)
     assert loaded["soil"]["lucas"]["format"] == "geoparquet"
+
+
+def test_load_catalog_merges_partner_catalog(tmp_path, monkeypatch):
+    catalog = tmp_path / "dataset_catalog.yaml"
+    catalog.write_text("climate:\n  rain:\n    description: Rain\n", encoding="utf-8")
+    partner = tmp_path / "partner_data_catalog.yaml"
+    partner.write_text(
+        "partner:\n  czech_globe_ms4:\n    format: zip\n    description: CG bundle\n"
+        "restricted_partner:\n  cg_full:\n    format: zip\n"
+        "    credential_env: PDP_AFTER_END_SAS\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(PDPDataDownloader, "CATALOG_FILE", catalog)
+    monkeypatch.setattr(PDPDataDownloader, "COG_CATALOG_FILE", tmp_path / "no_cog.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "GEOPARQUET_CATALOG_FILE", tmp_path / "no_gpq.yaml")
+    monkeypatch.setattr(PDPDataDownloader, "PARTNER_CATALOG_FILE", partner)
+    d = _new_downloader(tmp_path)
+    loaded = PDPDataDownloader._load_catalog(d)
+    assert loaded["partner"]["czech_globe_ms4"]["format"] == "zip"
+    assert loaded["restricted_partner"]["cg_full"]["credential_env"] == "PDP_AFTER_END_SAS"
+
+
+def _zip_entry():
+    # Blob names in the partner container contain spaces; keep one here to assert
+    # the whole-blob copy path passes them through unchanged.
+    return {
+        "path": "MS4-CG data for PDP.zip",
+        "container": "external-shared-open-data",
+        "format": "zip",
+        "anon": True,
+        "temporal": False,
+        "description": "Czech Globe MS4 bundle",
+        "variable": "partner_bundle",
+    }
+
+
+class _FakeFS:
+    """Filesystem stand-in exposing only open() - the zip path must not need list()."""
+
+    def __init__(self, captured, payload=b"PK\x03\x04"):
+        self.captured = captured
+        self.payload = payload
+
+    def open(self, rpath, mode="rb"):
+        self.captured["rpath"] = rpath
+        return io.BytesIO(self.payload)
+
+
+def test_download_dataset_routes_to_zip(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    d.dataset_catalog["partner"] = {"czech_globe_ms4": _zip_entry()}
+    d.output_format = "nc"  # ignored for zip entries
+
+    captured = {}
+    monkeypatch.setattr(d, "_dataset_filesystem", lambda info: _FakeFS(captured, b"PK\x03\x04"))
+
+    out_path = tmp_path / "data" / "partner" / "czech_globe_ms4" / "czech_globe_ms4.zip"
+
+    def fake_build(base, cat, sub, fmt):
+        captured["fmt"] = fmt
+        return out_path
+
+    monkeypatch.setattr("src.core.downloader.build_dataset_path", fake_build)
+    monkeypatch.setattr("src.core.downloader.remove_path_with_retry", lambda p: True)
+    monkeypatch.setattr(d, "_log_download", lambda *a, **k: None)
+
+    result = d.download_dataset("partner", "czech_globe_ms4")
+
+    assert result == out_path
+    assert captured["fmt"] == "zip"
+    assert captured["rpath"] == "external-shared-open-data/MS4-CG data for PDP.zip"
+    assert out_path.parent.exists()  # parent dir created before download
+    assert out_path.read_bytes() == b"PK\x03\x04"  # blob streamed through verbatim
+
+
+def _restricted_zip_entry():
+    return {
+        "path": "MS4-CG data for PDP.zip",
+        "container": "external-shared-after-end",
+        "format": "zip",
+        "anon": False,
+        "credential_env": "PDP_AFTER_END_SAS",
+        "temporal": False,
+        "display_name": "Czech Globe MS4 data - full (restricted)",
+        "description": "Restricted Czech Globe MS4 bundle",
+        "variable": "partner_bundle",
+    }
+
+
+class _RecordingFS:
+    """Stand-in for adlfs.AzureBlobFileSystem that records its constructor kwargs."""
+
+    instances = []
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+        _RecordingFS.instances.append(self)
+
+
+@pytest.fixture
+def recording_adlfs(monkeypatch):
+    _RecordingFS.instances = []
+    monkeypatch.setattr("src.core.downloader.adlfs.AzureBlobFileSystem", _RecordingFS)
+    return _RecordingFS
+
+
+def test_dataset_filesystem_uses_env_credential(monkeypatch, tmp_path, recording_adlfs):
+    d = _new_downloader(tmp_path)
+    monkeypatch.setenv("PDP_AFTER_END_SAS", "?sp=r&sig=secret")
+
+    fs = d._dataset_filesystem(_restricted_zip_entry())
+
+    assert len(recording_adlfs.instances) == 1
+    # Leading '?' stripped, token used as SAS, and no anonymous fallback.
+    assert fs.kwargs == {"account_name": "acct", "sas_token": "sp=r&sig=secret"}
+
+
+def test_dataset_filesystem_caches_env_credential(monkeypatch, tmp_path, recording_adlfs):
+    d = _new_downloader(tmp_path)
+    monkeypatch.setenv("PDP_AFTER_END_SAS", "sp=r&sig=secret")
+
+    first = d._dataset_filesystem(_restricted_zip_entry())
+    second = d._dataset_filesystem(_restricted_zip_entry())
+
+    assert first is second
+    assert len(recording_adlfs.instances) == 1
+
+
+def test_dataset_filesystem_missing_token_raises(monkeypatch, tmp_path, recording_adlfs):
+    d = _new_downloader(tmp_path)
+    monkeypatch.delenv("PDP_AFTER_END_SAS", raising=False)
+
+    with pytest.raises(PermissionError) as excinfo:
+        d._dataset_filesystem(_restricted_zip_entry())
+
+    message = str(excinfo.value)
+    assert "PDP_AFTER_END_SAS" in message
+    assert "external-shared-after-end" in message
+    assert ".env" in message
+    assert not recording_adlfs.instances  # no connection attempted
+
+
+def test_load_env_file_is_noop_without_dotenv(monkeypatch):
+    """python-dotenv is an optional convenience; tokens can be exported directly."""
+    monkeypatch.setattr("src.core.downloader._DOTENV_AVAILABLE", False)
+    monkeypatch.setattr("src.core.downloader.load_dotenv", None)
+    PDPDataDownloader._load_env_file()  # must not raise
+
+
+def test_load_env_file_uses_dotenv_when_available(monkeypatch):
+    calls = {}
+    monkeypatch.setattr("src.core.downloader._DOTENV_AVAILABLE", True)
+    monkeypatch.setattr("src.core.downloader.find_dotenv", lambda usecwd: "/tmp/.env")
+    monkeypatch.setattr(
+        "src.core.downloader.load_dotenv",
+        lambda path, override: calls.update(path=path, override=override),
+    )
+    PDPDataDownloader._load_env_file()
+    # Exported variables must win over the file.
+    assert calls == {"path": "/tmp/.env", "override": False}
+
+
+def test_missing_token_message_mentions_export_without_dotenv(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    monkeypatch.delenv("PDP_AFTER_END_SAS", raising=False)
+    monkeypatch.setattr("src.core.downloader._DOTENV_AVAILABLE", False)
+
+    with pytest.raises(PermissionError) as excinfo:
+        d._dataset_filesystem(_restricted_zip_entry())
+
+    message = str(excinfo.value)
+    assert "python-dotenv is not installed" in message
+    assert "PDP_AFTER_END_SAS" in message
+
+
+def test_dataset_filesystem_blank_token_raises(monkeypatch, tmp_path, recording_adlfs):
+    d = _new_downloader(tmp_path)
+    monkeypatch.setenv("PDP_AFTER_END_SAS", "   ")
+
+    with pytest.raises(PermissionError):
+        d._dataset_filesystem(_restricted_zip_entry())
+
+
+def test_dataset_filesystem_open_entries_unchanged(monkeypatch, tmp_path, recording_adlfs):
+    d = _new_downloader(tmp_path)
+    d.fs = object()
+
+    # No anon, no credential_env -> the main (built-in SAS) filesystem.
+    assert d._dataset_filesystem({"container": "zarr"}) is d.fs
+
+    # anon: true -> a cached anonymous filesystem.
+    anon_fs = d._dataset_filesystem({"anon": True})
+    assert anon_fs.kwargs == {"account_name": "acct", "anon": True}
+    assert d._dataset_filesystem({"anon": True}) is anon_fs
+
+
+def test_download_dataset_restricted_zip_routes_with_token(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    d.dataset_catalog["restricted_partner"] = {"czech_globe_ms4_full": _restricted_zip_entry()}
+    monkeypatch.setenv("PDP_AFTER_END_SAS", "sp=r&sig=secret")
+
+    captured = {}
+    monkeypatch.setattr(d, "_dataset_filesystem", lambda info: _FakeFS(captured))
+
+    out_path = tmp_path / "data" / "restricted_partner" / "cg" / "cg.zip"
+    monkeypatch.setattr("src.core.downloader.build_dataset_path", lambda *a: out_path)
+    monkeypatch.setattr("src.core.downloader.remove_path_with_retry", lambda p: True)
+    monkeypatch.setattr(d, "_log_download", lambda *a, **k: None)
+
+    result = d.download_dataset("restricted_partner", "czech_globe_ms4_full")
+
+    assert result == out_path
+    assert captured["rpath"] == "external-shared-after-end/MS4-CG data for PDP.zip"
+
+
+def test_download_zip_removes_partial_file_on_failure(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    d.dataset_catalog["restricted_partner"] = {"czech_globe_ms4_full": _restricted_zip_entry()}
+    monkeypatch.setenv("PDP_AFTER_END_SAS", "sp=r&sig=secret")
+
+    class _FailingFS:
+        def open(self, rpath, mode="rb"):
+            raise RuntimeError("AuthorizationPermissionMismatch")
+
+    monkeypatch.setattr(d, "_dataset_filesystem", lambda info: _FailingFS())
+
+    out_path = tmp_path / "data" / "restricted_partner" / "cg" / "cg.zip"
+    monkeypatch.setattr("src.core.downloader.build_dataset_path", lambda *a: out_path)
+    monkeypatch.setattr(d, "_log_download", lambda *a, **k: None)
+
+    with pytest.raises(RuntimeError):
+        d.download_dataset("restricted_partner", "czech_globe_ms4_full")
+
+    assert not out_path.exists()
+
+
+def test_download_dataset_restricted_zip_without_token_writes_nothing(monkeypatch, tmp_path):
+    d = _new_downloader(tmp_path)
+    d.dataset_catalog["restricted_partner"] = {"czech_globe_ms4_full": _restricted_zip_entry()}
+    monkeypatch.delenv("PDP_AFTER_END_SAS", raising=False)
+
+    with pytest.raises(PermissionError):
+        d.download_dataset("restricted_partner", "czech_globe_ms4_full")
+
+    assert not (tmp_path / "data").exists()
+
+
+def test_restricted_datasets_stay_listable(monkeypatch, tmp_path):
+    """The dataset name is public; only its contents are gated."""
+    d = _new_downloader(tmp_path)
+    d.dataset_catalog["restricted_partner"] = {"czech_globe_ms4_full": _restricted_zip_entry()}
+    d.dataset_catalog["partner"] = {"czech_globe_ms4": _zip_entry()}
+
+    monkeypatch.delenv("PDP_AFTER_END_SAS", raising=False)
+    assert "czech_globe_ms4_full" in d.list_available_datasets()["restricted_partner"]
+    assert d.dataset_requires_token("restricted_partner", "czech_globe_ms4_full") == (
+        "PDP_AFTER_END_SAS"
+    )
+    assert d.is_dataset_accessible("restricted_partner", "czech_globe_ms4_full") is False
+
+    monkeypatch.setenv("PDP_AFTER_END_SAS", "sp=r&sig=secret")
+    assert "czech_globe_ms4_full" in d.list_available_datasets()["restricted_partner"]
+    assert d.is_dataset_accessible("restricted_partner", "czech_globe_ms4_full") is True
+
+    # Open datasets report no token requirement.
+    assert d.dataset_requires_token("partner", "czech_globe_ms4") is None
+    assert d.is_dataset_accessible("partner", "czech_globe_ms4") is True
+    assert d.is_dataset_accessible("climate", "rain") is True
+
+
+def test_blob_url_uses_entry_credential(tmp_path):
+    d = _new_downloader(tmp_path)
+    assert d._blob_url("cogs/a.tif") == ("https://acct.blob.core.windows.net/cogs/a.tif?cred")
+    assert d._blob_url("cogs/a.tif", credential="?other") == (
+        "https://acct.blob.core.windows.net/cogs/a.tif?other"
+    )
+    assert d._blob_url("cogs/a.tif", anon=True) == "https://acct.blob.core.windows.net/cogs/a.tif"
 
 
 def test_download_dataset_pipeline(monkeypatch, tmp_path):

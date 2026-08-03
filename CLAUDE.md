@@ -12,7 +12,7 @@ A two-module pipeline that produces inputs for **DHI MIKE SHE + ECO Lab Plant Gr
 catchment shp/extent  ─►  data-download-tool  ─►  forcing DFS2 (precip, temp, PET, SSRD)
                                                             │
 land-use DFS2 + LU CSV    ┐                                 ▼
-soil-profile DFS2 + SP CSV ┼─►  plant-growth-module  ─►  per-parameter DFS2 maps
+soil-profile DFS2 + SP CSV ┼─►     MSHE-Ecolab       ─►  per-parameter DFS2 maps
 parameter template CSVs    ┘     (template_maps)        (LAI_2D.dfs2, RD_2D.dfs2, SOC.dfs2, …)
                                                             │
 soil-profile *.txt + preprocessed DFS2 ─► (soil_profile_setup) ─► WP_cell##.dfs2, FC_cell##.dfs2
@@ -23,6 +23,20 @@ soil-profile *.txt + preprocessed DFS2 ─► (soil_profile_setup) ─► WP_cel
 
 Both modules are independent Python projects (own `pyproject.toml`, `.venv`, tests, notebooks). Notebooks are **orchestrators only** — reusable logic lives in `src/`.
 
+### Repository layout
+
+`data-download-tool/` is shared infrastructure and sits at the repo root. Everything downstream of it is a **model train** and lives under `model-trains/`:
+
+```
+data-download-tool/                      # shared: pulls forcing + static layers from the datastore
+model-trains/
+├── MSHE-Ecolab/                         # was plant-growth-module/ — the only implemented train
+├── MSHE-Daisy/                          # README stub only
+└── HYDRUS-PHREEQC-MODFLOW2005-MT3D/     # README stub only
+```
+
+**`MSHE-Ecolab/` was `plant-growth-module/`.** The move was path-only: the Python package inside is still `plant_growth_module`, the distribution is still `plant-growth-module`, and `src/plant_growth_module/` is unchanged. Only the *containing folder* was renamed, so imports and `pyproject.toml` metadata are untouched. When adding a model train, create `model-trains/<train-name>/` as a self-contained project — do not add a second top-level module folder.
+
 ## Module 1: `data-download-tool/`
 
 Pulls clipped raster **and vector** subsets from a remote datastore (Azure-backed): Zarr time series, COG static rasters, and GeoParquet static vectors.
@@ -30,11 +44,13 @@ Pulls clipped raster **and vector** subsets from a remote datastore (Azure-backe
 - **`src/core/dataset_catalog.yaml`** — source of truth for Zarr (time-series) datasets. Schema: `category → dataset_id → {path, variable, crs, eumtype, eumunit, data_value_type, temporal}`. `eumtype/eumunit` are DHI EUM codes written into DFS2 headers. `data_value_type` is `StepAccumulated` vs `Instantaneous` and drives aggregation. **Adding a dataset = new YAML entry; no code change** unless it introduces a new category with different handling.
 - **`src/core/cog_catalog.yaml`** — source of truth for **COG (Cloud Optimized GeoTIFF)** static raster layers, kept separate from the Zarr catalog and merged into it per-category in `_load_catalog()`. COG entries add `format: cog`, `container` (the COG container, e.g. `cogs`), `anon` (public/anonymous read), and `tiled` (`true` ⇒ `path` is a prefix mosaicked over intersecting tiles; `false` ⇒ single `.tif`). They are static (`temporal: false`) and downloaded with `output_format="tif"`. Reader is `src/core/cogio.py` (parallel header/extent reads via GDAL `/vsicurl`, window-read + merge, write COG).
 - **`src/core/geoparquet_catalog.yaml`** — source of truth for **GeoParquet (vector)** static layers, also merged per-category in `_load_catalog()`. Entries add `format: geoparquet`, `container` (the vector container, e.g. `geoparquet`), and `anon`. They are static (`temporal: false`) vector data (a `GeoDataFrame`), so they bypass the xarray pipeline entirely: `download_dataset` branches to **`_download_geoparquet`** which reads + clips + writes in one pass. Reader/writer is `src/core/geoparquetio.py` (`open_geoparquet` reads via the fsspec filesystem with optional bbox pushdown, keeps **features intersecting the catchment whole** via the spatial index — no geometry truncation; `write_geoparquet` writes `.parquet` or `.shp`). Downloaded with `output_format="parquet"` or `"shp"` (a raster format falls back to parquet).
-- **`src/core/downloader.py`** — `PDPDataDownloader` class. Loads catalog in `__init__`. Key entry point: `download_dataset(category, subcategory, time_range, variables)` → raster datasets write `nc`/`zarr`/`dfs2`/`tif` via open→process→save; geoparquet datasets write `parquet`/`shp` via `_download_geoparquet`. Output formats are split into `RASTER_OUTPUT_FORMATS` / `VECTOR_OUTPUT_FORMATS`. Zarr stores are opened via `_open_zarr_store`, which tries consolidated → non-consolidated → `zarr_format=2` and takes the first result exposing data variables (some stores carry both v2 `.zmetadata` and a stray v3 `zarr.json`, which otherwise reads back empty — e.g. `ssebop_eta`).
+- **`src/core/partner_data_catalog.yaml`** — source of truth for **partner / externally-shared open data** delivered as **zip bundles**, also merged per-category in `_load_catalog()`. Entries add `format: zip`, `container: external-shared-open-data` (a public container), and `anon: true`. Contents are mixed/arbitrary (shapefiles, CSVs, Word metadata), so `download_dataset` branches to **`_download_zip`** which copies the `.zip` blob whole and as-is — **no extraction, no catchment clipping**; `output_format` is ignored (always written `.zip`). The whole-blob copy **streams** the blob (`fs.open()` + `shutil.copyfileobj`) on the filesystem from `_dataset_filesystem()` — deliberately *not* `fs.get()`, whose remote path expansion requires *list* permission on the container; streaming keeps a read-only (`sp=r`) SAS token sufficient. A failed copy removes the partial file. **Adding a partner zip = new YAML entry; no code change.** (Blob names may contain spaces — kept verbatim in `path`.) The same file also holds the **`restricted_partner`** category — zip bundles in the SAS-protected `external-shared-after-end` container, with `anon: false` + `credential_env: <ENV_VAR>` (see *Access-restricted datasets* below).
+- **Access-restricted datasets** — any catalog entry (any format) may set `credential_env: <ENV_VAR>`. `_dataset_filesystem()` then builds an `adlfs` filesystem from `os.environ[<ENV_VAR>]` (cached per variable in `self._env_fs`) instead of the built-in SAS or anonymous filesystem; `_dataset_credential()` supplies the same token to `_blob_url()` for GDAL/vsicurl. A missing/blank variable raises **`PermissionError`** with the variable name and container, before anything is written — never log the token. `__init__` calls `load_dotenv(find_dotenv(usecwd=True), override=False)`, so tokens come from the nearest `.env` (gitignored; template in `data-download-tool/.env.example`) while exported shell/CI variables win. Restricted entries stay **fully listable** — the name/description are public and the catalog exposes nothing about the contents; only downloading is gated. `dataset_requires_token()` / `is_dataset_accessible()` report lock status without touching the network (the notebook's Step 6 listing marks locked entries 🔒).
+- **`src/core/downloader.py`** — `PDPDataDownloader` class. Loads catalog in `__init__`. Key entry point: `download_dataset(category, subcategory, time_range, variables)` → partner zip datasets copy the `.zip` whole via `_download_zip`; geoparquet datasets write `parquet`/`shp` via `_download_geoparquet`; raster datasets write `nc`/`zarr`/`dfs2`/`tif` via open→process→save. Output formats are split into `RASTER_OUTPUT_FORMATS` / `VECTOR_OUTPUT_FORMATS`. Zarr stores are opened via `_open_zarr_store`, which tries consolidated → non-consolidated → `zarr_format=2` and takes the first result exposing data variables (some stores carry both v2 `.zmetadata` and a stray v3 `zarr.json`, which otherwise reads back empty — e.g. `ssebop_eta`).
 - **`src/analysis/`** — post-download layer. `catchment.py` loads/validates/reprojects AOI (hard limits: 0.01–500,000 km², ≤1000 features, ≥10% overlap with Europe AOI bbox, points/lines auto-buffered 1 km in EPSG:3035). `timeseries.py` does area-weighted basin averages and anomalies. `visualization.py` has three matplotlib helpers.
 - Driven by `notebooks/data_download_tool.ipynb`.
 
-## Module 2: `plant-growth-module/`
+## Module 2: `model-trains/MSHE-Ecolab/`
 
 Three workflows, three notebooks:
 
@@ -78,7 +94,7 @@ Re-injects a 3D UZ water-quality (WQ) result into a MIKE SHE `.she` (PFS) file a
 
 ### Cross-module dependency
 
-`plant-growth-module/pyproject.toml` declares:
+`model-trains/MSHE-Ecolab/pyproject.toml` declares:
 ```
 phishes-data-downloader @ git+https://github.com/DHI/phishes-pdp.git@main#subdirectory=data-download-tool
 ```
@@ -93,7 +109,7 @@ So PGM resolves DDT from **`main` on GitHub**, not from the local sibling folder
 All commands run **inside a module directory**, not the repo root.
 
 ```powershell
-cd <module>
+cd data-download-tool                    # or: cd model-trains/MSHE-Ecolab
 uv sync --link-mode copy                # --link-mode copy is required on OneDrive
 
 uv run pytest                            # all tests

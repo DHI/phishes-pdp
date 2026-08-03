@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dir: plant-growth-module
+          - dir: model-trains/MSHE-Ecolab
             test_deps: "pytest numpy pandas mikeio"
           - dir: data-download-tool
             test_deps: "pytest numpy pandas xarray shapely geopandas matplotlib mikeio pyyaml adlfs rioxarray fsspec"
