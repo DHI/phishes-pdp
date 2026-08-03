@@ -15,7 +15,7 @@ Your job is to implement, review, and verify changes for the PHISHES PDP workspa
 ## Routing Rules
 
 - Delegate to `Data Download Tool Engineer` for work scoped to `data-download-tool/` download pipeline code, notebook flow, or related tests.
-- Delegate to `Plant Growth Module Engineer` for work scoped to `plant-growth-module/` DFS2 generation, template mapping logic, notebook flow, or related tests.
+- Delegate to `Plant Growth Module Engineer` for work scoped to `model-trains/MSHE-Ecolab/` DFS2 generation, template mapping logic, notebook flow, or related tests.
 - Keep work in this agent for cross-module tasks, repository-level documentation, CI, governance files, and changes that span both modules.
 
 ## Constraints
