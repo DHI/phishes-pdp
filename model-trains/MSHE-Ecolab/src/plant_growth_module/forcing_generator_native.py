@@ -18,41 +18,162 @@ def to_abs_path(module_root: Path, path_value: Path | str) -> Path:
     return module_root.joinpath(p).resolve()
 
 
-def load_timeseries_inputs(module_root: Path, config_path: Path | str) -> list[dict[str, Any]]:
-    """Load per-grid-code timeseries input entries from a YAML config file.
+# A forcing's series are written as `inputs:` in the YAML; internally they keep the
+# same name as the top-level key so the rest of the module speaks one vocabulary.
+FORCING_KEY_ALIASES = {"inputs": "timeseries_inputs"}
 
-    The YAML may either be a top-level list of entries or a mapping with a
-    ``timeseries_inputs:`` key holding the list. Each entry needs at least
-    ``grid_code`` and ``path``; ``source`` and ``item`` are optional. Grid
-    codes present in the grid DFS2 but absent from this list are zero-filled
-    by ``run_native_setup``.
-    """
-    cfg_path = to_abs_path(module_root, config_path)
-    if not cfg_path.exists():
-        raise FileNotFoundError(f"Timeseries config file not found: {cfg_path}")
+# Fields a forcing must have — set on the forcing itself or inherited from
+# ``defaults:`` — before it can be generated.
+REQUIRED_FORCING_FIELDS = ("grid_code_dfs2", "output_grid", "eum_type", "eum_unit")
 
-    with open(cfg_path, "r", encoding="utf-8") as f:
-        data = yaml.safe_load(f)
 
-    if isinstance(data, dict):
-        entries = data.get("timeseries_inputs", [])
-    elif isinstance(data, list):
-        entries = data
-    else:
+def _validate_timeseries_entries(entries: Any, context: str) -> list[dict[str, Any]]:
+    """Validate a list of per-grid-code timeseries entries and return it."""
+    if entries is None:
         entries = []
-
     if not isinstance(entries, list):
-        raise ValueError(f"'timeseries_inputs' in {cfg_path} must be a list of entries.")
+        raise ValueError(f"'timeseries_inputs' in {context} must be a list of entries.")
 
     for i, entry in enumerate(entries):
         if not isinstance(entry, dict):
             raise ValueError(
-                f"Entry {i} in {cfg_path} must be a mapping, got {type(entry).__name__}."
+                f"Timeseries entry {i} in {context} must be a mapping, got {type(entry).__name__}."
             )
         if "grid_code" not in entry or "path" not in entry:
-            raise ValueError(f"Entry {i} in {cfg_path} must define both 'grid_code' and 'path'.")
+            raise ValueError(
+                f"Timeseries entry {i} in {context} must define both 'grid_code' and 'path'."
+            )
 
     return entries
+
+
+def _apply_key_aliases(entry: dict[str, Any]) -> dict[str, Any]:
+    """Return a copy of ``entry`` with alias keys renamed to canonical names."""
+    out: dict[str, Any] = {}
+    for key, value in entry.items():
+        out[FORCING_KEY_ALIASES.get(str(key), str(key))] = value
+    return out
+
+
+def _safe_filename(name: str) -> str:
+    """Turn a forcing name into a filename-safe stem."""
+    cleaned = "".join(ch if (ch.isalnum() or ch in "-_.") else "_" for ch in str(name).strip())
+    return cleaned.strip("_") or "forcing"
+
+
+def _normalize_forcing(
+    entry: dict[str, Any],
+    defaults: dict[str, Any],
+    index: int,
+    context: str,
+) -> dict[str, Any]:
+    """Merge one raw forcing entry with the config defaults into a canonical dict."""
+    if not isinstance(entry, dict):
+        raise ValueError(
+            f"Forcing entry {index} in {context} must be a mapping, got {type(entry).__name__}."
+        )
+
+    merged = {**_apply_key_aliases(defaults), **_apply_key_aliases(entry)}
+
+    name = str(merged.get("name") or f"forcing_{index + 1}")
+    output_dir = merged.get("output_dir")
+    output_grid = merged.get("output_grid")
+    if output_grid is None:
+        # Each forcing gets its own output file by default, so a config does not
+        # have to spell one out per entry.
+        output_grid = f"{_safe_filename(name)}.dfs2"
+    if output_dir:
+        output_path = Path(str(output_grid))
+        if not output_path.is_absolute():
+            output_grid = Path(str(output_dir)).joinpath(output_path)
+
+    forcing: dict[str, Any] = {
+        "name": name,
+        "grid_code_dfs2": merged.get("grid_code_dfs2"),
+        "output_grid": output_grid,
+        "item_name": merged.get("item_name") or name,
+        "eum_type": merged.get("eum_type"),
+        "eum_unit": merged.get("eum_unit"),
+        "timeseries_inputs": _validate_timeseries_entries(
+            merged.get("timeseries_inputs"), f"{context} (forcing '{name}')"
+        ),
+    }
+    return forcing
+
+
+def load_forcing_configs(module_root: Path, config_path: Path | str) -> list[dict[str, Any]]:
+    """Load every forcing setup defined in a YAML config file.
+
+    ``timeseries_inputs:`` is a mapping of forcing name to that forcing's settings,
+    optionally preceded by a ``defaults:`` mapping whose keys are inherited by every
+    forcing that does not override them::
+
+        defaults:
+          grid_code_dfs2: sample_data/.../GridCode5.dfs2
+          output_dir: output_data/pgm_forcing_generator/forcing_generator
+          eum_type: Concentration
+          eum_unit: kg_per_meter_pow_3
+        timeseries_inputs:
+          var1:
+            output_grid: var1.dfs2
+            item_name: Seed Application Rate
+            inputs:
+              - grid_code: 1
+                path: ...
+
+    Per forcing: ``grid_code_dfs2``, ``output_grid`` (default: ``<name>.dfs2``,
+    joined onto ``output_dir`` when relative), ``item_name`` (default: the forcing
+    name), ``eum_type``, ``eum_unit`` and ``inputs``. A forcing written as a plain
+    list of timeseries entries takes every output setting from ``defaults:``.
+    """
+    cfg_path = to_abs_path(module_root, config_path)
+    if not cfg_path.exists():
+        raise FileNotFoundError(f"Forcing config file not found: {cfg_path}")
+
+    with open(cfg_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+
+    if not isinstance(data, dict) or not isinstance(data.get("timeseries_inputs"), dict):
+        raise ValueError(
+            f"{cfg_path} must define 'timeseries_inputs:' as a mapping of forcing name to "
+            "that forcing's settings, e.g.\n"
+            "  timeseries_inputs:\n"
+            "    var1:\n"
+            "      output_grid: var1.dfs2\n"
+            "      inputs:\n"
+            "        - grid_code: 1\n"
+            "          path: series.dfs0"
+        )
+
+    defaults = data.get("defaults") or {}
+    if not isinstance(defaults, dict):
+        raise ValueError(f"'defaults' in {cfg_path} must be a mapping.")
+
+    raw_forcings: list[dict[str, Any]] = []
+    for name, value in data["timeseries_inputs"].items():
+        entry = dict(value) if isinstance(value, dict) else {"inputs": value}
+        entry.setdefault("name", name)
+        raw_forcings.append(entry)
+
+    if not raw_forcings:
+        raise ValueError(f"No forcings defined in {cfg_path}.")
+
+    return [
+        _normalize_forcing(entry, defaults, i, str(cfg_path))
+        for i, entry in enumerate(raw_forcings)
+    ]
+
+
+def resolve_forcing(forcing: dict[str, Any]) -> dict[str, Any]:
+    """Check a forcing carries every field needed to generate it."""
+    missing = [key for key in REQUIRED_FORCING_FIELDS if forcing.get(key) in (None, "")]
+    if missing:
+        raise ValueError(
+            f"Forcing '{forcing.get('name')}' is missing required field(s): {', '.join(missing)}. "
+            "Set them on the forcing or under 'defaults:' in the YAML config."
+        )
+
+    return dict(forcing)
 
 
 def normalize_daily_if_needed(series: pd.Series) -> pd.Series:
@@ -74,14 +195,18 @@ def normalize_daily_if_needed(series: pd.Series) -> pd.Series:
     return series.sort_index()
 
 
-def read_timeseries_input(module_root: Path, entry: dict[str, Any]) -> pd.Series:
-    ts_path = to_abs_path(module_root, entry["path"])
+def resolve_source(ts_path: Path, entry: dict[str, Any]) -> str:
+    """Return the reader to use for a timeseries entry: 'csv' or 'dfs0'."""
     source = str(entry.get("source", "")).strip().lower()
 
     if ts_path.suffix.lower() == ".csv":
-        source = "csv"
-    elif not source:
-        source = "dfs0"
+        return "csv"
+    return source or "dfs0"
+
+
+def read_timeseries_input(module_root: Path, entry: dict[str, Any]) -> pd.Series:
+    ts_path = to_abs_path(module_root, entry["path"])
+    source = resolve_source(ts_path, entry)
 
     if source == "dfs0":
         ds = mikeio.read(ts_path)
@@ -224,7 +349,7 @@ def build_input_rows(
         rows.append(
             {
                 "grid_code": int(entry["grid_code"]),
-                "source": str(entry.get("source", "dfs0")),
+                "source": resolve_source(ts_path, entry),
                 "item": entry.get("item", None),
                 "path": str(ts_path),
                 "path_exists": ts_path.exists(),
@@ -233,44 +358,83 @@ def build_input_rows(
     return rows
 
 
-def export_first_dfs0_item_to_csv(
+def build_forcing_rows(
     module_root: Path,
-    timeseries_inputs: list[dict[str, Any]],
-) -> Path:
-    first_dfs0_entry = None
-    for entry in timeseries_inputs:
-        candidate = to_abs_path(module_root, entry["path"])
-        if candidate.suffix.lower().startswith(".dfs"):
-            first_dfs0_entry = entry
-            break
+    forcings: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Resolve every forcing and report its paths, item metadata and input status."""
+    rows: list[dict[str, Any]] = []
+    for forcing in forcings:
+        row: dict[str, Any] = {"name": forcing.get("name"), "error": None}
+        try:
+            resolved = resolve_forcing(forcing)
+        except ValueError as exc:
+            row["error"] = str(exc)
+            rows.append(row)
+            continue
 
-    if first_dfs0_entry is None:
-        first_dfs0_entry = next(
-            (
-                e
-                for e in timeseries_inputs
-                if str(e.get("source", "dfs0")).strip().lower() == "dfs0"
-                and to_abs_path(module_root, e["path"]).suffix.lower().startswith(".dfs")
-            ),
-            None,
+        grid_path = to_abs_path(module_root, resolved["grid_code_dfs2"])
+        output_path = to_abs_path(module_root, resolved["output_grid"])
+        input_rows = build_input_rows(module_root, resolved["timeseries_inputs"])
+
+        row.update(
+            {
+                "grid_code_dfs2": str(grid_path),
+                "grid_code_dfs2_exists": grid_path.exists(),
+                "output_grid": str(output_path),
+                "output_parent_exists": output_path.parent.exists(),
+                "item_name": resolved["item_name"],
+                "eum_type": resolved["eum_type"],
+                "eum_unit": resolved["eum_unit"],
+                "n_timeseries_inputs": len(input_rows),
+                "missing_timeseries_inputs": [
+                    r["path"] for r in input_rows if not r["path_exists"]
+                ],
+                "timeseries_inputs": input_rows,
+            }
         )
+        rows.append(row)
 
-    if first_dfs0_entry is None:
-        raise ValueError("No DFS0 input found in TIMESERIES_INPUTS.")
+    return rows
 
-    dfs0_path = to_abs_path(module_root, first_dfs0_entry["path"])
-    ds = mikeio.read(dfs0_path)
-    da = ds[0]
 
-    csv_path = dfs0_path.with_name(f"{dfs0_path.stem}_item1.csv")
-    export_df = pd.DataFrame(
-        {
-            "time": pd.to_datetime(pd.DatetimeIndex(da.time)).tz_localize(None),
-            "value": np.asarray(da.to_numpy()).reshape(-1),
-        }
-    )
-    export_df.to_csv(csv_path, index=False)
-    return csv_path
+def run_forcing_setups(
+    module_root: Path,
+    forcings: list[dict[str, Any]],
+    continue_on_error: bool = False,
+) -> list[dict[str, Any]]:
+    """Generate every forcing in ``forcings``, one DFS2 output per entry.
+
+    Each result carries the forcing ``name`` plus ``status`` (``"ok"`` or
+    ``"failed"``). With ``continue_on_error=True`` a failing forcing is recorded
+    with its ``error`` message and the remaining forcings still run.
+    """
+    if not forcings:
+        raise ValueError("No forcings to run.")
+
+    results: list[dict[str, Any]] = []
+    for forcing in forcings:
+        name = forcing.get("name")
+        try:
+            resolved = resolve_forcing(forcing)
+            result = run_native_setup(
+                module_root=module_root,
+                grid_code_dfs2=resolved["grid_code_dfs2"],
+                timeseries_inputs=resolved["timeseries_inputs"],
+                output_grid=resolved["output_grid"],
+                output_item_name=resolved["item_name"],
+                output_eum_type=resolved["eum_type"],
+                output_eum_unit=resolved["eum_unit"],
+            )
+        except Exception as exc:
+            if not continue_on_error:
+                raise
+            results.append({"name": name, "status": "failed", "error": str(exc)})
+            continue
+
+        results.append({"name": name, "status": "ok", "error": None, **result})
+
+    return results
 
 
 def eum_matches(type_query: str = "", unit_query: str = "") -> dict[str, Any]:
