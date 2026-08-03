@@ -2,6 +2,23 @@
 
 Coupling field-scale process models with watershed-scale flow and transport models
 
+Each model train is a self-contained project in its own folder, with its own `pyproject.toml`,
+environment, tests and notebooks. All of them consume data pulled by the shared
+[data-download-tool](../data-download-tool/README.md).
+
+| # | Model train | Folder | Implementation status |
+| --- | --- | --- | --- |
+| 1 | MIKE SHE–Daisy | [MSHE-Daisy/](MSHE-Daisy/) | Description only |
+| 2 | MIKE SHE–MIKE ECO Lab Plant Growth Module | [MSHE-Ecolab/](MSHE-Ecolab/) | **Implemented** — see its [README](MSHE-Ecolab/README.md) |
+| 3 | MODFLOW 6–UZF–Reservoir with Daisy extension | — | Described below; no folder yet |
+| 4 | 1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D | [HYDRUS-PHREEQC-MODFLOW2005-MT3D/](HYDRUS-PHREEQC-MODFLOW2005-MT3D/) | Description only |
+
+`MSHE-Ecolab/` was previously `plant-growth-module/` at the repository root. The move was path-only —
+the `plant_growth_module` Python package, its distribution name and all imports are unchanged.
+
+The sections below describe each train scientifically: inputs, the coupling, the data exchanged
+between components, and outputs.
+
 ## 1. Small agricultural watersheds: MIKE SHE–Daisy
 
 ### Inputs

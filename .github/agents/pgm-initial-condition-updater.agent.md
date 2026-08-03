@@ -52,8 +52,10 @@ file as per-layer 2D initial conditions for a hotstart.
 1. Read the module, tests, and design note before changing behavior.
 2. Make the smallest safe change; keep the facade re-exports in sync.
 3. Add or update tests against the in-memory PFS fixture.
-4. Verify: `uv run pytest tests/test_initial_condition_updater.py`, `uvx ruff check .`,
-   `uvx ruff format --check .`. Confirm round-trip integrity (output re-reads; `SaturatedZone`
+4. Verify from `model-trains/MSHE-Ecolab/`: `uv run pytest tests/test_initial_condition_updater.py`,
+   `uv run ruff check .`, `uv run ruff format --check .`. Always `uv run` ruff — never `uvx ruff` or
+   a system-wide ruff, which resolve a different version than the pinned `ruff==0.16.0` and disagree
+   with CI. Confirm round-trip integrity (output re-reads; `SaturatedZone`
    unchanged). The definitive check is opening the output `.she` in MIKE Zero.
 
 ## Output Expectations

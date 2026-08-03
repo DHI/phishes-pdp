@@ -7,7 +7,8 @@ A Python toolkit for downloading and managing soil science datasets from the PDP
 The PHISHES Digital Platform (PDP) Data Download Tool works with the following inputs and capabilities for catchment-scale soil science modeling:
 
 - **Catchment spatial data** (Shapefile format or extent) defining your study area boundary
-- **PDP datastore** containing curated datasets in Zarr format
+- **PDP datastore** containing curated datasets as Zarr time series, COG static rasters, GeoParquet
+  vector layers, and partner data zip bundles
 - **Spatial subsetting** to extract only data within your catchment
 - **Automated downloads** with proper folder organization
 
@@ -174,15 +175,35 @@ data-download-tool/
 │   │   └── visualization.py        # Plotting functions
 ├── notebooks/
 │   └── data_download_tool.ipynb     # Main tutorial notebook
+├── tests/                          # pytest suite (also reads sample_data/)
+├── sample_data/
+│   └── demo_rhine/                 # Example catchment shapefile used by tests
 ├── data/
 │   └── shp/                        # Catchment shapefiles
 │       └── catchment_template/     # Example catchment
-├── pyproject.toml                  # Project dependencies
+├── .python-version                 # Pinned interpreter (3.11), matches CI
+├── pyproject.toml                  # Project dependencies and ruff config
 ├── .env.example                    # Template for restricted-dataset SAS tokens
 ├── README.md                       # This file
 ├── TECH_SPECS_OVERVIEW.md          # Technical overview
 └── TECH_SPECS_DETAILED.md          # Technical details
 ```
+
+> **Sample data is load-bearing:** the test suite reads from `sample_data/`. Do not rename or move
+> those files without updating the fixtures in `tests/`.
+
+### Development
+
+Run the blocking checks from this directory — they are what CI runs:
+
+```powershell
+uv run ruff check .
+uv run pytest -q
+```
+
+Always use `uv run ruff`, never a system-wide `ruff`: this module pins `ruff==0.16.0`, and a
+different version enforces a different rule set. Adding a dataset is normally a **catalog-only**
+change — a new YAML entry, no Python edit. See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ---
 
@@ -381,7 +402,7 @@ ModuleNotFoundError: No module named 'geopandas'
 
 The following are needed to run the tool:
 
-- Python 3.9+
+- Python 3.10–3.13 (`.python-version` pins `3.11` to match CI)
 - ~2 GB RAM minimum (more for large catchments)
 - Internet connection for data access
 - Disk space varies by catchment size and time range
