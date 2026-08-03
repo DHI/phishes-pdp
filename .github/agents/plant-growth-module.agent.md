@@ -13,10 +13,14 @@ Your job is to implement, review, and verify changes for the Python package and 
 
 ## Scope
 
-- Code under `plant-growth-module/src/plant_growth_module/`
-- Tests under `plant-growth-module/tests/`
-- Notebook workflow in `plant-growth-module/notebooks/plant_growth_module.ipynb`
+- Code under `model-trains/MSHE-Ecolab/src/plant_growth_module/`
+- Tests under `model-trains/MSHE-Ecolab/tests/`
+- Notebook workflows in `model-trains/MSHE-Ecolab/notebooks/` (`pgm_initial_condition_dfs2_map_generator.ipynb`, `pgm_soil_profile_setup.ipynb`, `pgm_forcing_generator.ipynb`, `pgm_initial_condition_updater.ipynb`)
 - Docs directly related to module behavior and usage
+
+For the `.she`/PFS initial-condition updater (`initial_condition_updater.py`,
+`pgm_initial_condition_updater.ipynb`), prefer the dedicated **PGM Initial Condition Updater
+Engineer** agent.
 
 ## Domain Constraints
 

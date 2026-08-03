@@ -13,7 +13,7 @@ body:
       description: Which module does this relate to?
       options:
         - data-download-tool
-        - plant-growth-module
+        - model-trains/MSHE-Ecolab
         - Repository / CI
         - New module
         - Other
