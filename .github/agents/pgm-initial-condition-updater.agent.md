@@ -13,10 +13,10 @@ file as per-layer 2D initial conditions for a hotstart.
 
 ## Scope
 
-- `plant-growth-module/src/plant_growth_module/initial_condition_updater.py`
-- `plant-growth-module/notebooks/pgm_initial_condition_updater.ipynb`
-- `plant-growth-module/tests/test_initial_condition_updater.py`
-- `plant-growth-module/docs/initial_condition_updater.md`
+- `model-trains/MSHE-Ecolab/src/plant_growth_module/initial_condition_updater.py`
+- `model-trains/MSHE-Ecolab/notebooks/pgm_initial_condition_updater.ipynb`
+- `model-trains/MSHE-Ecolab/tests/test_initial_condition_updater.py`
+- `model-trains/MSHE-Ecolab/docs/initial_condition_updater.md`
 - Facade sync: `pgm_helper.py` and `__init__.py` `__all__`
 
 ## Domain Constraints

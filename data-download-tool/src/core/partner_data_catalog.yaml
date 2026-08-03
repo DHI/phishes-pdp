@@ -1,0 +1,60 @@
+# Partner / externally-shared open data catalog.
+#
+# Datasets delivered by partners as zip bundles in the public
+# "external-shared-open-data" Azure container. Contents are mixed/arbitrary
+# (shapefiles, CSVs, Word metadata), so these bypass the raster/vector pipelines
+# entirely: the .zip blob is downloaded whole and as-is (no extraction, no
+# catchment clipping). Kept separate from dataset_catalog.yaml (Zarr), cog_catalog.yaml
+# (COG), and geoparquet_catalog.yaml (vector); the downloader loads and merges all four
+# per-category into one namespace for download_dataset(category, subcategory).
+#
+# Partner-specific fields:
+#   format: zip        -> routes the entry to the zip (whole-blob copy) path
+#   container: external-shared-open-data -> Azure container holding the .zip files
+#   anon: true         -> read the container with anonymous (public) access
+#   temporal: false    -> static bundle; temporal subsetting is skipped
+# OUTPUT_FORMAT is ignored for zip entries; the .zip is delivered verbatim.
+#
+# Access-restricted bundles live under the "restricted_partner" category below, in a
+# SAS-protected container. They add:
+#   anon: false                    -> not publicly readable
+#   credential_env: <VAR_NAME>     -> read the SAS token from this environment variable
+#                                     (set it in a .env file; see .env.example)
+# Restricted entries stay fully visible in the catalog listing - the name and
+# description are public - but downloading raises PermissionError unless the token is
+# present. Nothing about the bundle contents is exposed by the catalog.
+
+partner:
+  czech_globe_ms4:
+    path: "MS4-CG data for PDP.zip"
+    container: external-shared-open-data
+    format: zip
+    anon: true
+    display_name: Czech Globe MS4 data (zip)
+    description: Czech Globe MS4 partner bundle - Koprzywianka & Zelivka basin shapefiles (EPSG:3035) plus metadata.
+    variable: partner_bundle
+    temporal: false
+
+  copenhagen_university_ms4:
+    path: "MS4-KU data for PDP.zip"
+    container: external-shared-open-data
+    format: zip
+    anon: true
+    display_name: Copenhagen University MS4 data (zip)
+    description: Copenhagen University MS4 partner bundle - shapefile plus 30-year annual precipitation/evaporation/percolation CSVs and metadata.
+    variable: partner_bundle
+    temporal: false
+
+restricted_partner:
+  czech_globe_ms4_full:
+    path: "MS4-CG data for PDP.zip"
+    container: external-shared-after-end
+    format: zip
+    anon: false
+    credential_env: PDP_AFTER_END_SAS
+    display_name: Czech Globe MS4 data - full (restricted)
+    description: >-
+      Restricted Czech Globe MS4 bundle. Requires a SAS token for the
+      external-shared-after-end container; set PDP_AFTER_END_SAS in your .env file.
+    variable: partner_bundle
+    temporal: false

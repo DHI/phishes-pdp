@@ -16,10 +16,10 @@ per-layer 2D initial conditions.
 
 ## Where the code lives
 
-- Logic: `plant-growth-module/src/plant_growth_module/initial_condition_updater.py`
-- Notebook (orchestrator): `plant-growth-module/notebooks/pgm_initial_condition_updater.ipynb`
-- Tests: `plant-growth-module/tests/test_initial_condition_updater.py`
-- Design note: `plant-growth-module/docs/initial_condition_updater.md`
+- Logic: `model-trains/MSHE-Ecolab/src/plant_growth_module/initial_condition_updater.py`
+- Notebook (orchestrator): `model-trains/MSHE-Ecolab/notebooks/pgm_initial_condition_updater.ipynb`
+- Tests: `model-trains/MSHE-Ecolab/tests/test_initial_condition_updater.py`
+- Design note: `model-trains/MSHE-Ecolab/docs/initial_condition_updater.md`
 - Facade re-exports: `pgm_helper.py` + `__init__.py` `__all__` (keep in sync)
 
 ## Pipeline
@@ -53,7 +53,7 @@ function; ruff line length 100. Notebooks stay orchestrators — put logic in `s
 ## Verify
 
 ```powershell
-cd plant-growth-module
+cd model-trains/MSHE-Ecolab
 uv run pytest tests/test_initial_condition_updater.py
 uvx ruff check . ; uvx ruff format --check .
 ```
