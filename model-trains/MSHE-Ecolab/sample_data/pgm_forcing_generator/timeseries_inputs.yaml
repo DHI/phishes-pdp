@@ -5,7 +5,7 @@
 #
 # Fields per entry:
 #   grid_code : integer grid code in the grid-code DFS2 (required)
-#   path      : DFS0/CSV file, absolute or relative to the plant-growth-module
+#   path      : DFS0/CSV file, absolute or relative to the MSHE-Ecolab
 #               root (required)
 #   source    : "dfs0" or "csv" (optional; inferred from the file extension)
 #   item      : 1-based item index for multi-item DFS0 files (optional, default 1)
