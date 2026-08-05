@@ -33,9 +33,9 @@ model-trains/
 ├── README.md                            # the index of every train — keep it current (see below)
 ├── MSHE-Ecolab-PGM/                     # implemented, by DHI
 ├── MSHE-Daisy/                          # README stub only, by DHI
-├── 1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/     # 🔒 BRGM delivery — do not modify (see Module 3)
+├── hydrus-1d+modflow6/                  # 🔒 BRGM delivery — do not modify (see Module 3)
 │   ├── README.md                        #    the vendor's own README, not a repo README
-│   └── hydrus-1d+modflow6/              #    Hydrus-1D ↔ MODFLOW 6 coupling
+│   └── hydrus-1d+modflow6/              #    the delivered code folder — same name, one level down
 └── MODFLOW6-reservoir-model/            # 🔒 Deltares delivery — do not modify (see Module 4)
     ├── README.md                        #    the vendor's own README
     ├── pixi.toml / pixi.lock            #    pixi, not uv
@@ -43,9 +43,11 @@ model-trains/
     └── workflows/                       #    wadi + vegetation scenarios, with input data
 ```
 
-**Two of the four trains are partner deliveries kept byte-for-byte as received** — `1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and `MODFLOW6-reservoir-model/` (Deltares). The same rule and the same four enforcement mechanisms apply to both; see Module 3 for the full table.
+**Two of the four trains are partner deliveries kept byte-for-byte as received** — `hydrus-1d+modflow6/` (BRGM) and `MODFLOW6-reservoir-model/` (Deltares). The same rule and the same four enforcement mechanisms apply to both; see Module 3 for the full table.
 
-**Call the Deltares train `MODFLOW6-reservoir-model`** — its delivered name — everywhere in the docs. It was previously written up under the design-stage name *MODFLOW 6–UZF–Reservoir with Daisy extension*; that name is retired now that the code exists, since the delivery is what we actually have. Don't reintroduce it.
+**Name each partner train by its delivered name, everywhere in the docs** — `MODFLOW6-reservoir-model` and `hydrus-1d+modflow6`. Both were previously written up under design-stage names (*MODFLOW 6–UZF–Reservoir with Daisy extension* and *1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D*); those are retired now that the code exists, because the delivery is what we actually have. Don't reintroduce them, and don't invent prettier labels.
+
+**Mind the doubled path in the BRGM train.** The train folder and the delivered code folder inside it are both called `hydrus-1d+modflow6`, so paths read `model-trains/hydrus-1d+modflow6/hydrus-1d+modflow6/main_coupled_models.py`. That is deliberate: BRGM delivered `{README.md, hydrus-1d+modflow6/}` as a pair, and flattening it would restructure their delivery. When writing a path, check whether you need one level or two.
 
 **The folder name and the package name differ in `MSHE-Ecolab-PGM/`**: the folder is named after the model train, while the Python package inside is `plant_growth_module`, the distribution is `plant-growth-module`, and the source lives in `src/plant_growth_module/`. Imports and `pyproject.toml` metadata use the package name, never the folder name. When adding a model train, create `model-trains/<train-name>/` as a self-contained project — do not add a second top-level module folder.
 
@@ -130,9 +132,9 @@ So PGM resolves DDT from **`main` on GitHub**, not from the local sibling folder
 
 `pgm_helper.py` is a flat re-export of everything from the five real modules (`common_utils`, `template_maps`, `soil_profile_setup`, `forcing_repository`, `initial_condition_updater`). Older notebook cells still import from it — keep the re-exports in sync when adding new public names.
 
-## Module 3: `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/`
+## Module 3: `model-trains/hydrus-1d+modflow6/`
 
-Implemented, and **complete as delivered** — BRGM finished it; there is no half-built work to carry on here. `hydrus-1d+modflow6/` is a one-way coupling: HYDRUS-1D runs on a soil column, its recharge and associated solute concentration are read back, and a MODFLOW 6 flow + transport (GWT) model is stepped forward through the MODFLOW 6 BMI/API, receiving both at each step. It uses MODFLOW 6 rather than MODFLOW-2005 + MT3D (one program for flow and transport, plus the API the runtime exchange needs); PHREEQC is named in the train design but not called by the delivered code.
+Implemented, and **complete as delivered** — BRGM finished it; there is no half-built work to carry on here. The delivery is `README.md` plus an inner `hydrus-1d+modflow6/` holding the code, so **every path below that names `hydrus-1d+modflow6/` means the inner one**, i.e. `model-trains/hydrus-1d+modflow6/hydrus-1d+modflow6/`. It is a one-way coupling: HYDRUS-1D runs on a soil column, its recharge and associated solute concentration are read back, and a MODFLOW 6 flow + transport (GWT) model is stepped forward through the MODFLOW 6 BMI/API, receiving both at each step. It uses MODFLOW 6 rather than MODFLOW-2005 + MT3D (one program for flow and transport, plus the API the runtime exchange needs); PHREEQC is named in the train design but not called by the delivered code.
 
 **🔒 This whole folder is delivered by BRGM and kept byte-for-byte as received. Change nothing inside it — not the code, not `README.md` (that file is theirs, not a repo README), not whitespace, not line endings, not import order.** Corrections and anything else we want to say about it go in `model-trains/README.md` instead — but that file is a deliberately non-technical overview, so keep additions there to the minimum a user needs (it currently records only the Python packages, which the delivered README omits). This section is the home for the technical detail. Referencing the folder from elsewhere is fine; editing it is not.
 
@@ -150,7 +152,7 @@ Implemented, and **complete as delivered** — BRGM finished it; there is no hal
 Ruff at default rules reports 36 errors in this folder (22 unfixable); that is expected and is not ours to fix.
 
 - **Not a `uv` project** — no `pyproject.toml`, no tests, no `.python-version`. Deps are `flopy`, `xmipy`, `numpy`, `pandas`, `matplotlib`, `tqdm`, installed into whatever environment the user has. `xmipy` is imported lazily inside `functions_modflow.load_bmi()`, so a missing install surfaces mid-run, not at import.
-- **Entry point** `main_coupled_models.py`, run from **inside** `hydrus-1d+modflow6/` — every path (`inputs/`, `hydrus_templates/`, `modflow/`, `run.bat`) resolves relative to the working directory, and both models write their output in place next to the scripts.
+- **Entry point** `main_coupled_models.py`, run from **inside** `model-trains/hydrus-1d+modflow6/hydrus-1d+modflow6/` — every path (`inputs/`, `hydrus_templates/`, `modflow/`, `run.bat`) resolves relative to the working directory, and both models write their output in place next to the scripts.
 - **Third-party binaries are required and never committed**: HYDRUS-1D (`H1D_CALC.EXE` plus five PC-PROGRESS `DLL`/`SYS` files) at the root of `hydrus-1d+modflow6/`, MODFLOW 6 (`mf6.exe`, `libmf6.dll`) in its `modflow/`. Vendor licences — not ours to redistribute. `.gitignore` carries a path-scoped block for these plus the run artifacts (`*.out`, `mfsim.*`, `GWMODEL*`, generated `ATMOSPH.IN`/`SELECTOR.IN`).
 - `modflow/` was delivered **empty**, and git cannot track an empty directory, so it does not survive a clone. Users create it themselves. Do **not** add a `.gitkeep` — that would be a file the vendor did not deliver.
 - MODFLOW runs on Windows or Linux (`libmf6.dll` / `libmf6.so`), but HYDRUS is driven via `run.bat` → `H1D_CALC.EXE`, so the coupled run is effectively Windows-only.
@@ -236,5 +238,5 @@ There is also a skill at `.claude/skills/pgm-initial-condition-updater/SKILL.md`
 - **PGM↔DDT runtime import is brittle by design**: probes `core/downloader.py` and `analysis/catchment.py` paths directly. Restructuring DDT's `src/` layout will break PGM's `forcing_repository.py`.
 - **Catalog YAML drives behavior, not Python constants**: dataset selection, EUM units, value-accumulation type, and (eventually) PGM forcing routing come from the four catalogs in `src/core/` (`dataset_catalog.yaml`, `cog_catalog.yaml`, `geoparquet_catalog.yaml`, `partner_data_catalog.yaml`), merged per-category at load time. Check them before grepping for hardcoded dataset names.
 - **Docs duplicated in two places**: DDT and MSHE-Ecolab-PGM each keep a module-scoped copy of their agent file under `<module>/.github/agents/`. Same content, module-relative paths. Update both halves together.
-- **Two model-train folders are read-only vendor content**: `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and `model-trains/MODFLOW6-reservoir-model/` (Deltares). Both are kept byte-for-byte as delivered, their own `README.md` included. Never edit, reformat, lint-fix or `pathlib`-migrate anything inside them, and never add files to them — put user-facing notes in `model-trains/README.md` and technical detail in Module 3 / Module 4 above. The `.gitattributes` / pre-commit / markdownlint / CI exclusions that enforce this are listed in Module 3; leave them alone.
-- **Name a partner train as delivered.** The Deltares train is `MODFLOW6-reservoir-model` everywhere, not the design-stage name it once had. Inside the BRGM train the delivered subfolder is `hydrus-1d+modflow6/`. Don't rename a partner's folder to fit our naming, and don't invent a prettier label for it in the docs.
+- **Two model-train folders are read-only vendor content**: `model-trains/hydrus-1d+modflow6/` (BRGM) and `model-trains/MODFLOW6-reservoir-model/` (Deltares). Both are kept byte-for-byte as delivered, their own `README.md` included. Never edit, reformat, lint-fix or `pathlib`-migrate anything inside them, and never add files to them — put user-facing notes in `model-trains/README.md` and technical detail in Module 3 / Module 4 above. The `.gitattributes` / pre-commit / markdownlint / CI exclusions that enforce this are listed in Module 3; leave them alone.
+- **Name a partner train as delivered**: `MODFLOW6-reservoir-model` and `hydrus-1d+modflow6`, never the design-stage names they once had. Don't rename a partner's folder to fit our naming, and don't invent a prettier label for it in the docs. The BRGM train's path doubles — `model-trains/hydrus-1d+modflow6/hydrus-1d+modflow6/` — because the delivery pairs a README with a like-named code folder; leave it that way.

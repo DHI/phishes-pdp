@@ -18,14 +18,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - CITATION.cff for academic referencing
 - CODE_OF_CONDUCT.md
 - `model-trains/` parent folder to hold one self-contained project per model train
-- README stubs for the `MSHE-Daisy` and `1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D` trains
+- README stubs for the `MSHE-Daisy` and `hydrus-1d+modflow6` trains
 - `.python-version` (3.11) per module, matching CI
 - Dedicated agent and skill for the PGM initial condition updater (Workflow D)
-- `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` — Hydrus-1D ↔ MODFLOW 6 coupling delivered by
-  BRGM, added as vendored content
+- `model-trains/hydrus-1d+modflow6/` — Hydrus-1D ↔ MODFLOW 6 coupling delivered by BRGM, added as
+  vendored content. The path doubles (`hydrus-1d+modflow6/hydrus-1d+modflow6/`) because the delivery
+  pairs a README with a like-named code folder
 - `model-trains/MODFLOW6-reservoir-model/` — MODFLOW 6 + reservoir groundwater flow and transport
-  framework delivered by Deltares, added as vendored content. Referred to throughout by its delivered
-  name. Uses `pixi` rather than `uv`; the Daisy coupling itself is not part of the public code
+  framework delivered by Deltares, added as vendored content. Uses `pixi` rather than `uv`; the Daisy
+  coupling itself is not part of the public code
 - `.gitattributes`, marking both partner-delivered trains `-text linguist-vendored` so git's
   end-of-line conversion cannot alter the delivered bytes on any platform
 - Tooling exclusions keeping both partner deliveries byte-for-byte as received: every `pre-commit`
@@ -57,8 +58,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   added a **Delivered by** column (DHI, Deltares, BRGM), dropped the `#` column, added a
   "Which train do I need?" table and a short description per available train, and moved installation
   detail out to each train's own README
-- Renamed `model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/` to
-  `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` to match the train name in the index
+- Partner-delivered trains are now named after their delivery throughout the documentation —
+  `hydrus-1d+modflow6` (was *1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D*) and `MODFLOW6-reservoir-model`
+  (was *MODFLOW 6–UZF–Reservoir with Daisy extension*). The design-stage names are retired now that
+  the code exists; folders match the delivered names too
 
 ### Fixed
 

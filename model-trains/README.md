@@ -14,7 +14,7 @@ its own README has the technical detail: how to install it, what software it nee
 | MIKE SHE–Daisy                               | DHI          | [MSHE-Daisy/](MSHE-Daisy/)                                           | [README](MSHE-Daisy/README.md)                      | Not implemented yet   |
 | MIKE SHE–MIKE ECO Lab Plant Growth Module    | DHI          | [MSHE-Ecolab-PGM/](MSHE-Ecolab-PGM/)                                 | [README](MSHE-Ecolab-PGM/README.md)                 | **Implemented**       |
 | MODFLOW6-reservoir-model                     | Deltares     | [MODFLOW6-reservoir-model/](MODFLOW6-reservoir-model/)               | [README](MODFLOW6-reservoir-model/README.md)        | **Implemented**       |
-| 1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D          | BRGM         | [1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/](1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/) | [README](1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/README.md) | **Implemented**       |
+| hydrus-1d+modflow6          | BRGM         | [hydrus-1d+modflow6/](hydrus-1d+modflow6/) | [README](hydrus-1d+modflow6/README.md) | **Implemented**       |
 
 **The simulation software itself is not in this repository.** Every train drives external models —
 MIKE SHE and MIKE ECO Lab, Daisy, HYDRUS-1D, MODFLOW — which you install separately under their own
@@ -27,7 +27,7 @@ licences. The train's README says which ones it needs and where to get them.
 | A **small agricultural catchment**, and you care about how tillage, fertilising, crop rotation or irrigation change soil health and the leaching of nutrients and pesticides | MIKE SHE–Daisy                               | No — design stage |
 | A **large agricultural catchment**, where plant growth, carbon and nitrogen need to respond dynamically to the hydrology rather than being prescribed                        | MIKE SHE–MIKE ECO Lab Plant Growth Module    | **Yes**           |
 | An **urban catchment**, where ponding and inundation at the surface drive infiltration into the unsaturated zone and groundwater                                             | MODFLOW6-reservoir-model                     | **Yes**           |
-| A **contaminated site** — PFAS from firefighting foam, or trace metals from mine tailings — where you need contaminant movement from the soil profile into groundwater       | 1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D          | **Yes**           |
+| A **contaminated site** — PFAS from firefighting foam, or trace metals from mine tailings — where you need contaminant movement from the soil profile into groundwater       | hydrus-1d+modflow6          | **Yes**           |
 
 ## What the available trains do
 
@@ -57,7 +57,7 @@ with [pixi](https://pixi.sh) rather than uv. Its **[README](MODFLOW6-reservoir-m
 setup, the TOML configuration and how to run a scenario; note that per that README the Daisy coupling is
 still under development and not part of the public code.
 
-### 1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D — BRGM
+### hydrus-1d+modflow6 — BRGM
 
 Connects what happens in a soil column to what happens in the aquifer underneath it. HYDRUS-1D
 simulates water and solute movement down through the unsaturated soil profile; the resulting recharge
@@ -67,7 +67,7 @@ the soil profile into the aquifer — and it lets you follow a contaminant from 
 vadose zone, into the groundwater plume.
 
 Delivered complete by BRGM and run as Python scripts rather than notebooks. Installation and usage are
-in its **[README](1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/README.md)**; beyond the two models it names, the
+in its **[README](hydrus-1d+modflow6/README.md)**; beyond the two models it names, the
 scripts need the Python packages `flopy`, `xmipy`, `numpy`, `pandas`, `matplotlib` and `tqdm`.
 
 ## Scientific descriptions
@@ -131,7 +131,7 @@ MODFLOW 6 simulates saturated groundwater flow and groundwater transport. The UZ
 
 Ponding levels; inundation areas; soil moisture dynamics; groundwater levels; unsaturated-zone flow; saturated groundwater flow; solute transport; contaminant movement through vadose zone and groundwater; hydrological soil-function indicators.
 
-## 4. Contaminated sites: 1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D
+## 4. Contaminated sites: hydrus-1d+modflow6
 
 ### Inputs
 
