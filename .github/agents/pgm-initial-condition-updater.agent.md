@@ -13,10 +13,10 @@ file as per-layer 2D initial conditions for a hotstart.
 
 ## Scope
 
-- `model-trains/MSHE-Ecolab/src/plant_growth_module/initial_condition_updater.py`
-- `model-trains/MSHE-Ecolab/notebooks/pgm_initial_condition_updater.ipynb`
-- `model-trains/MSHE-Ecolab/tests/test_initial_condition_updater.py`
-- `model-trains/MSHE-Ecolab/docs/initial_condition_updater.md`
+- `model-trains/MSHE-Ecolab-PGM/src/plant_growth_module/initial_condition_updater.py`
+- `model-trains/MSHE-Ecolab-PGM/notebooks/pgm_initial_condition_updater.ipynb`
+- `model-trains/MSHE-Ecolab-PGM/tests/test_initial_condition_updater.py`
+- `model-trains/MSHE-Ecolab-PGM/docs/initial_condition_updater.md`
 - Facade sync: `pgm_helper.py` and `__init__.py` `__all__`
 
 ## Domain Constraints
@@ -52,7 +52,7 @@ file as per-layer 2D initial conditions for a hotstart.
 1. Read the module, tests, and design note before changing behavior.
 2. Make the smallest safe change; keep the facade re-exports in sync.
 3. Add or update tests against the in-memory PFS fixture.
-4. Verify from `model-trains/MSHE-Ecolab/`: `uv run pytest tests/test_initial_condition_updater.py`,
+4. Verify from `model-trains/MSHE-Ecolab-PGM/`: `uv run pytest tests/test_initial_condition_updater.py`,
    `uv run ruff check .`, `uv run ruff format --check .`. Always `uv run` ruff — never `uvx ruff` or
    a system-wide ruff, which resolve a different version than the pinned `ruff==0.16.0` and disagree
    with CI. Confirm round-trip integrity (output re-reads; `SaturatedZone`

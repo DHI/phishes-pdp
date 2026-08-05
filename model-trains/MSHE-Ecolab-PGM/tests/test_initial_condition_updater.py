@@ -171,10 +171,7 @@ def test_update_direct_order_all_species(monkeypatch, tmp_path):
     assert df.FILE_NAME == "|.\\sd\\Layer_1.dfs2|"
     assert alpha.Layer_1.Name == "Alpha - Layer 1"
     assert alpha.Layer_3.Name == "Alpha - Layer 3"
-    assert (
-        alpha.Layer_3.LayerData2DWQ.DFS_2D_DATA_FILE.FILE_NAME
-        == "|.\\sd\\Layer_3.dfs2|"
-    )
+    assert alpha.Layer_3.LayerData2DWQ.DFS_2D_DATA_FILE.FILE_NAME == "|.\\sd\\Layer_3.dfs2|"
     # LowerLevel is left at the template's unused zero.
     assert alpha.Layer_1.LowerLevel.FixedValue == 0
 
@@ -187,12 +184,8 @@ def test_update_reversed_order(monkeypatch, tmp_path):
     icu.update_initial_conditions(infile, out, splitted, reverse_layer_order=True)
 
     beta = _conc(mikeio.read_pfs(out)).Species_2
-    assert (
-        beta.Layer_1.LayerData2DWQ.DFS_2D_DATA_FILE.FILE_NAME == "|.\\sd\\Layer_3.dfs2|"
-    )
-    assert (
-        beta.Layer_3.LayerData2DWQ.DFS_2D_DATA_FILE.FILE_NAME == "|.\\sd\\Layer_1.dfs2|"
-    )
+    assert beta.Layer_1.LayerData2DWQ.DFS_2D_DATA_FILE.FILE_NAME == "|.\\sd\\Layer_3.dfs2|"
+    assert beta.Layer_3.LayerData2DWQ.DFS_2D_DATA_FILE.FILE_NAME == "|.\\sd\\Layer_1.dfs2|"
 
 
 def test_update_species_filter_leaves_others_untouched(monkeypatch, tmp_path):
@@ -210,9 +203,7 @@ def test_update_species_filter_leaves_others_untouched(monkeypatch, tmp_path):
 
 def test_update_raises_on_missing_section(monkeypatch, tmp_path):
     infile = tmp_path.joinpath("bad.she")
-    infile.write_text(
-        "[MIKESHE_FLOWMODEL]\nEndSect  // MIKESHE_FLOWMODEL\n", encoding="utf-8"
-    )
+    infile.write_text("[MIKESHE_FLOWMODEL]\nEndSect  // MIKESHE_FLOWMODEL\n", encoding="utf-8")
     splitted = _patch_layers(monkeypatch, tmp_path, {"Alpha": 1})
     with pytest.raises(KeyError):
         icu.update_initial_conditions(infile, tmp_path.joinpath("out.she"), splitted)

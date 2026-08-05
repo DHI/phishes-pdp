@@ -12,7 +12,7 @@ A two-module pipeline that produces inputs for **DHI MIKE SHE + ECO Lab Plant Gr
 catchment shp/extent  ─►  data-download-tool  ─►  forcing DFS2 (precip, temp, PET, SSRD)
                                                             │
 land-use DFS2 + LU CSV    ┐                                 ▼
-soil-profile DFS2 + SP CSV ┼─►     MSHE-Ecolab       ─►  per-parameter DFS2 maps
+soil-profile DFS2 + SP CSV ┼─►     MSHE-Ecolab-PGM       ─►  per-parameter DFS2 maps
 parameter template CSVs    ┘     (template_maps)        (LAI_2D.dfs2, RD_2D.dfs2, SOC.dfs2, …)
                                                             │
 soil-profile *.txt + preprocessed DFS2 ─► (soil_profile_setup) ─► WP_cell##.dfs2, FC_cell##.dfs2
@@ -30,12 +30,12 @@ Both modules are independent Python projects (own `pyproject.toml`, `.venv`, tes
 ```
 data-download-tool/                      # shared: pulls forcing + static layers from the datastore
 model-trains/
-├── MSHE-Ecolab/                         # was plant-growth-module/ — the only implemented train
+├── MSHE-Ecolab-PGM/                     # was plant-growth-module/ — the only implemented train
 ├── MSHE-Daisy/                          # README stub only
 └── HYDRUS-PHREEQC-MODFLOW2005-MT3D/     # README stub only
 ```
 
-**`MSHE-Ecolab/` was `plant-growth-module/`.** The move was path-only: the Python package inside is still `plant_growth_module`, the distribution is still `plant-growth-module`, and `src/plant_growth_module/` is unchanged. Only the *containing folder* was renamed, so imports and `pyproject.toml` metadata are untouched. When adding a model train, create `model-trains/<train-name>/` as a self-contained project — do not add a second top-level module folder.
+**`MSHE-Ecolab-PGM/` was `plant-growth-module/`.** The move was path-only: the Python package inside is still `plant_growth_module`, the distribution is still `plant-growth-module`, and `src/plant_growth_module/` is unchanged. Only the *containing folder* was renamed, so imports and `pyproject.toml` metadata are untouched. When adding a model train, create `model-trains/<train-name>/` as a self-contained project — do not add a second top-level module folder.
 
 ## Module 1: `data-download-tool/`
 
@@ -50,7 +50,7 @@ Pulls clipped raster **and vector** subsets from a remote datastore (Azure-backe
 - **`src/analysis/`** — post-download layer. `catchment.py` loads/validates/reprojects AOI (hard limits: 0.01–500,000 km², ≤1000 features, ≥10% overlap with Europe AOI bbox, points/lines auto-buffered 1 km in EPSG:3035). `timeseries.py` does area-weighted basin averages and anomalies. `visualization.py` has three matplotlib helpers.
 - Driven by `notebooks/data_download_tool.ipynb`.
 
-## Module 2: `model-trains/MSHE-Ecolab/`
+## Module 2: `model-trains/MSHE-Ecolab-PGM/`
 
 Three workflows, three notebooks:
 
@@ -94,7 +94,7 @@ Re-injects a 3D UZ water-quality (WQ) result into a MIKE SHE `.she` (PFS) file a
 
 ### Cross-module dependency
 
-`model-trains/MSHE-Ecolab/pyproject.toml` declares:
+`model-trains/MSHE-Ecolab-PGM/pyproject.toml` declares:
 ```
 phishes-data-downloader @ git+https://github.com/DHI/phishes-pdp.git@main#subdirectory=data-download-tool
 ```
@@ -109,7 +109,7 @@ So PGM resolves DDT from **`main` on GitHub**, not from the local sibling folder
 All commands run **inside a module directory**, not the repo root.
 
 ```powershell
-cd data-download-tool                    # or: cd model-trains/MSHE-Ecolab
+cd data-download-tool                    # or: cd model-trains/MSHE-Ecolab-PGM
 uv sync --link-mode copy                # --link-mode copy is required on OneDrive
 
 uv run pytest                            # all tests
@@ -142,7 +142,7 @@ Three invariants keep the gates honest — breaking any of them reintroduces a c
 - Timestamps: `pd.Timestamp`, not `datetime`.
 - Paths: `pathlib.Path` everywhere. **Use `Path.joinpath()`, not the `/` operator.** Refactor `/` to `joinpath()` when touching nearby code.
 - Every method needs a docstring (one-liner is fine).
-- Ruff: line length 100, target py310, `select = ["E","F","W","I","N"]`, `ignore = ["E501","I001"]`. Declared per module in `[tool.ruff]` — DDT and MSHE-Ecolab match, except MSHE-Ecolab also ignores `N999` (its stray root `__init__.py` makes ruff read the hyphenated folder name as the top-level module).
+- Ruff: line length 100, target py310, `select = ["E","F","W","I","N"]`, `ignore = ["E501","I001"]`. Declared per module in `[tool.ruff]` — DDT and MSHE-Ecolab-PGM match, except MSHE-Ecolab-PGM also ignores `N999` (its stray root `__init__.py` makes ruff read the hyphenated folder name as the top-level module).
 
 ## Agent routing (`.github/agents/`)
 
@@ -153,7 +153,7 @@ Three invariants keep the gates honest — breaking any of them reintroduces a c
 
 Prefer the matching agent for module-scoped work.
 
-**Duplicated copies.** DDT and MSHE-Ecolab each carry a module-scoped copy of their own agent at
+**Duplicated copies.** DDT and MSHE-Ecolab-PGM each carry a module-scoped copy of their own agent at
 `<module>/.github/agents/<name>.agent.md`. The content matches the root copy except that paths are
 module-relative instead of repo-relative. They drift easily — update both halves together, and note
 that only the root `.github/agents/` copies are picked up repo-wide.
@@ -168,4 +168,4 @@ There is also a skill at `.claude/skills/pgm-initial-condition-updater/SKILL.md`
 - **Direct pushes to `main` are blocked.** PRs require code-owner approval (`@DHI/phishes-maintainers` per `.github/CODEOWNERS`). All *blocking* CI checks must pass; advisory ones (format, markdown, notebook lint) never block.
 - **PGM↔DDT runtime import is brittle by design**: probes `core/downloader.py` and `analysis/catchment.py` paths directly. Restructuring DDT's `src/` layout will break PGM's `forcing_repository.py`.
 - **Catalog YAML drives behavior, not Python constants**: dataset selection, EUM units, value-accumulation type, and (eventually) PGM forcing routing come from the four catalogs in `src/core/` (`dataset_catalog.yaml`, `cog_catalog.yaml`, `geoparquet_catalog.yaml`, `partner_data_catalog.yaml`), merged per-category at load time. Check them before grepping for hardcoded dataset names.
-- **Docs duplicated in two places**: DDT and MSHE-Ecolab each keep a module-scoped copy of their agent file under `<module>/.github/agents/`. Same content, module-relative paths. Update both halves together.
+- **Docs duplicated in two places**: DDT and MSHE-Ecolab-PGM each keep a module-scoped copy of their agent file under `<module>/.github/agents/`. Same content, module-relative paths. Update both halves together.
