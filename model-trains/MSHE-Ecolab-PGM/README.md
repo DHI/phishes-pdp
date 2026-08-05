@@ -7,8 +7,7 @@ grids and re-inject simulated state as initial conditions.
 
 ## A note on names
 
-Three names refer to the same thing, for historical reasons — all three are correct and none is
-stale:
+Three names refer to the same thing — all three are correct and none is stale:
 
 | Name | What it is |
 | --- | --- |
@@ -16,9 +15,7 @@ stale:
 | `plant_growth_module` | The **Python package** in `src/`, and the `plant-growth-module` distribution name |
 | PGM | The **abbreviation** used in notebook filenames (`pgm_*.ipynb`) and throughout these docs |
 
-This folder was previously `plant-growth-module/` at the repository root. The move to
-`model-trains/MSHE-Ecolab-PGM/` was **path-only** — the package, the distribution name and every import
-are unchanged, so `from plant_growth_module import ...` still works exactly as before. See
+So `from plant_growth_module import ...` is the import path, regardless of the folder name. See
 [model-trains/README.md](../README.md) for the other model trains.
 
 ## Table of Contents

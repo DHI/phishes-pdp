@@ -16,7 +16,16 @@ repos:
     hooks:
       - id: ruff-check
         args: [--fix]
+        # model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/ is delivered by BRGM and
+        # kept byte-for-byte as received, so no hook may rewrite it — `--fix`
+        # least of all, since it deletes unused imports. It is also outside CI:
+        # the matrices in .github/workflows/{ci,security}.yml list modules
+        # explicitly and do not include this folder, so linting it here would
+        # block commits on findings no pull request check ever reports.
+        # Drop these exclusions only if the folder stops being vendor-owned.
+        exclude: ^model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/
       - id: ruff-format
+        exclude: ^model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -24,10 +33,14 @@ repos:
       # Fixes the MD009 and MD047 findings Markdown Lint reports.
       - id: trailing-whitespace
         # sample_data holds MIKE SHE PreProcessor output parsed by fixed column
-        # position; notebook JSON is already handled by the ruff hooks.
-        exclude: (^|/)sample_data/|\.ipynb$
+        # position; notebook JSON is already handled by the ruff hooks. The
+        # BRGM-delivered train is excluded wholesale — its content is not ours to
+        # rewrite, and its HYDRUS-1D project files (ATMOSPH.IN, PROFILE.DAT,
+        # SELECTOR.IN, …) are fixed-format, so stripping trailing whitespace
+        # would corrupt them.
+        exclude: (^|/)sample_data/|\.ipynb$|^model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/
       - id: end-of-file-fixer
-        exclude: (^|/)sample_data/|\.ipynb$
+        exclude: (^|/)sample_data/|\.ipynb$|^model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/
       - id: check-yaml
       - id: check-toml
       - id: check-merge-conflict

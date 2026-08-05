@@ -20,5 +20,11 @@
     "MD051": false
   },
   "globs": ["**/*.md"],
-  "ignores": ["**/node_modules/**"]
+  // The BRGM-delivered train is kept byte-for-byte as received (see
+  // .gitattributes), so its markdown is not ours to tidy. Reporting findings we
+  // must not act on would only invite someone to edit vendor content.
+  "ignores": [
+    "**/node_modules/**",
+    "model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/**"
+  ]
 }
