@@ -1,0 +1,81 @@
+# basis model definitie
+# hier wordt alle invoer opgegeven die voor beide modellen gelden (referentie + scenario)
+
+[model]
+type = 'wadi'
+name = 'validation_leegloop'
+mf6_binaries = 'c:\src\modflow6_release\mf6.7.0_win64\mf6.7.0_win64\bin'
+
+[model.solver]
+continue = false
+
+[model.discretisation]
+start_date = '2019\03\26 06:59' 
+end_date = '2019\03\26 22:09'  #22:09'  # '2019\03\28 22:09'
+dt = 0.006944444 # 10 min
+nlayers = 2
+top = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\grids\ahn4_filled_clip_1m.nc' 
+layer_thickness = [0.6, 0.3]
+
+[model.discretisation.extent]
+minx = 95640
+maxx = 95700
+miny = 432600
+maxy = 432700
+
+[model.transport]
+porosity = 0.2
+dispersivity=0.5
+retardation=0.0
+decay=0.0
+species = 'species1'
+
+[model.properties]
+kh = [0.001,0.001]
+kv = [0.001,0.001]
+celltype = [1,0]
+specific_yield = [0.15,0.15]
+specific_storage = [1e-6,1e-6]
+initial_steady-state_timestep = false
+
+[model.properties.refinement.kh]
+layer_1 = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\k_laag_1.shp'
+layer_2 = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\k_laag_2.shp'
+
+[model.properties.refinement.kv]
+layer_1 = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\k_laag_1.shp'
+layer_2 = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\k_laag_2.shp'
+
+[model.boundary_conditions]
+initial_conditions = [-2.4,-2.4]
+initial_concentrations = 0.0  # should be constant, xlsx-file, xarray.nc
+fraction_unpaved = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\grids\fraction_unpaved_test1.nc'
+recharge = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\Storms_A.xlsx' # should contain a column 'concentration'
+
+# [model.boundary_conditions.constant_head]
+# layer_1 = -2.4
+# layer_2 = -2.4
+# 
+# [model.boundary_conditions.constant_concentration]
+# species = 'species1'
+# layer_1 = 0.0
+# layer_2 = 0.0
+
+[[model.boundary_conditions.drainage_infiltration]]
+name = 'DIT-leiding'
+shape = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\drain.shp'
+concentration_species1 = 0.0
+
+[model.boundary_conditions.wadi]
+# start_date = '2019\03\27 06:59' 
+epsilon = [3.5,3.5]
+surface_depression_depth = [0.01,0.01]
+residual_theta = [0.01, 0.01]
+saturated_theta = [0.2,0.2]
+initial_theta = [0.01, 0.01]
+initial_stage = [100.0] #-1.85
+gwd_stage = false
+location = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\wadi.shp'
+runoff = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\wadi.shp'
+initial_concentration = 0.5  # should be constant, xlsx-file, xarray.nc
+concentration = 0.5  # should be constant, xlsx-file, xarray.nc

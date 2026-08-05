@@ -1,0 +1,20 @@
+# Externally delivered model trains.
+#
+# These folders are delivered by project partners and kept byte-for-byte as
+# received, including their own READMEs.
+#
+# `-text` disables git's end-of-line conversion for them: without it,
+# `core.autocrlf` normalises CRLF to LF on commit and back on checkout, so a
+# Linux clone would see different bytes than were delivered. That matters for
+# fixed-format model input parsed by column position (the HYDRUS-1D project
+# files ATMOSPH.IN, PROFILE.DAT, SELECTOR.IN, …) and for reproducing a partner's
+# delivery exactly.
+#
+# `linguist-vendored` keeps them out of GitHub's language statistics, so a third
+# party's code does not describe this repository.
+#
+# The matching tooling exclusions live in .pre-commit-config.yaml and
+# .markdownlint-cli2.jsonc; neither folder is in the CI matrices in
+# .github/workflows/{ci,security}.yml.
+model-trains/hydrus-1d+modflow6/** -text linguist-vendored
+model-trains/MODFLOW6-reservoir-model/**         -text linguist-vendored

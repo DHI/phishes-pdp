@@ -8,15 +8,25 @@
 #
 # Versions are pinned deliberately. The `ruff` rev here must match the `ruff==`
 # pin in data-download-tool/pyproject.toml and
-# model-trains/MSHE-Ecolab/pyproject.toml so local and CI results cannot
+# model-trains/MSHE-Ecolab-PGM/pyproject.toml so local and CI results cannot
 # diverge. Bump all three together.
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.0
+    rev: v0.16.1
     hooks:
       - id: ruff-check
         args: [--fix]
+        # The two partner-delivered model trains are kept byte-for-byte as
+        # received, so no hook may rewrite them — `--fix` least of all, since it
+        # deletes unused imports. They are also outside CI: the matrices in
+        # .github/workflows/{ci,security}.yml list modules explicitly and do not
+        # include either folder, so linting them here would block commits on
+        # findings no pull request check ever reports. Each partner lints its own
+        # code to its own rules (Deltares ships ruff in its pixi.toml).
+        # Drop an exclusion only if that folder stops being vendor-owned.
+        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
       - id: ruff-format
+        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -24,10 +34,14 @@ repos:
       # Fixes the MD009 and MD047 findings Markdown Lint reports.
       - id: trailing-whitespace
         # sample_data holds MIKE SHE PreProcessor output parsed by fixed column
-        # position; notebook JSON is already handled by the ruff hooks.
-        exclude: (^|/)sample_data/|\.ipynb$
+        # position; notebook JSON is already handled by the ruff hooks. The
+        # partner-delivered trains are excluded wholesale — their content is not
+        # ours to rewrite, and the HYDRUS-1D project files (ATMOSPH.IN,
+        # PROFILE.DAT, SELECTOR.IN, …) are fixed-format, so stripping trailing
+        # whitespace would corrupt them.
+        exclude: (^|/)sample_data/|\.ipynb$|^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
       - id: end-of-file-fixer
-        exclude: (^|/)sample_data/|\.ipynb$
+        exclude: (^|/)sample_data/|\.ipynb$|^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
       - id: check-yaml
       - id: check-toml
       - id: check-merge-conflict
