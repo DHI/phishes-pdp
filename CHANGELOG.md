@@ -18,9 +18,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - CITATION.cff for academic referencing
 - CODE_OF_CONDUCT.md
 - `model-trains/` parent folder to hold one self-contained project per model train
-- README stubs for the `MSHE-Daisy` and `HYDRUS-PHREEQC-MODFLOW2005-MT3D` trains
+- README stubs for the `MSHE-Daisy` and `1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D` trains
 - `.python-version` (3.11) per module, matching CI
 - Dedicated agent and skill for the PGM initial condition updater (Workflow D)
+- `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` — Hydrus-1D ↔ MODFLOW 6 coupling delivered by
+  BRGM, added as vendored content
+- `model-trains/MODFLOW6-reservoir-model/` — MODFLOW 6–UZF–Reservoir framework delivered by Deltares
+  (the *MODFLOW 6–UZF–Reservoir with Daisy extension* train), added as vendored content. Uses `pixi`
+  rather than `uv`; the Daisy coupling itself is not part of the public code
+- `.gitattributes`, marking both partner-delivered trains `-text linguist-vendored` so git's
+  end-of-line conversion cannot alter the delivered bytes on any platform
+- Tooling exclusions keeping both partner deliveries byte-for-byte as received: every `pre-commit`
+  hook, markdown lint, and the CI matrices all skip them
 
 ### Changed
 
@@ -44,6 +53,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   are unaffected; GitHub Actions updates are grouped into one monthly pull request
 - Enabled "Automatically delete head branches" and Dependabot security updates on the repository,
   documented in `.github/BRANCH_PROTECTION.md`
+- `model-trains/README.md` reworked from a technical index into an overview aimed at choosing a train:
+  added a **Delivered by** column (DHI, Deltares, BRGM), dropped the `#` column, added a
+  "Which train do I need?" table and a short description per available train, and moved installation
+  detail out to each train's own README
+- Renamed `model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/` to
+  `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` to match the train name in the index
 
 ### Fixed
 

@@ -24,9 +24,9 @@ repos:
         # findings no pull request check ever reports. Each partner lints its own
         # code to its own rules (Deltares ships ruff in its pixi.toml).
         # Drop an exclusion only if that folder stops being vendor-owned.
-        exclude: ^model-trains/(HYDRUS-PHREEQC-MODFLOW2005-MT3D|MODFLOW6-reservoir-model)/
+        exclude: ^model-trains/(1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D|MODFLOW6-reservoir-model)/
       - id: ruff-format
-        exclude: ^model-trains/(HYDRUS-PHREEQC-MODFLOW2005-MT3D|MODFLOW6-reservoir-model)/
+        exclude: ^model-trains/(1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D|MODFLOW6-reservoir-model)/
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -39,9 +39,9 @@ repos:
         # ours to rewrite, and the HYDRUS-1D project files (ATMOSPH.IN,
         # PROFILE.DAT, SELECTOR.IN, …) are fixed-format, so stripping trailing
         # whitespace would corrupt them.
-        exclude: (^|/)sample_data/|\.ipynb$|^model-trains/(HYDRUS-PHREEQC-MODFLOW2005-MT3D|MODFLOW6-reservoir-model)/
+        exclude: (^|/)sample_data/|\.ipynb$|^model-trains/(1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D|MODFLOW6-reservoir-model)/
       - id: end-of-file-fixer
-        exclude: (^|/)sample_data/|\.ipynb$|^model-trains/(HYDRUS-PHREEQC-MODFLOW2005-MT3D|MODFLOW6-reservoir-model)/
+        exclude: (^|/)sample_data/|\.ipynb$|^model-trains/(1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D|MODFLOW6-reservoir-model)/
       - id: check-yaml
       - id: check-toml
       - id: check-merge-conflict

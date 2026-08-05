@@ -33,7 +33,7 @@ Your job is to implement, review, and verify changes for the PHISHES PDP workspa
   *MODFLOW 6–UZF–Reservoir with Daisy extension* train. Map between them via the table in
   `model-trains/README.md`; never rename a partner's folder.
 - **Two folders are partner deliveries kept byte-for-byte as received**, their own `README.md`
-  included: `model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and
+  included: `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and
   `model-trains/MODFLOW6-reservoir-model/` (Deltares). Never edit, reformat or add files inside either;
   write what you need in `model-trains/README.md` instead. The `.gitattributes`, pre-commit,
   markdownlint and CI exclusions that enforce this must stay in place. To refresh a delivery, fetch the
