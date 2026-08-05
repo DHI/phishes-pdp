@@ -131,4 +131,4 @@ list anywhere in CI.
 
 - The project scripts in pyproject.toml reference `setup_folder_structure:main` and `download_datasets:main`, but those modules are not in src, so both console entry points are broken
 - `[project.urls]` points at `github.com/phishes/data-downloader`, not the actual `github.com/DHI/phishes-pdp`
-- The catalog has no top-level `pgm_forcings:` section, so the MSHE-Ecolab forcing-repository path (`load_pgm_forcing_library()`) raises until one is added
+- The catalog has no top-level `pgm_forcings:` section, so the MSHE-Ecolab-PGM forcing-repository path (`load_pgm_forcing_library()`) raises until one is added

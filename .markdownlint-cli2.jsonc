@@ -20,5 +20,12 @@
     "MD051": false
   },
   "globs": ["**/*.md"],
-  "ignores": ["**/node_modules/**"]
+  // The partner-delivered trains are kept byte-for-byte as received (see
+  // .gitattributes), so their markdown is not ours to tidy. Reporting findings we
+  // must not act on would only invite someone to edit vendor content.
+  "ignores": [
+    "**/node_modules/**",
+    "model-trains/hydrus-1d+modflow6/**",
+    "model-trains/MODFLOW6-reservoir-model/**"
+  ]
 }
