@@ -207,3 +207,30 @@ marimo/_lsp/
 __marimo__/
 model-trains/MSHE-Ecolab-PGM/output_data/
 .github/dhi-instructions/
+
+# Model-train third-party simulation software.
+# HYDRUS-1D (PC-PROGRESS) and MODFLOW 6 (USGS) executables and libraries are
+# downloaded by each user under the vendors' own licences — never redistributed
+# from this repository. Placement is documented in the delivered
+# model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/README.md
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/*.exe
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/*.EXE
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/*.dll
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/*.DLL
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/PCPINFOR.SYS
+# modflow/ is where mf6.exe + libmf6.dll go. Delivered empty, and git cannot track
+# an empty directory — a .gitkeep would be a file the vendor did not deliver, so
+# the folder is documented in model-trains/README.md instead of being faked here.
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/modflow/*
+
+# HYDRUS-1D and MODFLOW 6 run artifacts. Both models run in-place in
+# hydrus-1d+modflow6/, so their outputs land next to the scripts.
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/*.out
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/*.ou
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/Error.msg
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/mfsim.*
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/GWMODEL*
+# ATMOSPH.IN and SELECTOR.IN at this level are generated from hydrus_templates/
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/ATMOSPH.IN
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/SELECTOR.IN
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/hydrus-1d+modflow6/Results_coupledmodels.pdf

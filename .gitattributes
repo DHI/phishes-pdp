@@ -1,0 +1,15 @@
+# Externally delivered model code.
+#
+# model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/ is delivered by BRGM and is kept
+# byte-for-byte as received, including its own README. `-text` disables git's
+# end-of-line conversion for it: without this, `core.autocrlf` normalises CRLF to
+# LF on commit and back on checkout, so a Linux clone would see different bytes
+# than were delivered — and the HYDRUS-1D project files (ATMOSPH.IN, PROFILE.DAT,
+# SELECTOR.IN, …) are fixed-format input parsed by column position.
+#
+# `linguist-vendored` keeps the folder out of GitHub's language statistics, so a
+# third party's code does not describe this repository.
+#
+# The matching tooling exclusions live in .pre-commit-config.yaml; the folder is
+# also absent from the CI matrices in .github/workflows/{ci,security}.yml.
+model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/** -text linguist-vendored

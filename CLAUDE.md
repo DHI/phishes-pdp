@@ -30,12 +30,31 @@ Both modules are independent Python projects (own `pyproject.toml`, `.venv`, tes
 ```
 data-download-tool/                      # shared: pulls forcing + static layers from the datastore
 model-trains/
-├── MSHE-Ecolab-PGM/                     # was plant-growth-module/ — the only implemented train
-├── MSHE-Daisy/                          # README stub only
-└── HYDRUS-PHREEQC-MODFLOW2005-MT3D/     # README stub only
+├── README.md                            # the index of every train — keep it current (see below)
+├── MSHE-Ecolab-PGM/                     # implemented, by DHI
+├── MSHE-Daisy/                          # README stub only, by DHI
+└── HYDRUS-PHREEQC-MODFLOW2005-MT3D/     # 🔒 BRGM delivery — do not modify (see Module 3)
+    ├── README.md                        #    the vendor's own README, not a repo README
+    └── hydrus-1d+modflow6/              #    Hydrus-1D ↔ MODFLOW 6 coupling
 ```
 
-**`MSHE-Ecolab-PGM/` was `plant-growth-module/`.** The move was path-only: the Python package inside is still `plant_growth_module`, the distribution is still `plant-growth-module`, and `src/plant_growth_module/` is unchanged. Only the *containing folder* was renamed, so imports and `pyproject.toml` metadata are untouched. When adding a model train, create `model-trains/<train-name>/` as a self-contained project — do not add a second top-level module folder.
+A fourth train, MODFLOW 6–UZF–Reservoir with Daisy extension (Deltares), is described in `model-trains/README.md` but has no folder yet.
+
+**The folder name and the package name differ in `MSHE-Ecolab-PGM/`**: the folder is named after the model train, while the Python package inside is `plant_growth_module`, the distribution is `plant-growth-module`, and the source lives in `src/plant_growth_module/`. Imports and `pyproject.toml` metadata use the package name, never the folder name. When adding a model train, create `model-trains/<train-name>/` as a self-contained project — do not add a second top-level module folder.
+
+### Adding or changing a model train — always update `model-trains/README.md`
+
+`model-trains/README.md` is the single index of trains, and it is **stale by default**: nothing in CI checks it. Any change that adds a train, starts implementing one, or changes a train's status must update it **in the same change**. Its own *Adding a model train* section is the checklist; the five steps are:
+
+1. A row in the table at the top, with **all five columns** filled: train name, **Delivered by** (DHI or the partner organisation — this column exists because most trains come from project partners), folder (`—` when there is no code yet), documentation link (`—` when there is no README yet), implementation status.
+2. A row in *Which train do I need?* — phrased as the problem a reader arrives with, not as the model.
+3. If the train is available, a subsection under *What the available trains do* — two short paragraphs plus a link to its README.
+4. The train's numbered section under *Scientific descriptions* (`Inputs` / `Model train` / `Data exchanged` / `Outputs`).
+5. The available-trains list in the root `README.md`, and the layout tree above.
+
+**That file is an overview, deliberately non-technical** — its job is to help a reader pick a train. Installation steps, dependency lists, command lines and file formats go in the train's own README, or here in `CLAUDE.md` for agent-facing detail. Do not grow it into a manual. The single exception is an externally delivered train whose README we must not edit: record the minimum a user needs and no more.
+
+For an externally delivered train, also record who delivered it and whether its content is kept as received; if it is, add the `.gitattributes` / pre-commit / markdownlint exclusions described in Module 3.
 
 ## Module 1: `data-download-tool/`
 
@@ -104,6 +123,29 @@ So PGM resolves DDT from **`main` on GitHub**, not from the local sibling folder
 
 `pgm_helper.py` is a flat re-export of everything from the five real modules (`common_utils`, `template_maps`, `soil_profile_setup`, `forcing_repository`, `initial_condition_updater`). Older notebook cells still import from it — keep the re-exports in sync when adding new public names.
 
+## Module 3: `model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/`
+
+Implemented, and **complete as delivered** — BRGM finished it; there is no half-built work to carry on here. `hydrus-1d+modflow6/` is a one-way coupling: HYDRUS-1D runs on a soil column, its recharge and associated solute concentration are read back, and a MODFLOW 6 flow + transport (GWT) model is stepped forward through the MODFLOW 6 BMI/API, receiving both at each step. It uses MODFLOW 6 rather than MODFLOW-2005 + MT3D (one program for flow and transport, plus the API the runtime exchange needs); PHREEQC is named in the train design but not called by the delivered code.
+
+**🔒 This whole folder is delivered by BRGM and kept byte-for-byte as received. Change nothing inside it — not the code, not `README.md` (that file is theirs, not a repo README), not whitespace, not line endings, not import order.** Corrections and anything else we want to say about it go in `model-trains/README.md` instead — but that file is a deliberately non-technical overview, so keep additions there to the minimum a user needs (it currently records only the Python packages, which the delivered README omits). This section is the home for the technical detail. Referencing the folder from elsewhere is fine; editing it is not. Four mechanisms enforce this, and all four must stay in place:
+
+| Where | What it prevents |
+| --- | --- |
+| `.gitattributes` — `... /** -text linguist-vendored` | git's `core.autocrlf` silently rewriting CRLF↔LF on commit/checkout, which would change the delivered bytes on a Linux clone. Also keeps the folder out of GitHub's language stats. |
+| `.pre-commit-config.yaml` — excluded from **every** hook | `ruff-check --fix` deleting unused imports, `ruff-format` reflowing the code, `trailing-whitespace`/`end-of-file-fixer` corrupting the fixed-format HYDRUS input files |
+| `.markdownlint-cli2.jsonc` — path in `ignores` | advisory findings on the vendor README tempting someone to "tidy" it |
+| CI matrices in `.github/workflows/{ci,security}.yml` list modules explicitly | ruff/pytest/pip-audit/bandit ever running here — which is also why the pre-commit exclusion is not a gap: nothing downstream lints it either |
+
+Ruff at default rules reports 36 errors here (22 unfixable); that is expected and is not ours to fix.
+
+- **Not a `uv` project** — no `pyproject.toml`, no tests, no `.python-version`. Deps are `flopy`, `xmipy`, `numpy`, `pandas`, `matplotlib`, `tqdm`, installed into whatever environment the user has. `xmipy` is imported lazily inside `functions_modflow.load_bmi()`, so a missing install surfaces mid-run, not at import.
+- **Entry point** `main_coupled_models.py`, run from **inside** `hydrus-1d+modflow6/` — every path (`inputs/`, `hydrus_templates/`, `modflow/`, `run.bat`) resolves relative to the working directory, and both models write their output in place next to the scripts.
+- **Third-party binaries are required and never committed**: HYDRUS-1D (`H1D_CALC.EXE` plus five PC-PROGRESS `DLL`/`SYS` files) at the root of `hydrus-1d+modflow6/`, MODFLOW 6 (`mf6.exe`, `libmf6.dll`) in its `modflow/`. Vendor licences — not ours to redistribute. `.gitignore` carries a path-scoped block for these plus the run artifacts (`*.out`, `mfsim.*`, `GWMODEL*`, generated `ATMOSPH.IN`/`SELECTOR.IN`).
+- `modflow/` was delivered **empty**, and git cannot track an empty directory, so it does not survive a clone. Users create it themselves. Do **not** add a `.gitkeep` — that would be a file the vendor did not deliver.
+- MODFLOW runs on Windows or Linux (`libmf6.dll` / `libmf6.so`), but HYDRUS is driven via `run.bat` → `H1D_CALC.EXE`, so the coupled run is effectively Windows-only.
+- `hydrus-1d+modflow6/Results_coupledmodels_V2.pdf` is a committed ~7.7 MiB reference output — it passes the 10 MiB file-size gate but is the largest file in the repository. Don't add more like it.
+- The scripts use `os.path` throughout. The global `pathlib` convention does **not** apply here — migrating them would modify delivered content.
+
 ## Common commands
 
 All commands run **inside a module directory**, not the repo root.
@@ -170,3 +212,4 @@ There is also a skill at `.claude/skills/pgm-initial-condition-updater/SKILL.md`
 - **PGM↔DDT runtime import is brittle by design**: probes `core/downloader.py` and `analysis/catchment.py` paths directly. Restructuring DDT's `src/` layout will break PGM's `forcing_repository.py`.
 - **Catalog YAML drives behavior, not Python constants**: dataset selection, EUM units, value-accumulation type, and (eventually) PGM forcing routing come from the four catalogs in `src/core/` (`dataset_catalog.yaml`, `cog_catalog.yaml`, `geoparquet_catalog.yaml`, `partner_data_catalog.yaml`), merged per-category at load time. Check them before grepping for hardcoded dataset names.
 - **Docs duplicated in two places**: DDT and MSHE-Ecolab-PGM each keep a module-scoped copy of their agent file under `<module>/.github/agents/`. Same content, module-relative paths. Update both halves together.
+- **`model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/` is read-only vendor content.** A BRGM delivery kept byte-for-byte, including its own `README.md`. Never edit, reformat, lint-fix or `pathlib`-migrate anything inside it, and never add files to it — put user-facing notes in `model-trains/README.md` and technical detail in Module 3 above. The `.gitattributes` / pre-commit / markdownlint / CI exclusions that enforce this are listed in Module 3; leave them alone.
