@@ -96,17 +96,13 @@ def split_dfs3_to_layers(
     dfs3 = mikeio.Dfs3(dfs3_path)
     items = [item.name for item in dfs3.items if item_filter in item.name]
     if not items:
-        raise ValueError(
-            f"No items matching '{item_filter}' found in {dfs3_path.name}."
-        )
+        raise ValueError(f"No items matching '{item_filter}' found in {dfs3_path.name}.")
 
     nz = dfs3.geometry.nz
     written: list[Path] = []
     for k in range(1, nz + 1):
         layer_index = (nz - k) if reverse_z else (k - 1)
-        ds = dfs3.read(
-            items=items, layers=[layer_index], time=_normalize_time_selector(time)
-        )
+        ds = dfs3.read(items=items, layers=[layer_index], time=_normalize_time_selector(time))
         out_path = out_dir.joinpath(f"Layer_{k}.dfs2")
         with warnings.catch_warnings():
             _suppress_mikeio_static_timestep_warning()
@@ -121,9 +117,7 @@ def backup_she(she_path, *, suffix="orig"):
     """Copy a ``.she`` file to a timestamped sibling backup and return its path."""
     she_path = Path(she_path)
     stamp = pd.Timestamp.now().strftime("%Y%m%d%H%M%S")
-    backup_path = she_path.with_name(
-        f"{she_path.stem}.{suffix}-{stamp}{she_path.suffix}"
-    )
+    backup_path = she_path.with_name(f"{she_path.stem}.{suffix}-{stamp}{she_path.suffix}")
     shutil.copy2(she_path, backup_path)
     print(f"  💾 Backed up original .she -> {backup_path.name}")
     return backup_path
@@ -165,8 +159,7 @@ def _ordered_layer_files(splitted_dir):
     files = sorted(splitted_dir.glob("Layer_*.dfs2"), key=_layer_index)
     if not files:
         raise FileNotFoundError(
-            f"No 'Layer_*.dfs2' files found in {splitted_dir}. "
-            "Run split_dfs3_to_layers first."
+            f"No 'Layer_*.dfs2' files found in {splitted_dir}. Run split_dfs3_to_layers first."
         )
     return files
 
@@ -251,9 +244,7 @@ def update_initial_conditions(
     # Precompute the FILE_NAME clob for each .she layer position (1..n_layers).
     file_names: dict[int, str] = {}
     for k in range(1, n_layers + 1):
-        source = (
-            layer_files[n_layers - k] if reverse_layer_order else layer_files[k - 1]
-        )
+        source = layer_files[n_layers - k] if reverse_layer_order else layer_files[k - 1]
         file_names[k] = _relative_file_name(source, she_outfile)
 
     updated: list[str] = []
@@ -268,9 +259,7 @@ def update_initial_conditions(
         item_number = species_item_index[name]
 
         # Drop any existing layer sections, then set the three counters.
-        for layer_key in [
-            k for k in list(species_section.keys()) if k.startswith("Layer_")
-        ]:
+        for layer_key in [k for k in list(species_section.keys()) if k.startswith("Layer_")]:
             species_section.pop(layer_key)
         species_section.DistributionType = 1
         species_section.NumberOfLayers = n_layers
@@ -296,9 +285,7 @@ def update_initial_conditions(
     doc.write(she_outfile)
 
     matched_species = set(species_item_index)
-    all_species_names = {
-        getattr(getattr(conc, key), "Name", None) for key in conc.keys()
-    }
+    all_species_names = {getattr(getattr(conc, key), "Name", None) for key in conc.keys()}
     summary = {
         "outfile": str(she_outfile),
         "n_layers": n_layers,
@@ -306,7 +293,5 @@ def update_initial_conditions(
         "n_species_updated": len(updated),
         "items_without_species": sorted(matched_species - all_species_names),
     }
-    print(
-        f"  ✅ Updated {len(updated)} species x {n_layers} layers -> {she_outfile.name}"
-    )
+    print(f"  ✅ Updated {len(updated)} species x {n_layers} layers -> {she_outfile.name}")
     return summary

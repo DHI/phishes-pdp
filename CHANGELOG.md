@@ -24,7 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- Moved `plant-growth-module/` to `model-trains/MSHE-Ecolab/` (path-only; the
+- Moved `plant-growth-module/` to `model-trains/MSHE-Ecolab-PGM/` (path-only; the
   `plant_growth_module` package, distribution name and imports are unchanged)
 - Renamed `Task1 Plant_Growth_Module` to `plant-growth-module`
 - Renamed `Task2` to `data-download-tool`
@@ -35,7 +35,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (format, markdown lint, notebook lint), so formatting never blocks fork contributors
 - Pinned `ruff==0.16.0` in both modules and in `.pre-commit-config.yaml`
 - CI jobs now resolve dependencies via `uv sync` instead of a hand-maintained list
-- Refreshed root and module READMEs plus agent files for the `model-trains/MSHE-Ecolab` naming
+- Refreshed root and module READMEs plus agent files for the `model-trains/MSHE-Ecolab-PGM` naming
+- Root README now points at `model-trains/README.md` as the single model-train index rather than
+  linking individual trains, so no train is singled out and the train list lives in one place
 
 ### Fixed
 

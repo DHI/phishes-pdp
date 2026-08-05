@@ -205,5 +205,5 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
-model-trains/MSHE-Ecolab/output_data/
+model-trains/MSHE-Ecolab-PGM/output_data/
 .github/dhi-instructions/

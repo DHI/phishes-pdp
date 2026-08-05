@@ -8,7 +8,7 @@
 #
 # Versions are pinned deliberately. The `ruff` rev here must match the `ruff==`
 # pin in data-download-tool/pyproject.toml and
-# model-trains/MSHE-Ecolab/pyproject.toml so local and CI results cannot
+# model-trains/MSHE-Ecolab-PGM/pyproject.toml so local and CI results cannot
 # diverge. Bump all three together.
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit

@@ -61,7 +61,7 @@ extend-exclude = ["*.ipynb"]
 select = ["E", "F", "W", "I", "N"]
 # E501: line length is handled by the formatter, not the linter.
 # I001: import sorting is left to `ruff format`.
-# N999: the folder is `MSHE-Ecolab` (hyphenated to match `data-download-tool`),
+# N999: the folder is `MSHE-Ecolab-PGM` (hyphenated to match `data-download-tool`),
 #       and the stray root `__init__.py` makes ruff read that folder name as the
 #       top-level module. Renaming it would undo the model-trains layout.
 ignore = ["E501", "I001", "N999"]

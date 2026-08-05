@@ -5,7 +5,7 @@
 # set of per-grid-code time series.
 #
 # defaults:            inherited by every forcing that does not override it
-#   grid_code_dfs2 : grid-code DFS2, absolute or relative to the MSHE-Ecolab root
+#   grid_code_dfs2 : grid-code DFS2, absolute or relative to the MSHE-Ecolab-PGM root
 #   output_dir     : folder a relative 'output_grid' is written into
 #   ...any other forcing field
 #
@@ -18,7 +18,7 @@
 #
 # Fields per entry under `inputs`:
 #   grid_code : integer grid code in the grid-code DFS2 (required)
-#   path      : DFS0/CSV file, absolute or relative to the MSHE-Ecolab root (required)
+#   path      : DFS0/CSV file, absolute or relative to the MSHE-Ecolab-PGM root (required)
 #   item      : 1-based item index for multi-item DFS0 files (optional, default 1)
 #   source    : "dfs0" or "csv" (optional; inferred from the file extension)
 #
