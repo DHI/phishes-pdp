@@ -20,6 +20,9 @@ Most user-facing workflows are provided as Jupyter notebooks in the module folde
 
 - Windows, Linux, or macOS
 - Python x64 3.10 - 3.13 (each module pins `3.11` to match CI)
+- Per model train: the third-party simulation software that train drives (MIKE SHE + MIKE ECO Lab,
+  Daisy, HYDRUS-1D, MODFLOW). None of it is redistributed here — each train's README lists what it
+  needs and where to download it.
 
 ## Installation
 
@@ -49,13 +52,19 @@ rasters, GeoParquet vector layers, and partner data zip bundles. Shared by every
 
 ### Model trains
 
-Each model train is an independent project under [model-trains/](model-trains/) with its own
-`pyproject.toml`, environment, tests and notebooks. It consumes data pulled by the download tool and
-produces that train's simulation inputs.
+Each model train is an independent project under [model-trains/](model-trains/), built by one of the
+project partners, that produces the simulation inputs for its own chain of coupled models. Some take
+their data from the download tool, others ship with their own.
 
-[model-trains/README.md](model-trains/README.md) is the single index: which trains exist, how far
-each one is implemented, and the scientific description of each — inputs, the coupling, the data
-exchanged between components, and outputs. Start there and follow the link to the train you need.
+[model-trains/README.md](model-trains/README.md) is the single index: which trains exist, which one
+fits your problem, who delivered each, and the scientific description of each — inputs, the coupling,
+the data exchanged between components, and outputs. Start there and follow the link to the train you
+need.
+
+Available to use today:
+
+- **MIKE SHE–MIKE ECO Lab Plant Growth Module** (DHI) — [model-trains/MSHE-Ecolab-PGM/](model-trains/MSHE-Ecolab-PGM/)
+- **1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D** (BRGM) — [model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/](model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/)
 
 ## 📁 Repository structure (high level)
 

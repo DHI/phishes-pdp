@@ -1,12 +1,44 @@
-# HYDRUS - PHREEQC - MODFLOW-2005 - MT3D
+# Coupling between Hydrus-1D and MODFLOW6
 
-A 1D HYDRUS–PHREEQC – MODFLOW 2005 – MT3D model train designed for PFAS contaminated sites resulting from AFFF use, as well as for mine tailings enriched in trace metals.
+This folder contains scripts performing the coupling of Hydrus-1D model (Šimůnek and Van Genuchten, 2008) with MODFLOW6 model (Hughes et al., 2017), effectively coupling soil columns with an aquifer.
 
-The model train applies one-dimensional flow (1D Hydrus) and reactive transport (PHREEQC) to representative soil profiles which simulate a mass-balance of water and contaminant transport, in turn used as input to a more extensive 3D groundwater flow (MODFLOW) and transport (MT3D) model. This allows for simulation of the fate of contaminants, here PFAS and arsenic, to optimize, assess and compare different soil remediation approaches. These simulations include parameters which directly influence soil function and health, although in this model train a distinction is made between parameterized soil function indicators such as root zone depth, soil retention capacity and porosity and simulated soil function indicators such as soil moisture, permeability/drainage and degree of contamination.
+This is the first version that performs a one-way coupling transferring the recharge between the bottom soil layer and the aquifer only layer.
 
-The coupling of the one-dimensional and three-dimensional components is achieved through a staged workflow:
-- 1D Hydrus calculates unsaturated water flow using the Richards’ equation.
-- PHREEQC processes chemical speciation and mass balance reactions under transient moisture and redox conditions.
-- Outputs from 1D HP, including vertical water fluxes, leaching rates, and solute concentrations at the bottom boundary of the unsaturated zone, are exported as time series boundary conditions to the saturated zone model.
-- MODFLOW simulates groundwater flow using site-specific hydraulic properties and geological structure.
-- MT3D incorporates the transferred solute fluxes, allowing simulation of PFAS migration in three dimensions.
+## Installation
+
+This folder does not contain the executable files and the DLLS for the two models. The missing files should be placed as follows in this folder:
+
+```text
+hydrus-1d+modflow6
+├── modflow
+│   ├── libmf6.dll
+│   └── mf6.exe
+├── H1D_CALC.EXE
+├── PCP_BASE.DLL
+├── PCP_FEM2.DLL
+├── PCP_MESH.DLL
+├── PCPINFOR.SYS
+└── ROSETTA.DLL
+```
+
+The files *H1D_CALC.EXE*, *PCP_BASE.DLL*, *PCP_FEM2.DLL*, *PCP_MESH.DLL*, *PCPINFOR.SYS*, and *ROSETTA.DLL* are to be downloaded from https://www.pc-progress.com/en/Default.aspx?hydrus-1d.
+
+The files *libmf6.dll* and *mf6.exe* are to be downloaded from https://code.usgs.gov/modflow61/modflow6/-/releases (ZIP archive *mf#.#.#_win64.zip*) (Langevin et al., 2026).
+
+## Usage
+
+The main script to run is *main_coupled_models.py*. This will run the HYDRUS-1D model then the MODFLOW6 model.
+
+## Acknowledments
+
+This coupling has been created by Luca Guillaumot, Thibault Hallouin, and Nicolas Devau (French Geological Survey, BRGM).
+
+This work is part of the EU-funded PHISHES project https://www.phishes-project.eu/.
+
+## References
+
+Hughes, J.D., Langevin, C.D., and Banta, E.R., 2017, Documentation for the MODFLOW 6 framework: U.S. Geological Survey Techniques and Methods, book 6, chap. A57, 40 p., https://doi.org/10.3133/tm6A57.
+
+Langevin, C.D., Hughes, J.D., Provost, A.M., Russcher, M.J., Morway, E.D., Reno, M.J., Bonelli, W.P., Niswonger, R.G., Panday, S., Titus, S., Merrick, D, and Banta, E.R., 2026, MODFLOW 6 Modular Hydrologic Model version 6.7.0: U.S. Geological Survey Software Release, 6 February 2026, https://doi.org/10.5066/P1IJAXDZ
+
+Šimůnek, J. and van Genuchten, M.T. (2008), Modeling Nonequilibrium Flow and Transport Processes Using HYDRUS. Vadose Zone Journal, 7: 782-797. https://doi.org/10.2136/vzj2007.0074

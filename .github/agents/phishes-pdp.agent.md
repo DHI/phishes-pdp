@@ -22,12 +22,34 @@ Your job is to implement, review, and verify changes for the PHISHES PDP workspa
 ## Repository Layout
 
 - `data-download-tool/` is shared infrastructure at the repository root.
-- Everything downstream is a **model train** under `model-trains/<train-name>/`, each a
-  self-contained project with its own `pyproject.toml`, environment, tests and notebooks. A new
-  model train goes there — never as a second top-level module folder.
-- `model-trains/MSHE-Ecolab-PGM/` was previously `plant-growth-module/`. The move was path-only: the
-  `plant_growth_module` package, the `plant-growth-module` distribution name and all imports are
-  unchanged. Treat all three names as current.
+- Everything downstream is a **model train** under `model-trains/<train-name>/`. Trains built here are
+  self-contained projects with their own `pyproject.toml`, environment, tests and notebooks;
+  externally delivered ones may be plain scripts. A new model train goes there — never as a second
+  top-level module folder.
+- In `model-trains/MSHE-Ecolab-PGM/` the folder is named after the model train while the Python package
+  is `plant_growth_module` and the distribution is `plant-growth-module`. Treat all three names as
+  current; imports use the package name.
+- `model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/` is a **BRGM delivery kept byte-for-byte as
+  received**, its own `README.md` included. Never edit, reformat or add files inside it; write what you
+  need in `model-trains/README.md` instead. The `.gitattributes`, pre-commit, markdownlint and CI
+  exclusions that enforce this must stay in place.
+
+## Model Train Index
+
+`model-trains/README.md` is the single index of trains and nothing in CI checks it, so it goes stale
+silently. **Any change that adds a train, starts implementing one, or changes a train's status must
+update it in the same change.** Its own *Adding a model train* section is the checklist:
+
+1. A table row with all five columns: train name, **Delivered by** (DHI or the partner organisation),
+   folder (`—` if no code yet), documentation link (`—` if no README yet), implementation status.
+2. A row in *Which train do I need?*, phrased as the problem a reader arrives with.
+3. If the train is available, a subsection under *What the available trains do* — two short paragraphs
+   plus a link to its README.
+4. The train's numbered section under *Scientific descriptions*.
+5. The available-trains list in the root `README.md` and the layout tree in `CLAUDE.md`.
+
+That file is a deliberately non-technical **overview**: it helps a reader pick a train. Installation
+steps, dependency lists and command lines belong in the train's own README, not there.
 
 ## Cross-Module Coordination
 
