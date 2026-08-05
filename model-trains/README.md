@@ -6,14 +6,14 @@ Each model train is a self-contained project in its own folder, with its own `py
 environment, tests and notebooks. All of them consume data pulled by the shared
 [data-download-tool](../data-download-tool/README.md).
 
-| # | Model train | Folder | Implementation status |
-| --- | --- | --- | --- |
-| 1 | MIKE SHE–Daisy | [MSHE-Daisy/](MSHE-Daisy/) | Description only |
-| 2 | MIKE SHE–MIKE ECO Lab Plant Growth Module | [MSHE-Ecolab/](MSHE-Ecolab/) | **Implemented** — see its [README](MSHE-Ecolab/README.md) |
-| 3 | MODFLOW 6–UZF–Reservoir with Daisy extension | — | Described below; no folder yet |
-| 4 | 1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D | [HYDRUS-PHREEQC-MODFLOW2005-MT3D/](HYDRUS-PHREEQC-MODFLOW2005-MT3D/) | Description only |
+| # | Model train | Folder | Documentation | Implementation status |
+| --- | --- | --- | --- | --- |
+| 1 | MIKE SHE–Daisy | [MSHE-Daisy/](MSHE-Daisy/) | [README](MSHE-Daisy/README.md) | Description only |
+| 2 | MIKE SHE–MIKE ECO Lab Plant Growth Module | [MSHE-Ecolab-PGM/](MSHE-Ecolab-PGM/) | [README](MSHE-Ecolab-PGM/README.md) | **Implemented** |
+| 3 | MODFLOW 6–UZF–Reservoir with Daisy extension | — | [described below](#3-urban-watersheds-modflow-6uzfreservoir-model-with-daisy-extension) | No folder yet |
+| 4 | 1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D | [HYDRUS-PHREEQC-MODFLOW2005-MT3D/](HYDRUS-PHREEQC-MODFLOW2005-MT3D/) | [README](HYDRUS-PHREEQC-MODFLOW2005-MT3D/README.md) | Description only |
 
-`MSHE-Ecolab/` was previously `plant-growth-module/` at the repository root. The move was path-only —
+`MSHE-Ecolab-PGM/` was previously `plant-growth-module/` at the repository root. The move was path-only —
 the `plant_growth_module` Python package, its distribution name and all imports are unchanged.
 
 The sections below describe each train scientifically: inputs, the coupling, the data exchanged

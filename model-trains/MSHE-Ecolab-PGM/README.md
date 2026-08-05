@@ -1,6 +1,6 @@
-# MSHE-Ecolab — MIKE SHE + MIKE ECO Lab Plant Growth Module
+# MSHE-Ecolab-PGM — MIKE SHE + MIKE ECO Lab Plant Growth Module
 
-Input generation for the **MSHE-Ecolab** model train: DHI's MIKE SHE coupled to the MIKE ECO Lab
+Input generation for the **MSHE-Ecolab-PGM** model train: DHI's MIKE SHE coupled to the MIKE ECO Lab
 **Plant Growth Module (PGM)**. This project turns land use, soil profile and parameter templates into
 the spatially distributed DFS2 files that MIKE SHE / ECO Lab consume, and can also build forcing
 grids and re-inject simulated state as initial conditions.
@@ -12,12 +12,12 @@ stale:
 
 | Name | What it is |
 | --- | --- |
-| `model-trains/MSHE-Ecolab/` | The **folder** (this project), named after the model train it feeds |
+| `model-trains/MSHE-Ecolab-PGM/` | The **folder** (this project), named after the model train it feeds |
 | `plant_growth_module` | The **Python package** in `src/`, and the `plant-growth-module` distribution name |
 | PGM | The **abbreviation** used in notebook filenames (`pgm_*.ipynb`) and throughout these docs |
 
 This folder was previously `plant-growth-module/` at the repository root. The move to
-`model-trains/MSHE-Ecolab/` was **path-only** — the package, the distribution name and every import
+`model-trains/MSHE-Ecolab-PGM/` was **path-only** — the package, the distribution name and every import
 are unchanged, so `from plant_growth_module import ...` still works exactly as before. See
 [model-trains/README.md](../README.md) for the other model trains.
 
@@ -75,7 +75,7 @@ And generates:
 Navigate to the project directory and create the virtual environment with all dependencies:
 
 ```bash
-cd "model-trains/MSHE-Ecolab"
+cd "model-trains/MSHE-Ecolab-PGM"
 uv sync --link-mode copy
 ```
 
@@ -125,17 +125,17 @@ Each workflow is described under [Notebook Workflows](#-notebook-workflows) belo
 
 1. **Open the correct folder in VS Code:**
 
-   > ⚠️ **Critical:** You must open the `model-trains/MSHE-Ecolab` folder itself as the workspace root in VS Code. If you open a higher-level parent folder (e.g., the repository root or `model-trains/`), VS Code **will not detect** the `.venv` Python environment and the Jupyter kernel will not appear in the kernel picker.
+   > ⚠️ **Critical:** You must open the `model-trains/MSHE-Ecolab-PGM` folder itself as the workspace root in VS Code. If you open a higher-level parent folder (e.g., the repository root or `model-trains/`), VS Code **will not detect** the `.venv` Python environment and the Jupyter kernel will not appear in the kernel picker.
 
    **How to open the correct folder:**
    - Launch VS Code
    - Go to **File → Open Folder…** (or press `Ctrl + K`, `Ctrl + O`)
-   - Browse to and select the `model-trains/MSHE-Ecolab` folder, then click **Select Folder**
-   - Verify the VS Code Explorer sidebar shows `MSHE-Ecolab` as the top-level folder
+   - Browse to and select the `model-trains/MSHE-Ecolab-PGM` folder, then click **Select Folder**
+   - Verify the VS Code Explorer sidebar shows `MSHE-Ecolab-PGM` as the top-level folder
 
    **Why this matters:**
    - VS Code discovers Python environments (`.venv/`) relative to the opened workspace root
-   - The `.venv` created by `uv sync` lives inside `model-trains/MSHE-Ecolab/.venv/`
+   - The `.venv` created by `uv sync` lives inside `model-trains/MSHE-Ecolab-PGM/.venv/`
    - If your workspace root is a parent folder, VS Code won't look inside nested subdirectories for virtual environments, so the kernel won't be found
 
 2. **Open the notebook:**
@@ -212,7 +212,7 @@ jupyter notebook notebooks/pgm_initial_condition_dfs2_map_generator.ipynb
 ## 📁 Project Structure
 
 ```
-model-trains/MSHE-Ecolab/
+model-trains/MSHE-Ecolab-PGM/
 ├── src/
 │   └── plant_growth_module/
 │       ├── __init__.py                     # Package entry point

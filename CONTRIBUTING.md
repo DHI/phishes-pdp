@@ -62,7 +62,7 @@ the isolation we want for code we have not reviewed yet.
 Each module is an independent project with its own environment:
 
 ```bash
-cd data-download-tool          # or: cd model-trains/MSHE-Ecolab
+cd data-download-tool          # or: cd model-trains/MSHE-Ecolab-PGM
 uv sync --link-mode copy
 ```
 
@@ -77,7 +77,7 @@ certainly do not have.
 See the module READMEs for details:
 
 - [data-download-tool/README.md](data-download-tool/README.md)
-- [model-trains/MSHE-Ecolab/README.md](model-trains/MSHE-Ecolab/README.md)
+- [model-trains/MSHE-Ecolab-PGM/README.md](model-trains/MSHE-Ecolab-PGM/README.md)
 
 ## Development Workflow
 
