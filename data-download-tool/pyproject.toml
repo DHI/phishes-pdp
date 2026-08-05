@@ -53,11 +53,11 @@ dependencies = [
 
 [project.optional-dependencies]
 jupyter = ["jupyter>=1.0.0", "ipywidgets>=8.0.0"]
-dev = ["pytest>=9.0.3", "ruff==0.16.0"]
+dev = ["pytest>=9.0.3", "ruff==0.16.1"]
 all = ["phishes-data-downloader[jupyter,dev]"]
 
 [dependency-groups]
-dev = ["pytest>=9.0.3", "ruff==0.16.0"]
+dev = ["pytest>=9.0.3", "ruff==0.16.1"]
 
 [project.scripts]
 phishes-setup = "setup_folder_structure:main"
