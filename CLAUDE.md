@@ -33,7 +33,7 @@ model-trains/
 ├── README.md                            # the index of every train — keep it current (see below)
 ├── MSHE-Ecolab-PGM/                     # implemented, by DHI
 ├── MSHE-Daisy/                          # README stub only, by DHI
-├── HYDRUS-PHREEQC-MODFLOW2005-MT3D/     # 🔒 BRGM delivery — do not modify (see Module 3)
+├── 1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/     # 🔒 BRGM delivery — do not modify (see Module 3)
 │   ├── README.md                        #    the vendor's own README, not a repo README
 │   └── hydrus-1d+modflow6/              #    Hydrus-1D ↔ MODFLOW 6 coupling
 └── MODFLOW6-reservoir-model/            # 🔒 Deltares delivery — do not modify (see Module 4)
@@ -43,7 +43,7 @@ model-trains/
     └── workflows/                       #    wadi + vegetation scenarios, with input data
 ```
 
-**Two of the four trains are partner deliveries kept byte-for-byte as received** — `HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and `MODFLOW6-reservoir-model/` (Deltares). The same rule and the same four enforcement mechanisms apply to both; see Module 3 for the full table. Folder names are the partners' own — `MODFLOW6-reservoir-model` is not named after the train it implements (MODFLOW 6–UZF–Reservoir with Daisy extension), so map between them via the table in `model-trains/README.md`.
+**Two of the four trains are partner deliveries kept byte-for-byte as received** — `1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and `MODFLOW6-reservoir-model/` (Deltares). The same rule and the same four enforcement mechanisms apply to both; see Module 3 for the full table. Folder names are the partners' own — `MODFLOW6-reservoir-model` is not named after the train it implements (MODFLOW 6–UZF–Reservoir with Daisy extension), so map between them via the table in `model-trains/README.md`.
 
 **The folder name and the package name differ in `MSHE-Ecolab-PGM/`**: the folder is named after the model train, while the Python package inside is `plant_growth_module`, the distribution is `plant-growth-module`, and the source lives in `src/plant_growth_module/`. Imports and `pyproject.toml` metadata use the package name, never the folder name. When adding a model train, create `model-trains/<train-name>/` as a self-contained project — do not add a second top-level module folder.
 
@@ -128,7 +128,7 @@ So PGM resolves DDT from **`main` on GitHub**, not from the local sibling folder
 
 `pgm_helper.py` is a flat re-export of everything from the five real modules (`common_utils`, `template_maps`, `soil_profile_setup`, `forcing_repository`, `initial_condition_updater`). Older notebook cells still import from it — keep the re-exports in sync when adding new public names.
 
-## Module 3: `model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/`
+## Module 3: `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/`
 
 Implemented, and **complete as delivered** — BRGM finished it; there is no half-built work to carry on here. `hydrus-1d+modflow6/` is a one-way coupling: HYDRUS-1D runs on a soil column, its recharge and associated solute concentration are read back, and a MODFLOW 6 flow + transport (GWT) model is stepped forward through the MODFLOW 6 BMI/API, receiving both at each step. It uses MODFLOW 6 rather than MODFLOW-2005 + MT3D (one program for flow and transport, plus the API the runtime exchange needs); PHREEQC is named in the train design but not called by the delivered code.
 
@@ -234,5 +234,5 @@ There is also a skill at `.claude/skills/pgm-initial-condition-updater/SKILL.md`
 - **PGM↔DDT runtime import is brittle by design**: probes `core/downloader.py` and `analysis/catchment.py` paths directly. Restructuring DDT's `src/` layout will break PGM's `forcing_repository.py`.
 - **Catalog YAML drives behavior, not Python constants**: dataset selection, EUM units, value-accumulation type, and (eventually) PGM forcing routing come from the four catalogs in `src/core/` (`dataset_catalog.yaml`, `cog_catalog.yaml`, `geoparquet_catalog.yaml`, `partner_data_catalog.yaml`), merged per-category at load time. Check them before grepping for hardcoded dataset names.
 - **Docs duplicated in two places**: DDT and MSHE-Ecolab-PGM each keep a module-scoped copy of their agent file under `<module>/.github/agents/`. Same content, module-relative paths. Update both halves together.
-- **Two model-train folders are read-only vendor content**: `model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and `model-trains/MODFLOW6-reservoir-model/` (Deltares). Both are kept byte-for-byte as delivered, their own `README.md` included. Never edit, reformat, lint-fix or `pathlib`-migrate anything inside them, and never add files to them — put user-facing notes in `model-trains/README.md` and technical detail in Module 3 / Module 4 above. The `.gitattributes` / pre-commit / markdownlint / CI exclusions that enforce this are listed in Module 3; leave them alone.
+- **Two model-train folders are read-only vendor content**: `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and `model-trains/MODFLOW6-reservoir-model/` (Deltares). Both are kept byte-for-byte as delivered, their own `README.md` included. Never edit, reformat, lint-fix or `pathlib`-migrate anything inside them, and never add files to them — put user-facing notes in `model-trains/README.md` and technical detail in Module 3 / Module 4 above. The `.gitattributes` / pre-commit / markdownlint / CI exclusions that enforce this are listed in Module 3; leave them alone.
 - **A partner's folder name is not the train name.** `MODFLOW6-reservoir-model/` implements the *MODFLOW 6–UZF–Reservoir with Daisy extension* train; `hydrus-1d+modflow6/` sits inside the *1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D* train. Don't rename either to match — map between them via the table in `model-trains/README.md`.
