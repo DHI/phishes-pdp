@@ -65,7 +65,7 @@ Available to use today:
 
 - **MIKE SHE–MIKE ECO Lab Plant Growth Module** (DHI) — [model-trains/MSHE-Ecolab-PGM/](model-trains/MSHE-Ecolab-PGM/)
 - **MODFLOW6-reservoir-model** (Deltares) — [model-trains/MODFLOW6-reservoir-model/](model-trains/MODFLOW6-reservoir-model/)
-- **1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D** (BRGM) — [model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/](model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/)
+- **hydrus-1d+modflow6** (BRGM) — [model-trains/hydrus-1d+modflow6/](model-trains/hydrus-1d+modflow6/)
 
 ## 📁 Repository structure (high level)
 
