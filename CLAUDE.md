@@ -43,7 +43,9 @@ model-trains/
     └── workflows/                       #    wadi + vegetation scenarios, with input data
 ```
 
-**Two of the four trains are partner deliveries kept byte-for-byte as received** — `1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and `MODFLOW6-reservoir-model/` (Deltares). The same rule and the same four enforcement mechanisms apply to both; see Module 3 for the full table. Folder names are the partners' own — `MODFLOW6-reservoir-model` is not named after the train it implements (MODFLOW 6–UZF–Reservoir with Daisy extension), so map between them via the table in `model-trains/README.md`.
+**Two of the four trains are partner deliveries kept byte-for-byte as received** — `1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and `MODFLOW6-reservoir-model/` (Deltares). The same rule and the same four enforcement mechanisms apply to both; see Module 3 for the full table.
+
+**Call the Deltares train `MODFLOW6-reservoir-model`** — its delivered name — everywhere in the docs. It was previously written up under the design-stage name *MODFLOW 6–UZF–Reservoir with Daisy extension*; that name is retired now that the code exists, since the delivery is what we actually have. Don't reintroduce it.
 
 **The folder name and the package name differ in `MSHE-Ecolab-PGM/`**: the folder is named after the model train, while the Python package inside is `plant_growth_module`, the distribution is `plant-growth-module`, and the source lives in `src/plant_growth_module/`. Imports and `pyproject.toml` metadata use the package name, never the folder name. When adding a model train, create `model-trains/<train-name>/` as a self-contained project — do not add a second top-level module folder.
 
@@ -157,7 +159,7 @@ Ruff at default rules reports 36 errors in this folder (22 unfixable); that is e
 
 ## Module 4: `model-trains/MODFLOW6-reservoir-model/`
 
-The **MODFLOW 6–UZF–Reservoir with Daisy extension** train (train 3 in `model-trains/README.md`). Note the mismatch: the folder is named for the model, not the train. A TOML-driven framework built on **iMOD Python** that generates, runs and post-processes MODFLOW 6 groundwater flow + transport models, with a reservoir water balance supplying surface ponding and infiltration.
+Train 3 in `model-trains/README.md`, referred to everywhere by its delivered name. A TOML-driven framework built on **iMOD Python** that generates, runs and post-processes MODFLOW 6 groundwater flow + transport models, with a reservoir water balance supplying surface ponding and infiltration.
 
 **🔒 Delivered by Deltares and kept byte-for-byte as received, exactly like Module 3 — same rule, same four enforcement mechanisms (see the table there).** Pulled from `sleiriao/phishes-pdp` (a fork of this repo); all 101 blob SHAs verified identical to theirs.
 
@@ -165,7 +167,7 @@ The **MODFLOW 6–UZF–Reservoir with Daisy extension** train (train 3 in `mode
 - Layout: `src/generation/` (build flow + transport models), `src/simulation/` (MF6 and reservoir runners, logger), `src/postprocessing/` (results + water balance), `workflows/<scenario>/` (a `.toml` config plus a driver script).
 - **Two scenarios**, each run from inside its own folder: `workflows/wadi/scenario_wadi.py` (urban runoff through a wadi channel) and `workflows/vegetation/scenario_vegetation.py` (longer-term dynamics under ET, ditches and sewers). `run = True` in the script builds and runs; `run = False` loads existing results.
 - **MODFLOW 6 binaries are not committed** — the user downloads them and points `mf6_binaries` in the scenario TOML at the `bin/` directory.
-- **Daisy coupling is not in this code.** Their README states it is under active development and not in the public repository, and that Daisy BMI binaries are currently `.pyd` files installed via pixi tasks. So the train's "Daisy extension" is design-stage even though the MODFLOW 6 + reservoir part is delivered — say it that way rather than calling the train incomplete.
+- **Daisy coupling is not in this code.** Their README states it is under active development and not in the public repository, and that Daisy BMI binaries are currently `.pyd` files installed via pixi tasks. Note it as an upcoming addition from Deltares, not as something missing from the delivery.
 - `workflows/input/` carries the scenario input data (`meteo.xlsx`, `Storms_A.xlsx`, NetCDF grids, shapefiles). Their own nested `.gitignore` excludes two large grids (`AHN4.TIF`, `ahn4_filled.nc`) and `simulation_dir` output — that file is theirs; leave it alone. Largest committed file here is ~573 KB, so the folder is no concern for the 10 MiB gate.
 
 ## Common commands
@@ -235,4 +237,4 @@ There is also a skill at `.claude/skills/pgm-initial-condition-updater/SKILL.md`
 - **Catalog YAML drives behavior, not Python constants**: dataset selection, EUM units, value-accumulation type, and (eventually) PGM forcing routing come from the four catalogs in `src/core/` (`dataset_catalog.yaml`, `cog_catalog.yaml`, `geoparquet_catalog.yaml`, `partner_data_catalog.yaml`), merged per-category at load time. Check them before grepping for hardcoded dataset names.
 - **Docs duplicated in two places**: DDT and MSHE-Ecolab-PGM each keep a module-scoped copy of their agent file under `<module>/.github/agents/`. Same content, module-relative paths. Update both halves together.
 - **Two model-train folders are read-only vendor content**: `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and `model-trains/MODFLOW6-reservoir-model/` (Deltares). Both are kept byte-for-byte as delivered, their own `README.md` included. Never edit, reformat, lint-fix or `pathlib`-migrate anything inside them, and never add files to them — put user-facing notes in `model-trains/README.md` and technical detail in Module 3 / Module 4 above. The `.gitattributes` / pre-commit / markdownlint / CI exclusions that enforce this are listed in Module 3; leave them alone.
-- **A partner's folder name is not the train name.** `MODFLOW6-reservoir-model/` implements the *MODFLOW 6–UZF–Reservoir with Daisy extension* train; `hydrus-1d+modflow6/` sits inside the *1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D* train. Don't rename either to match — map between them via the table in `model-trains/README.md`.
+- **Name a partner train as delivered.** The Deltares train is `MODFLOW6-reservoir-model` everywhere, not the design-stage name it once had. Inside the BRGM train the delivered subfolder is `hydrus-1d+modflow6/`. Don't rename a partner's folder to fit our naming, and don't invent a prettier label for it in the docs.
