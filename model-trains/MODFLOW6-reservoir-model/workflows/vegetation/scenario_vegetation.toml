@@ -1,0 +1,75 @@
+# basis model definitie
+[model]
+name = 'validation_vegetation'
+mf6_binaries = 'c:\src\modflow6_release\mf6.7.0_win64\mf6.7.0_win64\bin'
+
+[model.solver]
+continue = false
+
+[model.discretisation]
+start_date = '2019\01\01' 
+end_date ='2019\01\03'
+dt = 1.0
+nlayers = 2
+top = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\grids\maaiveld.nc' 
+layer_thickness = [0.5, 1.0]
+
+[model.discretisation.extent]
+minx = 95490
+maxx = 95900
+miny = 432400
+maxy = 432750
+
+[model.transport]
+porosity = 0.2
+dispersivity=0.5
+retardation=0.0
+decay=0.0
+species = 'species1'
+
+[model.properties]
+kh = [0.1,0.1]
+kv = [0.1,0.1]
+celltype = [1,0]
+specific_yield = [0.15,0.15]
+specific_storage = [1e-6,1e-6]
+initial_steady-state_timestep = false
+
+[model.properties.refinement.kh]
+layer_1 = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\k_laag_1.shp'
+
+[model.properties.refinement.kv]
+layer_1 = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\k_laag_1.shp'
+
+[model.boundary_conditions]
+initial_conditions = [-2.4,-2.4]
+initial_concentrations = 0.0  # should be constant, xlsx-file, xarray.nc
+recharge = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\meteo.xlsx'  # ' # mm/d      # should contain a column 'concentration'
+recharge_date_format = '%Y%m%d'
+fraction_unpaved = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\grids\fraction_unpaved_test.nc'
+
+[[model.boundary_conditions.drainage_infiltration]]
+name = 'riool'
+shape = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\riool.shp'
+concentration_species1 = 0.0
+
+[[model.boundary_conditions.evapotranspiration]]
+name = 'vegetatie'
+maximum_rate = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\meteo.xlsx'   # mm/d, optional: concentration column??
+maximum_rate_date_format = '%Y%m%d'
+vegetation = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\vegetatie.shp'
+
+[[model.boundary_conditions.drainage_infiltration]]
+name = 'DIT-riool'
+shape = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\riool_ext.shp'
+concentration_species1 = 10.0
+
+
+# scenariodefinitie
+[scenario]
+name = 'DIT-riool'
+
+[[scenario.boundary_conditions.drainage_infiltration]]
+name = 'DIT-riool'
+shape = 'c:\werkmap\PHISHES_project\PHISHES\workflows\input\shape\riool_ext.shp'
+concentration_species1 = 0.0

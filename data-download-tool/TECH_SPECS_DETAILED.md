@@ -286,7 +286,7 @@ See pyproject.toml for declared dependencies and versions.
 
 - pyproject.toml scripts reference setup_folder_structure:main and download_datasets:main, but no such modules exist in src, so both console entry points are broken
 - `[project.urls]` points at `github.com/phishes/data-downloader` rather than `github.com/DHI/phishes-pdp`
-- No top-level `pgm_forcings:` section in the catalog, so MSHE-Ecolab's `load_pgm_forcing_library()` raises until one is added
+- No top-level `pgm_forcings:` section in the catalog, so MSHE-Ecolab-PGM's `load_pgm_forcing_library()` raises until one is added
 
 ## 9. Future Enhancements (Optional)
 

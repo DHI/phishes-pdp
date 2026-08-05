@@ -1,0 +1,29 @@
+[workspace]
+name = "mk_model"
+version = "0.1"
+authors = ["Kok-Hendrik <hendrik.kok@deltares.nl>"]
+channels = ["conda-forge"]
+platforms = ["win-64"]
+
+[tasks]
+
+[dependencies]
+geopandas = "*"
+h5netcdf = "*"
+mypy = "*"
+numpy = "*"
+imod = "*"
+pip = "*"
+python = ">=3.10"
+rasterio = ">=1.0"
+ruff = "*"
+scipy = "*"
+tomli-w = "*"
+twine = "*"
+xmipy = "*"
+xarray = "*"
+openpyxl = "*"
+fiona = "*"
+rioxarray = ">=0.21.0,<0.22"
+
+

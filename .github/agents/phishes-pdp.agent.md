@@ -15,23 +15,54 @@ Your job is to implement, review, and verify changes for the PHISHES PDP workspa
 ## Routing Rules
 
 - Delegate to `Data Download Tool Engineer` for work scoped to `data-download-tool/` download pipeline code, dataset catalogs, notebook flow, or related tests.
-- Delegate to `Plant Growth Module Engineer` for work scoped to `model-trains/MSHE-Ecolab/` DFS2 generation, template mapping logic, soil profile setup, forcing generation, notebook flow, or related tests.
+- Delegate to `Plant Growth Module Engineer` for work scoped to `model-trains/MSHE-Ecolab-PGM/` DFS2 generation, template mapping logic, soil profile setup, forcing generation, notebook flow, or related tests.
 - Delegate to `PGM Initial Condition Updater Engineer` for the `.she`/PFS initial-condition updater (Workflow D): `initial_condition_updater.py`, its notebook, tests and design doc.
 - Keep work in this agent for cross-module tasks, repository-level documentation, CI, governance files, and changes that span both modules.
 
 ## Repository Layout
 
 - `data-download-tool/` is shared infrastructure at the repository root.
-- Everything downstream is a **model train** under `model-trains/<train-name>/`, each a
-  self-contained project with its own `pyproject.toml`, environment, tests and notebooks. A new
-  model train goes there — never as a second top-level module folder.
-- `model-trains/MSHE-Ecolab/` was previously `plant-growth-module/`. The move was path-only: the
-  `plant_growth_module` package, the `plant-growth-module` distribution name and all imports are
-  unchanged. Treat all three names as current.
+- Everything downstream is a **model train** under `model-trains/<folder>/`. Trains built here are
+  self-contained `uv` projects with their own `pyproject.toml`, environment, tests and notebooks;
+  partner-delivered ones may be plain scripts or use a different tool entirely (the Deltares train uses
+  `pixi`). A new model train goes there — never as a second top-level module folder.
+- In `model-trains/MSHE-Ecolab-PGM/` the folder is named after the model train while the Python package
+  is `plant_growth_module` and the distribution is `plant-growth-module`. Treat all three names as
+  current; imports use the package name.
+- **Name a partner train as delivered**: `MODFLOW6-reservoir-model` and `hydrus-1d+modflow6` throughout
+  the docs — not the design-stage names (*MODFLOW 6–UZF–Reservoir with Daisy extension*, *1D HYDRUS–
+  PHREEQC–MODFLOW-2005–MT3D*) they carried before the code arrived. Never rename a partner's folder, and
+  never substitute a prettier label for it. Note the BRGM train's path doubles —
+  `model-trains/hydrus-1d+modflow6/hydrus-1d+modflow6/` — because the delivery pairs a README with a
+  like-named code folder.
+- **Two folders are partner deliveries kept byte-for-byte as received**, their own `README.md`
+  included: `model-trains/hydrus-1d+modflow6/` (BRGM) and
+  `model-trains/MODFLOW6-reservoir-model/` (Deltares). Never edit, reformat or add files inside either;
+  write what you need in `model-trains/README.md` instead. The `.gitattributes`, pre-commit,
+  markdownlint and CI exclusions that enforce this must stay in place. To refresh a delivery, fetch the
+  partner's remote and `git checkout <remote>/<branch> -- <path>` so their blob SHAs are reused
+  verbatim — see `CLAUDE.md` Module 3.
+
+## Model Train Index
+
+`model-trains/README.md` is the single index of trains and nothing in CI checks it, so it goes stale
+silently. **Any change that adds a train, starts implementing one, or changes a train's status must
+update it in the same change.** Its own *Adding a model train* section is the checklist:
+
+1. A table row with all five columns: train name, **Delivered by** (DHI or the partner organisation),
+   folder (`—` if no code yet), documentation link (`—` if no README yet), implementation status.
+2. A row in *Which train do I need?*, phrased as the problem a reader arrives with.
+3. If the train is available, a subsection under *What the available trains do* — two short paragraphs
+   plus a link to its README.
+4. The train's numbered section under *Scientific descriptions*.
+5. The available-trains list in the root `README.md` and the layout tree in `CLAUDE.md`.
+
+That file is a deliberately non-technical **overview**: it helps a reader pick a train. Installation
+steps, dependency lists and command lines belong in the train's own README, not there.
 
 ## Cross-Module Coordination
 
-- `model-trains/MSHE-Ecolab` resolves `phishes-data-downloader` from GitHub `main`, not the local
+- `model-trains/MSHE-Ecolab-PGM` resolves `phishes-data-downloader` from GitHub `main`, not the local
   sibling folder. For coordinated changes, merge the `data-download-tool` change first, then re-run
   `uv sync --link-mode copy` in the model train.
 - The runtime import probes `core/downloader.py` and `analysis/catchment.py` directly. Restructuring

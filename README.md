@@ -20,21 +20,23 @@ Most user-facing workflows are provided as Jupyter notebooks in the module folde
 
 - Windows, Linux, or macOS
 - Python x64 3.10 - 3.13 (each module pins `3.11` to match CI)
+- Per model train: the third-party simulation software that train drives (MIKE SHE + MIKE ECO Lab,
+  Daisy, HYDRUS-1D, MODFLOW). None of it is redistributed here — each train's README lists what it
+  needs and where to download it.
 
 ## Installation
 
-Installations are handled per sub-project — each has its own environment. See the module README
-files for setup steps:
+Installations are handled per sub-project — each has its own environment. See that project's README
+for setup steps:
 
 - [data-download-tool/README.md](data-download-tool/README.md)
-- [model-trains/MSHE-Ecolab/README.md](model-trains/MSHE-Ecolab/README.md)
+- Model trains: pick yours from the index in [model-trains/README.md](model-trains/README.md), then
+  follow that train's own README
 
 ## Where can I get help?
 
-- Module-specific documentation:
-  - [data-download-tool/README.md](data-download-tool/README.md)
-  - [model-trains/MSHE-Ecolab/README.md](model-trains/MSHE-Ecolab/README.md)
-- Model train descriptions: [model-trains/README.md](model-trains/README.md)
+- Shared download tooling: [data-download-tool/README.md](data-download-tool/README.md)
+- Model trains — index, status and scientific descriptions: [model-trains/README.md](model-trains/README.md)
 - Repository design: [REPOSITORY_DESIGN.md](REPOSITORY_DESIGN.md)
 - Contributing and CI: [CONTRIBUTING.md](CONTRIBUTING.md)
 
@@ -50,20 +52,20 @@ rasters, GeoParquet vector layers, and partner data zip bundles. Shared by every
 
 ### Model trains
 
-Each model train is an independent project under [model-trains/](model-trains/). The scientific
-description of all four trains — inputs, coupling, data exchanged, outputs — is in
-[model-trains/README.md](model-trains/README.md).
+Each model train is an independent project under [model-trains/](model-trains/), built by one of the
+project partners, that produces the simulation inputs for its own chain of coupled models. Some take
+their data from the download tool, others ship with their own.
 
-| Model train | Status | Documentation |
-| --- | --- | --- |
-| [MSHE-Ecolab](model-trains/MSHE-Ecolab/) — MIKE SHE + MIKE ECO Lab Plant Growth Module | Implemented | [README](model-trains/MSHE-Ecolab/README.md) |
-| [MSHE-Daisy](model-trains/MSHE-Daisy/) — MIKE SHE + Daisy | Description only | [README](model-trains/MSHE-Daisy/README.md) |
-| [HYDRUS-PHREEQC-MODFLOW2005-MT3D](model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/) | Description only | [README](model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/README.md) |
+[model-trains/README.md](model-trains/README.md) is the single index: which trains exist, which one
+fits your problem, who delivered each, and the scientific description of each — inputs, the coupling,
+the data exchanged between components, and outputs. Start there and follow the link to the train you
+need.
 
-**MSHE-Ecolab** generates spatially distributed DFS2 maps for DHI's ECO Lab Plant Growth Module from
-land use, soil profile and species parameter templates, plus forcing grids and MIKE SHE hotstart
-initial conditions. It was previously `plant-growth-module/` at the repository root; the move was
-path-only, so the `plant_growth_module` package and all imports are unchanged.
+Available to use today:
+
+- **MIKE SHE–MIKE ECO Lab Plant Growth Module** (DHI) — [model-trains/MSHE-Ecolab-PGM/](model-trains/MSHE-Ecolab-PGM/)
+- **MODFLOW6-reservoir-model** (Deltares) — [model-trains/MODFLOW6-reservoir-model/](model-trains/MODFLOW6-reservoir-model/)
+- **hydrus-1d+modflow6** (BRGM) — [model-trains/hydrus-1d+modflow6/](model-trains/hydrus-1d+modflow6/)
 
 ## 📁 Repository structure (high level)
 
@@ -78,10 +80,8 @@ phishes-pdp/
 ├── images/
 ├── data-download-tool/                     # Shared: datastore downloads + catchment analysis
 └── model-trains/                           # One self-contained project per model train
-    ├── README.md                           # Scientific description of all four trains
-    ├── MSHE-Ecolab/                        # MIKE SHE + ECO Lab Plant Growth Module (implemented)
-    ├── MSHE-Daisy/
-    └── HYDRUS-PHREEQC-MODFLOW2005-MT3D/
+    ├── README.md                           # Index + scientific description of every train
+    └── <train-name>/                       # e.g. MSHE-Ecolab-PGM/, MSHE-Daisy/
 ```
 
 Adding a model train means creating `model-trains/<train-name>/` as a self-contained project with its
@@ -90,11 +90,9 @@ own `pyproject.toml`, environment, tests and notebooks — not a new top-level f
 ## 📚 Documentation
 
 - Repository-level design: [REPOSITORY_DESIGN.md](REPOSITORY_DESIGN.md)
-- Model train descriptions: [model-trains/README.md](model-trains/README.md)
+- Model trains — index, status and scientific descriptions: [model-trains/README.md](model-trains/README.md)
 - Release history: [CHANGELOG.md](CHANGELOG.md)
-- Module technical details:
-  - [data-download-tool/README.md](data-download-tool/README.md)
-  - [model-trains/MSHE-Ecolab/README.md](model-trains/MSHE-Ecolab/README.md)
+- Download tool technical details: [data-download-tool/README.md](data-download-tool/README.md)
 
 ---
 

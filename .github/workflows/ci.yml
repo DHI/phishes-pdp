@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         dir:
-          - model-trains/MSHE-Ecolab
+          - model-trains/MSHE-Ecolab-PGM
           - data-download-tool
 
     steps:
@@ -56,7 +56,7 @@ jobs:
       fail-fast: false
       matrix:
         dir:
-          - model-trains/MSHE-Ecolab
+          - model-trains/MSHE-Ecolab-PGM
           - data-download-tool
 
     steps:

@@ -55,7 +55,7 @@ at load time, and each format takes a different path through `download_dataset`:
   overlap, point/line buffering).
 - `sample_data/` is load-bearing — tests read from it. Do not rename or move those files without
   updating `tests/`.
-- `model-trains/MSHE-Ecolab` imports this module's source by probing `core/downloader.py` and
+- `model-trains/MSHE-Ecolab-PGM` imports this module's source by probing `core/downloader.py` and
   `analysis/catchment.py` directly. Restructuring `src/` breaks that import — flag it explicitly.
 
 ## Tooling Constraints
