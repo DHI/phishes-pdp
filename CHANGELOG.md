@@ -38,9 +38,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Refreshed root and module READMEs plus agent files for the `model-trains/MSHE-Ecolab-PGM` naming
 - Root README now points at `model-trains/README.md` as the single model-train index rather than
   linking individual trains, so no train is singled out and the train list lives in one place
+- Disabled Dependabot *version* updates for both pip ecosystems (`open-pull-requests-limit: 0`).
+  Dependencies are `>=` floors that `uv sync` already resolves past, and the three-file `ruff==`
+  pin cannot be bumped correctly by a bot. Security updates and the blocking `pip-audit` check
+  are unaffected; GitHub Actions updates are grouped into one monthly pull request
+- Enabled "Automatically delete head branches" and Dependabot security updates on the repository,
+  documented in `.github/BRANCH_PROTECTION.md`
 
 ### Fixed
 
+- Realigned the `ruff` pin: both modules were bumped to `0.16.1` by Dependabot while
+  `.pre-commit-config.yaml` stayed at `v0.16.0`, so pre-commit disagreed with CI
 - Workflow and Dependabot paths updated to match renamed folders
 - Removed stray merge conflict marker from .gitignore
 - Corrected outdated file references in documentation
