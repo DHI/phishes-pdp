@@ -23,9 +23,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Dedicated agent and skill for the PGM initial condition updater (Workflow D)
 - `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` — Hydrus-1D ↔ MODFLOW 6 coupling delivered by
   BRGM, added as vendored content
-- `model-trains/MODFLOW6-reservoir-model/` — MODFLOW 6–UZF–Reservoir framework delivered by Deltares
-  (the *MODFLOW 6–UZF–Reservoir with Daisy extension* train), added as vendored content. Uses `pixi`
-  rather than `uv`; the Daisy coupling itself is not part of the public code
+- `model-trains/MODFLOW6-reservoir-model/` — MODFLOW 6 + reservoir groundwater flow and transport
+  framework delivered by Deltares, added as vendored content. Referred to throughout by its delivered
+  name. Uses `pixi` rather than `uv`; the Daisy coupling itself is not part of the public code
 - `.gitattributes`, marking both partner-delivered trains `-text linguist-vendored` so git's
   end-of-line conversion cannot alter the delivered bytes on any platform
 - Tooling exclusions keeping both partner deliveries byte-for-byte as received: every `pre-commit`

@@ -13,7 +13,7 @@ its own README has the technical detail: how to install it, what software it nee
 | -------------------------------------------- | ------------ | -------------------------------------------------------------------- | --------------------------------------------------- | --------------------- |
 | MIKE SHE–Daisy                               | DHI          | [MSHE-Daisy/](MSHE-Daisy/)                                           | [README](MSHE-Daisy/README.md)                      | Not implemented yet   |
 | MIKE SHE–MIKE ECO Lab Plant Growth Module    | DHI          | [MSHE-Ecolab-PGM/](MSHE-Ecolab-PGM/)                                 | [README](MSHE-Ecolab-PGM/README.md)                 | **Implemented**       |
-| MODFLOW 6–UZF–Reservoir with Daisy extension | Deltares     | [MODFLOW6-reservoir-model/](MODFLOW6-reservoir-model/)               | [README](MODFLOW6-reservoir-model/README.md)        | **Implemented**       |
+| MODFLOW6-reservoir-model                     | Deltares     | [MODFLOW6-reservoir-model/](MODFLOW6-reservoir-model/)               | [README](MODFLOW6-reservoir-model/README.md)        | **Implemented**       |
 | 1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D          | BRGM         | [1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/](1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/) | [README](1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/README.md) | **Implemented**       |
 
 **The simulation software itself is not in this repository.** Every train drives external models —
@@ -26,7 +26,7 @@ licences. The train's README says which ones it needs and where to get them.
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ----------------- |
 | A **small agricultural catchment**, and you care about how tillage, fertilising, crop rotation or irrigation change soil health and the leaching of nutrients and pesticides | MIKE SHE–Daisy                               | No — design stage |
 | A **large agricultural catchment**, where plant growth, carbon and nitrogen need to respond dynamically to the hydrology rather than being prescribed                        | MIKE SHE–MIKE ECO Lab Plant Growth Module    | **Yes**           |
-| An **urban catchment**, where ponding and inundation at the surface drive infiltration into the unsaturated zone and groundwater                                             | MODFLOW 6–UZF–Reservoir with Daisy extension | **Yes**           |
+| An **urban catchment**, where ponding and inundation at the surface drive infiltration into the unsaturated zone and groundwater                                             | MODFLOW6-reservoir-model                     | **Yes**           |
 | A **contaminated site** — PFAS from firefighting foam, or trace metals from mine tailings — where you need contaminant movement from the soil profile into groundwater       | 1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D          | **Yes**           |
 
 ## What the available trains do
@@ -41,6 +41,21 @@ can restart a simulation from the water-quality state of a previous run.
 
 Four workflows, each driven by its own Jupyter notebook. Setup, the workflow descriptions and the
 notebook index are in its **[README](MSHE-Ecolab-PGM/README.md)**.
+
+### MODFLOW6-reservoir-model — Deltares
+
+Simulates an urban catchment where water ponds at the surface before it gets into the ground. A
+reservoir water balance tracks ponding and inundation and hands the resulting infiltration to a
+MODFLOW 6 model, which carries groundwater flow and solute transport through the unsaturated zone and
+the aquifer. You describe a scenario in a TOML file — extent, layers, soil and aquifer properties,
+boundary conditions, transport parameters — and the framework builds, runs and post-processes the
+simulation for you, water balance included.
+
+Two worked scenarios ship with it: a wadi channel draining urban runoff, and longer-term groundwater
+dynamics under vegetation evapotranspiration with ditches and sewers. Built on iMOD Python and managed
+with [pixi](https://pixi.sh) rather than uv. Its **[README](MODFLOW6-reservoir-model/README.md)** covers
+setup, the TOML configuration and how to run a scenario; note that per that README the Daisy coupling is
+still under development and not part of the public code.
 
 ### 1D HYDRUS–PHREEQC–MODFLOW-2005–MT3D — BRGM
 
@@ -97,7 +112,7 @@ MIKE SHE passes constants, forcings and existing state-variable values to MIKE E
 
 Water balance indicators; actual evapotranspiration; soil moisture; runoff; infiltration; percolation; drain flow; crop yield; above-ground and below-ground residues; total soil organic carbon; nitrogen fixation; plant nitrogen uptake; denitrification losses; nitrate and ammonium leaching.
 
-## 3. Urban watersheds: MODFLOW 6–UZF–Reservoir model with Daisy extension
+## 3. Urban watersheds: MODFLOW6-reservoir-model
 
 ### Inputs
 
