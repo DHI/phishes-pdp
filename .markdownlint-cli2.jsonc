@@ -25,7 +25,7 @@
   // must not act on would only invite someone to edit vendor content.
   "ignores": [
     "**/node_modules/**",
-    "model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/**",
+    "model-trains/hydrus-1d+modflow6/**",
     "model-trains/MODFLOW6-reservoir-model/**"
   ]
 }

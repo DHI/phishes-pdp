@@ -29,11 +29,14 @@ Your job is to implement, review, and verify changes for the PHISHES PDP workspa
 - In `model-trains/MSHE-Ecolab-PGM/` the folder is named after the model train while the Python package
   is `plant_growth_module` and the distribution is `plant-growth-module`. Treat all three names as
   current; imports use the package name.
-- **Name a partner train as delivered.** The Deltares train is `MODFLOW6-reservoir-model` throughout
-  the docs — not the design-stage name *MODFLOW 6–UZF–Reservoir with Daisy extension* it carried before
-  the code arrived. Never rename a partner's folder, and never substitute a prettier label for it.
+- **Name a partner train as delivered**: `MODFLOW6-reservoir-model` and `hydrus-1d+modflow6` throughout
+  the docs — not the design-stage names (*MODFLOW 6–UZF–Reservoir with Daisy extension*, *1D HYDRUS–
+  PHREEQC–MODFLOW-2005–MT3D*) they carried before the code arrived. Never rename a partner's folder, and
+  never substitute a prettier label for it. Note the BRGM train's path doubles —
+  `model-trains/hydrus-1d+modflow6/hydrus-1d+modflow6/` — because the delivery pairs a README with a
+  like-named code folder.
 - **Two folders are partner deliveries kept byte-for-byte as received**, their own `README.md`
-  included: `model-trains/1D-HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and
+  included: `model-trains/hydrus-1d+modflow6/` (BRGM) and
   `model-trains/MODFLOW6-reservoir-model/` (Deltares). Never edit, reformat or add files inside either;
   write what you need in `model-trains/README.md` instead. The `.gitattributes`, pre-commit,
   markdownlint and CI exclusions that enforce this must stay in place. To refresh a delivery, fetch the
