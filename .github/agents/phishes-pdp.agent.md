@@ -22,17 +22,23 @@ Your job is to implement, review, and verify changes for the PHISHES PDP workspa
 ## Repository Layout
 
 - `data-download-tool/` is shared infrastructure at the repository root.
-- Everything downstream is a **model train** under `model-trains/<train-name>/`. Trains built here are
-  self-contained projects with their own `pyproject.toml`, environment, tests and notebooks;
-  externally delivered ones may be plain scripts. A new model train goes there — never as a second
-  top-level module folder.
+- Everything downstream is a **model train** under `model-trains/<folder>/`. Trains built here are
+  self-contained `uv` projects with their own `pyproject.toml`, environment, tests and notebooks;
+  partner-delivered ones may be plain scripts or use a different tool entirely (the Deltares train uses
+  `pixi`). A new model train goes there — never as a second top-level module folder.
 - In `model-trains/MSHE-Ecolab-PGM/` the folder is named after the model train while the Python package
   is `plant_growth_module` and the distribution is `plant-growth-module`. Treat all three names as
   current; imports use the package name.
-- `model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/` is a **BRGM delivery kept byte-for-byte as
-  received**, its own `README.md` included. Never edit, reformat or add files inside it; write what you
-  need in `model-trains/README.md` instead. The `.gitattributes`, pre-commit, markdownlint and CI
-  exclusions that enforce this must stay in place.
+- **A folder name is not necessarily the train name.** `MODFLOW6-reservoir-model/` implements the
+  *MODFLOW 6–UZF–Reservoir with Daisy extension* train. Map between them via the table in
+  `model-trains/README.md`; never rename a partner's folder.
+- **Two folders are partner deliveries kept byte-for-byte as received**, their own `README.md`
+  included: `model-trains/HYDRUS-PHREEQC-MODFLOW2005-MT3D/` (BRGM) and
+  `model-trains/MODFLOW6-reservoir-model/` (Deltares). Never edit, reformat or add files inside either;
+  write what you need in `model-trains/README.md` instead. The `.gitattributes`, pre-commit,
+  markdownlint and CI exclusions that enforce this must stay in place. To refresh a delivery, fetch the
+  partner's remote and `git checkout <remote>/<branch> -- <path>` so their blob SHAs are reused
+  verbatim — see `CLAUDE.md` Module 3.
 
 ## Model Train Index
 
