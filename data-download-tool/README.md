@@ -2,6 +2,11 @@
 
 A Python toolkit for downloading and managing soil science datasets from the PDP datastore based on user-defined catchment boundaries.
 
+> [!IMPORTANT]
+> **Disclaimer:** This tool downloads and processes third-party datasets and is provided "as is"
+> for research purposes, with no warranty on data accuracy or spatial outputs. Read the full
+> [DISCLAIMER.md](DISCLAIMER.md) before relying on its outputs.
+
 ## 🌍 What Does This Tool Do?
 
 The PHISHES Digital Platform (PDP) Data Download Tool works with the following inputs and capabilities for catchment-scale soil science modeling:

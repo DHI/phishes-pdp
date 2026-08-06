@@ -19,3 +19,65 @@ spatial mapping, temporal mapping, and a Quality Control (QC) calculation. Figur
 coupling process steps. The spatial mapping step takes place in the beginning, whereas the temporal
 mapping step is continuous based on the MIKE SHE UZ time step. The user, in addition to defining user defined settings for the coupling, must supply both models and results, a land use map and a
 soil type map.
+
+> [!IMPORTANT]
+> **Disclaimer:** This model train couples DAISY output into MIKE SHE via third-party spatial and
+> soil-profile inputs, and is provided "as is" for research purposes — it is also not yet final
+> (see [Status](#status) below). Read the full [DISCLAIMER.md](DISCLAIMER.md) before relying on
+> its outputs.
+
+## Status
+
+Runoff, matrix percolation and matrix drain flow coupling are implemented and run against the
+Cernici (Romania) field-site test case, with a passing test suite. It is **not final**: proof that
+native MIKE SHE runoff generation is suppressed for coupled cells, and authoritative confirmation of
+the matrix-percolation target variable (`SZ_LEAK_FLX` vs `SZ_LEAK_FLO`), remain open. See
+[docs/tasks.md](docs/tasks.md) for the current sign-off status per phase.
+
+## Environment
+
+Managed with [pixi](https://pixi.sh) rather than `uv` — Windows x64 only. **MIKE Zero 2025** must be
+installed separately; `pixi.toml` points at its `bin/x64` via the `MIKE_ZERO_X64` activation
+variable, so update that path if your installation differs.
+
+```powershell
+pixi shell
+```
+
+## Commands
+
+```powershell
+# Run the full test suite
+pixi run python -m pytest tests/
+
+# Full simulation against the Cernici setup (requires MIKE Zero + data files)
+pixi run python -m src.Test_Cernici
+
+# Smoke tests: short runs isolating one coupling phase at a time
+just runoff-test
+just percolation-test
+just drain-test
+
+# Print resolved configuration without running
+pixi run python -m src.Test_Cernici --print-config
+```
+
+`justfile` and `pixi.toml` define further tasks, including cross-run plotting
+(`plot-3dsz-crossrun`) and the investigation probes referenced in `docs/tasks.md`.
+
+## Project structure
+
+```
+MSHE-Daisy/
+├── src/                    # Coupling math, spatial mapping, DAISY I/O, diagnostics, plotting
+├── tests/                  # pytest suite
+├── docs/                   # Implementation plan, phase sign-offs, exchangeable-items reference
+├── pixi.toml / pixi.lock   # Environment (pixi, not uv)
+└── justfile                # Smoke-test and reporting recipes
+```
+
+`src/investigations/` and `docs/investigations/` hold one-off diagnostic probes and their output
+artifacts; both are gitignored because the artifacts run into the hundreds of MB per file.
+
+Full architecture, module-by-module notes and coupling conventions are in this project's own
+[CLAUDE.md](CLAUDE.md).
