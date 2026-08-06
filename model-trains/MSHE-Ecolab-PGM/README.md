@@ -5,6 +5,11 @@ Input generation for the **MSHE-Ecolab-PGM** model train: DHI's MIKE SHE coupled
 the spatially distributed DFS2 files that MIKE SHE / ECO Lab consume, and can also build forcing
 grids and re-inject simulated state as initial conditions.
 
+> [!IMPORTANT]
+> **Disclaimer:** This tool consumes land use, soil profile, and forcing data from third-party and
+> partner sources, and is provided "as is" for research purposes with no warranty on its outputs.
+> Read the full [DISCLAIMER.md](DISCLAIMER.md) before relying on its outputs.
+
 ## A note on names
 
 Three names refer to the same thing — all three are correct and none is stale:
