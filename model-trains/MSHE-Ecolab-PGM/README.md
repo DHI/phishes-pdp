@@ -224,7 +224,8 @@ model-trains/MSHE-Ecolab-PGM/
 │   ├── pgm_initial_condition_dfs2_map_generator.ipynb  # Workflow A
 │   ├── pgm_soil_profile_setup.ipynb                    # Workflow B
 │   ├── pgm_forcing_generator.ipynb                     # Workflow C
-│   └── pgm_initial_condition_updater.ipynb             # Workflow D
+│   ├── pgm_initial_condition_updater.ipynb             # Workflow D
+│   └── result-inspection/                              # Ad-hoc result QA, see below
 ├── tests/                                  # pytest suite (also reads sample_data/)
 ├── sample_data/
 │   ├── plant_growth_module/                # Templates, land use / soil profile DFS2, example model
@@ -298,6 +299,18 @@ model-trains/MSHE-Ecolab-PGM/
 - Outputs: `Layer_<k>.dfs2` files in `<dfs3-stem>_splitted/`, a timestamped backup of the original
   `.she`, and an updated `.she`.
 - Details and design rationale: [docs/initial_condition_updater.md](docs/initial_condition_updater.md).
+
+### Result Inspection (ad-hoc)
+
+- Folder: `notebooks/result-inspection/`
+- `obs_res_compare_cernici.ipynb` — compares PGM/MIKE SHE outputs (harvest, GWL, porewater, …) against
+  processed Cernici field observations.
+- `plot_mikeshe_veg_cernizi_sz.py` — plots UZ/SZ 3D MIKE SHE results layer-by-layer (depth profiles
+  and time series) for the Cernici vegetation run.
+- These are **scratch QA scripts, not a formal workflow**: paths are hardcoded to a specific machine
+  (`P:\WP1_PGM\...`, `C:\DHI\Cernici_060125\...`), logic lives inline rather than in
+  `src/plant_growth_module/`, and they are not covered by `tests/`. Edit the paths at the top before
+  running; treat them as a starting point for inspecting a specific run, not a reusable pipeline.
 
 ---
 
