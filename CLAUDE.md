@@ -32,7 +32,7 @@ data-download-tool/                      # shared: pulls forcing + static layers
 model-trains/
 ├── README.md                            # the index of every train — keep it current (see below)
 ├── MSHE-Ecolab-PGM/                     # implemented, by DHI
-├── MSHE-Daisy/                          # README stub only, by DHI
+├── MSHE-Daisy/                          # by DHI, pixi not uv — see Module 5, not final
 ├── hydrus-1d+modflow6/                  # 🔒 BRGM delivery — do not modify (see Module 3)
 │   ├── README.md                        #    the vendor's own README, not a repo README
 │   └── hydrus-1d+modflow6/              #    the delivered code folder — same name, one level down
@@ -171,6 +171,15 @@ Train 3 in `model-trains/README.md`, referred to everywhere by its delivered nam
 - **MODFLOW 6 binaries are not committed** — the user downloads them and points `mf6_binaries` in the scenario TOML at the `bin/` directory.
 - **Daisy coupling is not in this code.** Their README states it is under active development and not in the public repository, and that Daisy BMI binaries are currently `.pyd` files installed via pixi tasks. Note it as an upcoming addition from Deltares, not as something missing from the delivery.
 - `workflows/input/` carries the scenario input data (`meteo.xlsx`, `Storms_A.xlsx`, NetCDF grids, shapefiles). Their own nested `.gitignore` excludes two large grids (`AHN4.TIF`, `ahn4_filled.nc`) and `simulation_dir` output — that file is theirs; leave it alone. Largest committed file here is ~573 KB, so the folder is no concern for the 10 MiB gate.
+
+## Module 5: `model-trains/MSHE-Daisy/`
+
+Train 1 in `model-trains/README.md`. Couples DAISY (field-scale soil–plant–atmosphere model) outputs into a running MIKE SHE simulation through the MShePy runtime API, one-way: DAISY drives MIKE SHE's unsaturated-zone fluxes in coupled agricultural cells, MIKE SHE never feeds back. The Cernici field site (Romania) is the implementation and validation case. **This is DHI's own code, not a partner delivery — it is not byte-for-byte locked like Modules 3/4, and it is not final yet.**
+
+- **`pixi`, not `uv`** — like Module 4: `pixi.toml` + `pixi.lock`, Windows x64 only. Requires MIKE Zero 2025 installed separately; its `bin/x64` path is set via `MIKE_ZERO_X64` in `pixi.toml` activation env. **Not yet wired into the repo's CI** (uv-based `lint-test`/`dependency-audit` matrices, pre-commit) — its `pixi.toml` doesn't declare `pytest`/`ruff` as dev dependencies yet, so treat it like the pixi vendor trains for now rather than assuming it's covered by the blocking checks.
+- **Has its own `CLAUDE.md`** at `model-trains/MSHE-Daisy/CLAUDE.md` carrying the full architecture, commands and coupling-convention detail — unlike every other model train, where that detail lives in this file. Keep the two in sync for anything repo-wide (CI contract, global conventions); module-internal detail (coupling math, spatial mapping, diagnostics schema) belongs only in the module's own file.
+- Three coupling phases, one-way DAISY → MIKE SHE: **Runoff** → `OLDR_IN_FLO`, **Matrix percolation** → `SZ_LEAK_FLX` + `UZ_WC` correction, **Matrix drain flow** → `SZDR_IN_FLO`. All three are implemented and covered by the module's test suite against Cernici; still open per `docs/tasks.md`: proof that native MIKE SHE runoff generation is suppressed (not just routed around) in coupled cells, and authoritative confirmation of `SZ_LEAK_FLX` vs `SZ_LEAK_FLO` as the percolation target.
+- **`docs/investigations/`, `src/investigations/`, and `*.html` are gitignored in this module.** The investigation probes that live there write diagnostic CSV/JSON dumps that run into the hundreds of MB per file — well past the repo's blocking 10 MB file-size gate — so they stay local-only rather than committed.
 
 ## Common commands
 

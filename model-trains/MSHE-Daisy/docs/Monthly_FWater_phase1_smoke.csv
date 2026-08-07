@@ -1,0 +1,10 @@
+dlf-0.0 -- Field water (defined in 'log-std.dai').
+
+VERSION: 7.0.13
+LOGFILE: Monthly_FWater_phase1_smoke.csv
+RUN: Fri May 29 21:00:00 2026
+
+year	month	mday	hour	Runoff	Matrix percolation
+				mm	mm
+2020	8	1	0	0.0	2.99483
+2020	9	1	0	62.0	2.99483

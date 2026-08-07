@@ -11,7 +11,7 @@ its own README has the technical detail: how to install it, what software it nee
 
 | Model train                                  | Delivered by | Folder                                                               | Documentation                                       | Implementation status |
 | -------------------------------------------- | ------------ | -------------------------------------------------------------------- | --------------------------------------------------- | --------------------- |
-| MIKE SHE–Daisy                               | DHI          | [MSHE-Daisy/](MSHE-Daisy/)                                           | [README](MSHE-Daisy/README.md)                      | Not implemented yet   |
+| MIKE SHE–Daisy                               | DHI          | [MSHE-Daisy/](MSHE-Daisy/)                                           | [README](MSHE-Daisy/README.md)                      | **Implemented**       |
 | MIKE SHE–MIKE ECO Lab Plant Growth Module    | DHI          | [MSHE-Ecolab-PGM/](MSHE-Ecolab-PGM/)                                 | [README](MSHE-Ecolab-PGM/README.md)                 | **Implemented**       |
 | MODFLOW6-reservoir-model                     | Deltares     | [MODFLOW6-reservoir-model/](MODFLOW6-reservoir-model/)               | [README](MODFLOW6-reservoir-model/README.md)        | **Implemented**       |
 | hydrus-1d+modflow6          | BRGM         | [hydrus-1d+modflow6/](hydrus-1d+modflow6/) | [README](hydrus-1d+modflow6/README.md) | **Implemented**       |
@@ -24,12 +24,29 @@ licences. The train's README says which ones it needs and where to get them.
 
 | If you are working on…                                                                                                                                                       | Use                                          | Available now?    |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ----------------- |
-| A **small agricultural catchment**, and you care about how tillage, fertilising, crop rotation or irrigation change soil health and the leaching of nutrients and pesticides | MIKE SHE–Daisy                               | No — design stage |
+| A **small agricultural catchment**, and you care about how tillage, fertilising, crop rotation or irrigation change soil health and the leaching of nutrients and pesticides | MIKE SHE–Daisy                               | **Yes**            |
 | A **large agricultural catchment**, where plant growth, carbon and nitrogen need to respond dynamically to the hydrology rather than being prescribed                        | MIKE SHE–MIKE ECO Lab Plant Growth Module    | **Yes**           |
 | An **urban catchment**, where ponding and inundation at the surface drive infiltration into the unsaturated zone and groundwater                                             | MODFLOW6-reservoir-model                     | **Yes**           |
 | A **contaminated site** — PFAS from firefighting foam, or trace metals from mine tailings — where you need contaminant movement from the soil profile into groundwater       | hydrus-1d+modflow6          | **Yes**           |
 
 ## What the available trains do
+
+### MIKE SHE–Daisy — DHI
+
+Couples DAISY, a detailed field-scale soil–plant–atmosphere model, into a MIKE SHE catchment
+simulation. DAISY simulates the effect of agricultural practices — tillage, fertilising, crop
+rotation, irrigation — on soil health and the leaching of nutrients and pesticides for a
+representative soil profile; its results substitute MIKE SHE's own unsaturated-zone calculation in
+the matching agricultural cells, one-way, driven through the MShePy runtime API rather than a file
+exchange. The current implementation and validation case is the Cernici field site in Romania.
+
+Runs as Python scripts against a running MIKE SHE session (no notebook), managed with
+[pixi](https://pixi.sh) rather than uv. Setup, commands and coupling detail are in its
+**[README](MSHE-Daisy/README.md)** and its own `CLAUDE.md`. Runoff, matrix percolation and matrix
+drain flow coupling are all implemented and pass the test suite against the Cernici case; proof
+that native MIKE SHE runoff generation is suppressed for coupled cells, and authoritative
+confirmation of the percolation target variable, remain open — see the module's `docs/tasks.md`
+for the current sign-off status per phase.
 
 ### MIKE SHE–MIKE ECO Lab Plant Growth Module — DHI
 
