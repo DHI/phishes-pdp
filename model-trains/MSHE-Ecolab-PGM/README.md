@@ -10,6 +10,9 @@ grids and re-inject simulated state as initial conditions.
 > partner sources, and is provided "as is" for research purposes with no warranty on its outputs.
 > Read the full [DISCLAIMER.md](DISCLAIMER.md) before relying on its outputs.
 
+For the full walkthrough — background, workflows and usage in one document — see the
+[PGM User Guide (PDF)](PGM%20User%20Guide_v1.0.pdf).
+
 ## A note on names
 
 Three names refer to the same thing — all three are correct and none is stale:
@@ -236,6 +239,7 @@ model-trains/MSHE-Ecolab-PGM/
 │   └── pgm_forcing_generator/              # Example DFS0/CSV + multi-forcing timeseries_inputs.yaml
 ├── docs/
 │   └── initial_condition_updater.md         # Workflow D design & usage
+├── PGM User Guide_v1.0.pdf                  # Full user guide (background, workflows, usage)
 ├── .python-version                          # Pinned interpreter (3.11), matches CI
 ├── pyproject.toml                           # Project dependencies and ruff config
 └── README.md                                # This file
