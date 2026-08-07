@@ -22,17 +22,30 @@ soil type map.
 
 > [!IMPORTANT]
 > **Disclaimer:** This model train couples DAISY output into MIKE SHE via third-party spatial and
-> soil-profile inputs, and is provided "as is" for research purposes — it is also not yet final
-> (see [Status](#status) below). Read the full [DISCLAIMER.md](DISCLAIMER.md) before relying on
-> its outputs.
+> soil-profile inputs, and is provided "as is" for research purposes — two physics-authority
+> questions were also deliberately left deferred rather than resolved (see
+> [Status](#status) below). Read the full [DISCLAIMER.md](DISCLAIMER.md) before relying on its
+> outputs.
 
 ## Status
 
-Runoff, matrix percolation and matrix drain flow coupling are implemented and run against the
-Cernici (Romania) field-site test case, with a passing test suite. It is **not final**: proof that
-native MIKE SHE runoff generation is suppressed for coupled cells, and authoritative confirmation of
-the matrix-percolation target variable (`SZ_LEAK_FLX` vs `SZ_LEAK_FLO`), remain open. See
-[docs/tasks.md](docs/tasks.md) for the current sign-off status per phase.
+**Implementation complete.** Runoff, matrix percolation and matrix drain flow coupling are
+implemented and run against the Cernici (Romania) field-site test case, with a passing test suite.
+[docs/final_cross_phase_closeout_matrix_2026-06-01.md](docs/final_cross_phase_closeout_matrix_2026-06-01.md)
+records final sign-off at the accepted milestone boundary for all five implementation phases.
+
+Two stricter physics-authority questions were deliberately left deferred by project decision
+rather than resolved — see
+[docs/followup_decision_record_2026-06-01.md](docs/followup_decision_record_2026-06-01.md):
+
+- Whether native MIKE SHE runoff generation is actually suppressed (not just routed around) in
+  coupled cells is unproven. The one hook for it, `--zero-preprocessed-runoff-coefficients` in
+  `src/Test_Cernici.py`, is explicitly experimental and off by default, and every recorded probe of
+  it found no measurable suppression effect (see [docs/tasks.md](docs/tasks.md)).
+- `SZ_LEAK_FLX` vs `SZ_LEAK_FLO` as the matrix-percolation target remains a provisional engineering
+  choice, not a vendor-confirmed one.
+
+See [docs/tasks.md](docs/tasks.md) for the full phase-by-phase implementation and sign-off history.
 
 ## Setting up a new site
 

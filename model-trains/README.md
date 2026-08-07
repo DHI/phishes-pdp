@@ -43,10 +43,11 @@ exchange. The current implementation and validation case is the Cernici field si
 Runs as Python scripts against a running MIKE SHE session (no notebook), managed with
 [pixi](https://pixi.sh) rather than uv. Setup, commands and coupling detail are in its
 **[README](MSHE-Daisy/README.md)** and its own `CLAUDE.md`. Runoff, matrix percolation and matrix
-drain flow coupling are all implemented and pass the test suite against the Cernici case; proof
-that native MIKE SHE runoff generation is suppressed for coupled cells, and authoritative
-confirmation of the percolation target variable, remain open — see the module's `docs/tasks.md`
-for the current sign-off status per phase.
+drain flow coupling are all implemented and pass the test suite against the Cernici case, with
+final sign-off recorded at the accepted milestone boundary. Two stricter physics-authority
+questions — proof that native MIKE SHE runoff generation is suppressed for coupled cells, and
+authoritative confirmation of the percolation target variable — were deliberately left deferred by
+project decision rather than resolved; see the module's `docs/tasks.md` for the sign-off history.
 
 ### MIKE SHE–MIKE ECO Lab Plant Growth Module — DHI
 
