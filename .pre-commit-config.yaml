@@ -16,9 +16,11 @@ repos:
     hooks:
       - id: ruff-check
         args: [--fix]
-        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
+        # hydrus-1d+modflow6 / MODFLOW6-reservoir-model: vendor deliveries kept byte-for-byte.
+        # MSHE-Daisy: DHI research code, not yet wired into CI (no pytest/ruff dev deps pinned yet).
+        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model|MSHE-Daisy)/
       - id: ruff-format
-        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
+        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model|MSHE-Daisy)/
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0

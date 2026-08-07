@@ -14,11 +14,11 @@ grids and re-inject simulated state as initial conditions.
 
 Three names refer to the same thing — all three are correct and none is stale:
 
-| Name | What it is |
-| --- | --- |
-| `model-trains/MSHE-Ecolab-PGM/` | The **folder** (this project), named after the model train it feeds |
-| `plant_growth_module` | The **Python package** in `src/`, and the `plant-growth-module` distribution name |
-| PGM | The **abbreviation** used in notebook filenames (`pgm_*.ipynb`) and throughout these docs |
+| Name                            | What it is                                                                                |
+| ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `model-trains/MSHE-Ecolab-PGM/` | The **folder** (this project), named after the model train it feeds                       |
+| `plant_growth_module`           | The **Python package** in `src/`, and the `plant-growth-module` distribution name         |
+| PGM                             | The **abbreviation** used in notebook filenames (`pgm_*.ipynb`) and throughout these docs |
 
 So `from plant_growth_module import ...` is the import path, regardless of the folder name. See
 [model-trains/README.md](../README.md) for the other model trains.
@@ -31,8 +31,6 @@ So `from plant_growth_module import ...` is the import path, regardless of the f
 - [Notebook Workflows](#-notebook-workflows)
 - [Project Structure](#-project-structure)
 - [Configuration](#-configuration)
-- [Development](#-development)
-- [Test Coverage](#-test-coverage)
 - [Troubleshooting](#-troubleshooting)
 - [License](#-license)
 
@@ -111,12 +109,12 @@ After a `data-download-tool` change is merged, re-run `uv sync --link-mode copy`
 
 Choose the notebook based on your task:
 
-| Notebook | Workflow |
-| --- | --- |
-| `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb` | **A** — template-driven land use and soil profile map generation |
-| `notebooks/pgm_soil_profile_setup.ipynb` | **B** — soil profile text files → per-cell wilting point / field capacity DFS2 |
-| `notebooks/pgm_forcing_generator.ipynb` | **C** — DFS0/CSV time series → forcing DFS2 grids |
-| `notebooks/pgm_initial_condition_updater.ipynb` | **D** — 3D UZ water-quality `.dfs3` → per-layer initial conditions in a `.she` file |
+| Notebook                                                   | Workflow                                                                            |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb` | **A** — template-driven land use and soil profile map generation                    |
+| `notebooks/pgm_soil_profile_setup.ipynb`                   | **B** — soil profile text files → per-cell wilting point / field capacity DFS2      |
+| `notebooks/pgm_forcing_generator.ipynb`                    | **C** — DFS0/CSV time series → forcing DFS2 grids                                   |
+| `notebooks/pgm_initial_condition_updater.ipynb`            | **D** — 3D UZ water-quality `.dfs3` → per-layer initial conditions in a `.she` file |
 
 Each workflow is described under [Notebook Workflows](#-notebook-workflows) below.
 
@@ -405,51 +403,6 @@ Configure these settings in the notebook's configuration cell (Step 0):
 - **`OUTPUT_DIR`**: Specify the output directory path
   - All generated DFS2 files will be saved here
   - Use absolute paths for reliability
-
----
-
-## 🛠️ Development
-
-Run the blocking checks from **this directory** — they are what CI runs:
-
-```powershell
-uv run ruff check .
-uv run pytest -q
-```
-
-Always use `uv run ruff`, never a system-wide `ruff`. This module pins `ruff==0.16.0`; a different
-version enforces a different rule set and will disagree with CI. Formatting
-(`uv run ruff format .`) is checked but advisory — it never blocks a pull request.
-
-Conventions that linters do not enforce:
-
-- Use `pathlib.Path` and `Path.joinpath()`, not the `/` operator
-- Use `pd.Timestamp`, not `datetime`
-- Every method gets a docstring (a one-liner is fine)
-- Notebooks stay orchestrators; reusable logic belongs in `src/plant_growth_module/`
-
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the branch, hook and pull request workflow, and
-[CLAUDE.md](../../CLAUDE.md) for the full architectural notes.
-
----
-
-## 🧪 Test Coverage
-
-Run tests with coverage:
-
-```powershell
-uv run pytest
-```
-
-Generate an HTML coverage report:
-
-```powershell
-uv run pytest --cov-report=html
-```
-
-Open report:
-
-- `htmlcov/index.html`
 
 ---
 
