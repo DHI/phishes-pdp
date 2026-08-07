@@ -11,8 +11,8 @@ organised around two layers:
 
 - **`data-download-tool/`** — shared infrastructure that pulls clipped datasets (climate time series,
   static rasters, vector layers, partner data bundles) from the PDP datastore for a catchment you define
-- **`model-trains/`** — one self-contained project per coupled model train, each consuming the
-  downloaded data and producing that train's simulation inputs
+- **`model-trains/`** — one self-contained project per coupled model train, producing that
+  train's simulation inputs; some trains consume `data-download-tool` output
 
 Most user-facing workflows are provided as Jupyter notebooks in the module folders.
 
@@ -63,6 +63,7 @@ need.
 
 Available to use today:
 
+- **MIKE SHE–Daisy** (DHI) — [model-trains/MSHE-Daisy/](model-trains/MSHE-Daisy/)
 - **MIKE SHE–MIKE ECO Lab Plant Growth Module** (DHI) — [model-trains/MSHE-Ecolab-PGM/](model-trains/MSHE-Ecolab-PGM/)
 - **MODFLOW6-reservoir-model** (Deltares) — [model-trains/MODFLOW6-reservoir-model/](model-trains/MODFLOW6-reservoir-model/)
 - **hydrus-1d+modflow6** (BRGM) — [model-trains/hydrus-1d+modflow6/](model-trains/hydrus-1d+modflow6/)

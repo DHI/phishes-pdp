@@ -5,15 +5,23 @@ Input generation for the **MSHE-Ecolab-PGM** model train: DHI's MIKE SHE coupled
 the spatially distributed DFS2 files that MIKE SHE / ECO Lab consume, and can also build forcing
 grids and re-inject simulated state as initial conditions.
 
+> [!IMPORTANT]
+> **Disclaimer:** This tool consumes land use, soil profile, and forcing data from third-party and
+> partner sources, and is provided "as is" for research purposes with no warranty on its outputs.
+> Read the full [DISCLAIMER.md](DISCLAIMER.md) before relying on its outputs.
+
+For the full walkthrough — background, workflows and usage in one document — see the
+[PGM User Guide (PDF)](PGM%20User%20Guide_v1.0.pdf).
+
 ## A note on names
 
 Three names refer to the same thing — all three are correct and none is stale:
 
-| Name | What it is |
-| --- | --- |
-| `model-trains/MSHE-Ecolab-PGM/` | The **folder** (this project), named after the model train it feeds |
-| `plant_growth_module` | The **Python package** in `src/`, and the `plant-growth-module` distribution name |
-| PGM | The **abbreviation** used in notebook filenames (`pgm_*.ipynb`) and throughout these docs |
+| Name                            | What it is                                                                                |
+| ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `model-trains/MSHE-Ecolab-PGM/` | The **folder** (this project), named after the model train it feeds                       |
+| `plant_growth_module`           | The **Python package** in `src/`, and the `plant-growth-module` distribution name         |
+| PGM                             | The **abbreviation** used in notebook filenames (`pgm_*.ipynb`) and throughout these docs |
 
 So `from plant_growth_module import ...` is the import path, regardless of the folder name. See
 [model-trains/README.md](../README.md) for the other model trains.
@@ -26,8 +34,6 @@ So `from plant_growth_module import ...` is the import path, regardless of the f
 - [Notebook Workflows](#-notebook-workflows)
 - [Project Structure](#-project-structure)
 - [Configuration](#-configuration)
-- [Development](#-development)
-- [Test Coverage](#-test-coverage)
 - [Troubleshooting](#-troubleshooting)
 - [License](#-license)
 
@@ -106,12 +112,12 @@ After a `data-download-tool` change is merged, re-run `uv sync --link-mode copy`
 
 Choose the notebook based on your task:
 
-| Notebook | Workflow |
-| --- | --- |
-| `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb` | **A** — template-driven land use and soil profile map generation |
-| `notebooks/pgm_soil_profile_setup.ipynb` | **B** — soil profile text files → per-cell wilting point / field capacity DFS2 |
-| `notebooks/pgm_forcing_generator.ipynb` | **C** — DFS0/CSV time series → forcing DFS2 grids |
-| `notebooks/pgm_initial_condition_updater.ipynb` | **D** — 3D UZ water-quality `.dfs3` → per-layer initial conditions in a `.she` file |
+| Notebook                                                   | Workflow                                                                            |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `notebooks/pgm_initial_condition_dfs2_map_generator.ipynb` | **A** — template-driven land use and soil profile map generation                    |
+| `notebooks/pgm_soil_profile_setup.ipynb`                   | **B** — soil profile text files → per-cell wilting point / field capacity DFS2      |
+| `notebooks/pgm_forcing_generator.ipynb`                    | **C** — DFS0/CSV time series → forcing DFS2 grids                                   |
+| `notebooks/pgm_initial_condition_updater.ipynb`            | **D** — 3D UZ water-quality `.dfs3` → per-layer initial conditions in a `.she` file |
 
 Each workflow is described under [Notebook Workflows](#-notebook-workflows) below.
 
@@ -224,7 +230,8 @@ model-trains/MSHE-Ecolab-PGM/
 │   ├── pgm_initial_condition_dfs2_map_generator.ipynb  # Workflow A
 │   ├── pgm_soil_profile_setup.ipynb                    # Workflow B
 │   ├── pgm_forcing_generator.ipynb                     # Workflow C
-│   └── pgm_initial_condition_updater.ipynb             # Workflow D
+│   ├── pgm_initial_condition_updater.ipynb             # Workflow D
+│   └── result-inspection/                              # Ad-hoc result QA, see below
 ├── tests/                                  # pytest suite (also reads sample_data/)
 ├── sample_data/
 │   ├── plant_growth_module/                # Templates, land use / soil profile DFS2, example model
@@ -232,6 +239,7 @@ model-trains/MSHE-Ecolab-PGM/
 │   └── pgm_forcing_generator/              # Example DFS0/CSV + multi-forcing timeseries_inputs.yaml
 ├── docs/
 │   └── initial_condition_updater.md         # Workflow D design & usage
+├── PGM User Guide_v1.0.pdf                  # Full user guide (background, workflows, usage)
 ├── .python-version                          # Pinned interpreter (3.11), matches CI
 ├── pyproject.toml                           # Project dependencies and ruff config
 └── README.md                                # This file
@@ -298,6 +306,18 @@ model-trains/MSHE-Ecolab-PGM/
 - Outputs: `Layer_<k>.dfs2` files in `<dfs3-stem>_splitted/`, a timestamped backup of the original
   `.she`, and an updated `.she`.
 - Details and design rationale: [docs/initial_condition_updater.md](docs/initial_condition_updater.md).
+
+### Result Inspection (ad-hoc)
+
+- Folder: `notebooks/result-inspection/`
+- `obs_res_compare_cernici.ipynb` — compares PGM/MIKE SHE outputs (harvest, GWL, porewater, …) against
+  processed Cernici field observations.
+- `plot_mikeshe_veg_cernizi_sz.py` — plots UZ/SZ 3D MIKE SHE results layer-by-layer (depth profiles
+  and time series) for the Cernici vegetation run.
+- These are **scratch QA scripts, not a formal workflow**: paths are hardcoded to a specific machine
+  (`P:\WP1_PGM\...`, `C:\DHI\Cernici_060125\...`), logic lives inline rather than in
+  `src/plant_growth_module/`, and they are not covered by `tests/`. Edit the paths at the top before
+  running; treat them as a starting point for inspecting a specific run, not a reusable pipeline.
 
 ---
 
@@ -387,51 +407,6 @@ Configure these settings in the notebook's configuration cell (Step 0):
 - **`OUTPUT_DIR`**: Specify the output directory path
   - All generated DFS2 files will be saved here
   - Use absolute paths for reliability
-
----
-
-## 🛠️ Development
-
-Run the blocking checks from **this directory** — they are what CI runs:
-
-```powershell
-uv run ruff check .
-uv run pytest -q
-```
-
-Always use `uv run ruff`, never a system-wide `ruff`. This module pins `ruff==0.16.0`; a different
-version enforces a different rule set and will disagree with CI. Formatting
-(`uv run ruff format .`) is checked but advisory — it never blocks a pull request.
-
-Conventions that linters do not enforce:
-
-- Use `pathlib.Path` and `Path.joinpath()`, not the `/` operator
-- Use `pd.Timestamp`, not `datetime`
-- Every method gets a docstring (a one-liner is fine)
-- Notebooks stay orchestrators; reusable logic belongs in `src/plant_growth_module/`
-
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the branch, hook and pull request workflow, and
-[CLAUDE.md](../../CLAUDE.md) for the full architectural notes.
-
----
-
-## 🧪 Test Coverage
-
-Run tests with coverage:
-
-```powershell
-uv run pytest
-```
-
-Generate an HTML coverage report:
-
-```powershell
-uv run pytest --cov-report=html
-```
-
-Open report:
-
-- `htmlcov/index.html`
 
 ---
 

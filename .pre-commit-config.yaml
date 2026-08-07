@@ -16,17 +16,11 @@ repos:
     hooks:
       - id: ruff-check
         args: [--fix]
-        # The two partner-delivered model trains are kept byte-for-byte as
-        # received, so no hook may rewrite them — `--fix` least of all, since it
-        # deletes unused imports. They are also outside CI: the matrices in
-        # .github/workflows/{ci,security}.yml list modules explicitly and do not
-        # include either folder, so linting them here would block commits on
-        # findings no pull request check ever reports. Each partner lints its own
-        # code to its own rules (Deltares ships ruff in its pixi.toml).
-        # Drop an exclusion only if that folder stops being vendor-owned.
-        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
+        # hydrus-1d+modflow6 / MODFLOW6-reservoir-model: vendor deliveries kept byte-for-byte.
+        # MSHE-Daisy: DHI research code, not yet wired into CI (no pytest/ruff dev deps pinned yet).
+        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model|MSHE-Daisy)/
       - id: ruff-format
-        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
+        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model|MSHE-Daisy)/
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -34,11 +28,7 @@ repos:
       # Fixes the MD009 and MD047 findings Markdown Lint reports.
       - id: trailing-whitespace
         # sample_data holds MIKE SHE PreProcessor output parsed by fixed column
-        # position; notebook JSON is already handled by the ruff hooks. The
-        # partner-delivered trains are excluded wholesale — their content is not
-        # ours to rewrite, and the HYDRUS-1D project files (ATMOSPH.IN,
-        # PROFILE.DAT, SELECTOR.IN, …) are fixed-format, so stripping trailing
-        # whitespace would corrupt them.
+        # position; notebook JSON is already handled by the ruff hooks.
         exclude: (^|/)sample_data/|\.ipynb$|^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
       - id: end-of-file-fixer
         exclude: (^|/)sample_data/|\.ipynb$|^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
