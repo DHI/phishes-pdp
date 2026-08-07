@@ -6,7 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo does
 
-A two-module pipeline that produces inputs for **DHI MIKE SHE + ECO Lab Plant Growth Module** simulations. End-to-end shape:
+Python tooling and notebooks that produce simulation inputs for **four independent model trains** —
+each one couples a field/process model with a catchment-scale flow model, for a soil-health question.
+One train is DHI's own **MIKE SHE + ECO Lab Plant Growth Module** pipeline; the other three are
+MIKE SHE–Daisy (DHI), hydrus-1d+modflow6 (BRGM) and MODFLOW6-reservoir-model (Deltares).
+`model-trains/README.md` is the index of all four — what each does, which one fits a given problem,
+and implementation status; see Modules 1–5 below for the agent-facing detail on each.
+
+All four trains can draw on the same shared infrastructure, `data-download-tool/`, which pulls
+forcing and static layers from the datastore for a catchment. The most detailed of the four —
+MSHE-Ecolab-PGM — chains together like this:
 
 ```
 catchment shp/extent  ─►  data-download-tool  ─►  forcing DFS2 (precip, temp, PET, SSRD)
@@ -21,7 +30,13 @@ soil-profile *.txt + preprocessed DFS2 ─► (soil_profile_setup) ─► WP_cel
                                                     MIKE SHE / ECO Lab
 ```
 
-Both modules are independent Python projects (own `pyproject.toml`, `.venv`, tests, notebooks). Notebooks are **orchestrators only** — reusable logic lives in `src/`.
+The other three trains don't follow this exact shape — MSHE-Daisy drives a running MIKE SHE session
+directly through a runtime API rather than producing DFS2 inputs upfront, and the two partner
+deliveries have their own pipelines entirely (see Modules 3–5 below).
+
+Each model train is an independent Python project (own `pyproject.toml`/`pixi.toml`, environment,
+tests, notebooks where applicable). Notebooks are **orchestrators only** — reusable logic lives in
+`src/`.
 
 ### Repository layout
 
@@ -32,7 +47,7 @@ data-download-tool/                      # shared: pulls forcing + static layers
 model-trains/
 ├── README.md                            # the index of every train — keep it current (see below)
 ├── MSHE-Ecolab-PGM/                     # implemented, by DHI
-├── MSHE-Daisy/                          # by DHI, pixi not uv — see Module 5, not final
+├── MSHE-Daisy/                          # by DHI, pixi not uv — see Module 5, implementation complete
 ├── hydrus-1d+modflow6/                  # 🔒 BRGM delivery — do not modify (see Module 3)
 │   ├── README.md                        #    the vendor's own README, not a repo README
 │   └── hydrus-1d+modflow6/              #    the delivered code folder — same name, one level down
@@ -174,11 +189,11 @@ Train 3 in `model-trains/README.md`, referred to everywhere by its delivered nam
 
 ## Module 5: `model-trains/MSHE-Daisy/`
 
-Train 1 in `model-trains/README.md`. Couples DAISY (field-scale soil–plant–atmosphere model) outputs into a running MIKE SHE simulation through the MShePy runtime API, one-way: DAISY drives MIKE SHE's unsaturated-zone fluxes in coupled agricultural cells, MIKE SHE never feeds back. The Cernici field site (Romania) is the implementation and validation case. **This is DHI's own code, not a partner delivery — it is not byte-for-byte locked like Modules 3/4, and it is not final yet.**
+Train 1 in `model-trains/README.md`. Couples DAISY (field-scale soil–plant–atmosphere model) outputs into a running MIKE SHE simulation through the MShePy runtime API, one-way: DAISY drives MIKE SHE's unsaturated-zone fluxes in coupled agricultural cells, MIKE SHE never feeds back. The Cernici field site (Romania) is the implementation and validation case. **This is DHI's own code, not a partner delivery — it is not byte-for-byte locked like Modules 3/4.** Implementation is complete: `docs/final_cross_phase_closeout_matrix_2026-06-01.md` records final sign-off at the accepted milestone boundary for all five phases.
 
 - **`pixi`, not `uv`** — like Module 4: `pixi.toml` + `pixi.lock`, Windows x64 only. Requires MIKE Zero 2025 installed separately; its `bin/x64` path is set via `MIKE_ZERO_X64` in `pixi.toml` activation env. **Not yet wired into the repo's CI** (uv-based `lint-test`/`dependency-audit` matrices, pre-commit) — its `pixi.toml` doesn't declare `pytest`/`ruff` as dev dependencies yet, so treat it like the pixi vendor trains for now rather than assuming it's covered by the blocking checks.
 - **Has its own `CLAUDE.md`** at `model-trains/MSHE-Daisy/CLAUDE.md` carrying the full architecture, commands and coupling-convention detail — unlike every other model train, where that detail lives in this file. Keep the two in sync for anything repo-wide (CI contract, global conventions); module-internal detail (coupling math, spatial mapping, diagnostics schema) belongs only in the module's own file.
-- Three coupling phases, one-way DAISY → MIKE SHE: **Runoff** → `OLDR_IN_FLO`, **Matrix percolation** → `SZ_LEAK_FLX` + `UZ_WC` correction, **Matrix drain flow** → `SZDR_IN_FLO`. All three are implemented and covered by the module's test suite against Cernici; still open per `docs/tasks.md`: proof that native MIKE SHE runoff generation is suppressed (not just routed around) in coupled cells, and authoritative confirmation of `SZ_LEAK_FLX` vs `SZ_LEAK_FLO` as the percolation target.
+- Three coupling phases, one-way DAISY → MIKE SHE: **Runoff** → `OLDR_IN_FLO`, **Matrix percolation** → `SZ_LEAK_FLX` + `UZ_WC` correction, **Matrix drain flow** → `SZDR_IN_FLO`. All three are implemented and covered by the module's test suite against Cernici, signed off at the accepted milestone boundary. Two stricter physics-authority questions were deliberately left deferred by project decision rather than resolved (`docs/followup_decision_record_2026-06-01.md`) — they are not open bugs, but they mean the caveats below still hold: whether native MIKE SHE runoff generation is actually suppressed (not just routed around) in coupled cells is unproven — the one hook for it, `--zero-preprocessed-runoff-coefficients` in `Test_Cernici.py`, is experimental, off by default, and every recorded probe of it found no measurable suppression effect — and `SZ_LEAK_FLX` vs `SZ_LEAK_FLO` as the percolation target remains a provisional engineering choice, not a vendor-confirmed one.
 - **`docs/investigations/`, `src/investigations/`, and `*.html` are gitignored in this module.** The investigation probes that live there write diagnostic CSV/JSON dumps that run into the hundreds of MB per file — well past the repo's blocking 10 MB file-size gate — so they stay local-only rather than committed.
 
 ## Common commands

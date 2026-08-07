@@ -13,8 +13,9 @@ the terms of the repository [LICENSE](../../LICENSE).
 This software is provided for research purposes. It is provided "as is", without warranty of any
 kind, express or implied, including but not limited to the accuracy, reliability, merchantability,
 or fitness for a particular purpose of the software or its outputs. DHI does not warrant that the
-software is error-free or that its use will be uninterrupted. This model train is not final — see
-its [README](README.md#status) for open items.
+software is error-free or that its use will be uninterrupted. Implementation is complete, but two
+physics-authority questions were deliberately left deferred rather than resolved — see its
+[README](README.md#status) for detail.
 
 ## Third-party data
 
