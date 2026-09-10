@@ -52,19 +52,22 @@ class PDPDataDownloader:
     - Download logging and metadata
 
     Environment Variables:
-    Open datasets need no configuration; the account, container and read-only SAS
-    token for them are built in. Access-restricted catalog entries declare a
-    ``credential_env`` field naming the environment variable that must hold the SAS
-    token for their container (e.g. ``PDP_AFTER_END_SAS``). Those variables are read
-    from the process environment, which is populated from a ``.env`` file on init if
-    one is found; see ``.env.example``. Already-exported variables take precedence
-    over the ``.env`` file.
+    The account and container for open datasets are built in, but the read-only SAS
+    token for them is not: it is read from ``PDP_DEFAULT_SAS``. Access-restricted
+    catalog entries declare a ``credential_env`` field naming the environment
+    variable that must hold the SAS token for their container (e.g.
+    ``PDP_AFTER_END_SAS``). All of these variables are read from the process
+    environment, which is populated from a ``.env`` file on init if one is found;
+    see ``.env.example``. Already-exported variables take precedence over the
+    ``.env`` file. If ``PDP_DEFAULT_SAS`` is unset, connections to the open
+    container fall back to anonymous access.
     """
 
     # Azure Storage Configuration
     DEFAULT_AZURE_ACCOUNT = "phishesdatastore"
     DEFAULT_AZURE_CONTAINER = "zarr"
-    DEFAULT_AZURE_CREDENTIAL = "***REMOVED-SECRET***"
+    # Name of the env var holding the default (open-dataset) SAS token - see .env.example.
+    DEFAULT_AZURE_CREDENTIAL_ENV = "PDP_DEFAULT_SAS"
 
     DEFAULT_OUTPUT_FORMAT = "nc"
     # Raster outputs flow through the xarray pipeline; vector (GeoParquet) outputs
@@ -109,10 +112,14 @@ class PDPDataDownloader:
         output_format : str, optional
             Output format for downloaded datasets. Supported: "nc", "zarr", "dfs2".
         """
+        # Must run before the default credential lookup below, so a token set via
+        # .env is visible to it.
+        self._load_env_file()
+
         self.output_base = Path(output_base)
         self.azure_account = azure_account or self.DEFAULT_AZURE_ACCOUNT
         self.azure_container = azure_container or self.DEFAULT_AZURE_CONTAINER
-        self.azure_credential = azure_credential or self.DEFAULT_AZURE_CREDENTIAL
+        self.azure_credential = azure_credential or self._default_azure_credential()
         self.buffer_cells = int(buffer_cells)
         self.output_format = (output_format or self.DEFAULT_OUTPUT_FORMAT).lower()
         self.mask_on_catchment = bool(mask_on_catchment)
@@ -128,8 +135,6 @@ class PDPDataDownloader:
 
         # Load dataset catalog
         self.dataset_catalog = self._load_catalog()
-
-        self._load_env_file()
 
         # Load or use provided catchment
         if isinstance(catchment, gpd.GeoDataFrame):
@@ -172,6 +177,15 @@ class PDPDataDownloader:
         if not _DOTENV_AVAILABLE:
             return
         load_dotenv(find_dotenv(usecwd=True), override=False)
+
+    @classmethod
+    def _default_azure_credential(cls) -> Optional[str]:
+        """Read-only SAS token for the open (non-restricted) dataset container.
+
+        Sourced from ``PDP_DEFAULT_SAS`` rather than hardcoded. Returns None
+        (anonymous access) if the variable is unset.
+        """
+        return os.environ.get(cls.DEFAULT_AZURE_CREDENTIAL_ENV, "").strip() or None
 
     def _load_catalog(self) -> Dict:
         """Load the dataset catalog, merging the COG, GeoParquet, and partner catalogs into it.
