@@ -116,13 +116,13 @@ list anywhere in CI.
 - European AOI validation is enforced by default
 - Catchment size limits are enforced by default
 - Raster datasets are expected to have spatial dimensions named x/y or lon/lat
-- Default SAS token is embedded unless overridden; public containers are read anonymously, and restricted entries require their `credential_env` variable
+- Default SAS token is read from `PDP_DEFAULT_SAS` unless overridden; if unset, falls back to anonymous access, and restricted entries require their `credential_env` variable
 - Zarr stores are opened by trying consolidated → non-consolidated → `zarr_format=2`, taking the first result that exposes data variables (some stores carry both a v2 `.zmetadata` and a stray v3 `zarr.json`, which otherwise reads back empty)
 - DFS2 output requires equidistant axes; near-equidistant grids are snapped by `utils.regularize_axis`, and genuinely irregular ones still raise
 
 ## 12. Security Considerations
 
-- Default SAS token is embedded in code; production use should move this to environment variables or a secrets store
+- Default SAS token is read from the `PDP_DEFAULT_SAS` environment variable (see `.env.example`), not embedded in code
 - Access-restricted entries take their token from the environment variable named by `credential_env`, loaded from the nearest `.env`. `.env` is gitignored and must never be committed; only `.env.example` belongs in git. Tokens are never logged, and a missing token fails before any file is written
 - A read-only (`sp=r`) SAS token is sufficient for restricted bundles by design — do not introduce calls that need *list* permission on the container
 - Download logs may contain local paths and catchment references
