@@ -315,6 +315,14 @@ Currently available:
 | partner  | czech_globe_ms4            | Czech Globe            | Basin shapefiles (EPSG:3035) + metadata            |
 | partner  | copenhagen_university_ms4  | Copenhagen University  | Shapefile + 30-yr precip/evap/percolation CSVs     |
 
+### Default (open dataset) container token
+
+The default `zarr` container (open datasets) is read using a SAS token from the
+**`PDP_DEFAULT_SAS`** environment variable, rather than a token bundled with the tool.
+If it isn't set, the downloader falls back to anonymous access, which is sufficient for
+most open datasets. If you hit a connection/access error on an open dataset, request a
+`PDP_DEFAULT_SAS` token from the repository owner and add it to your `.env` (see below).
+
 ### Access-restricted datasets
 
 Some datasets are not public. They live in a SAS-protected container and their catalog
@@ -330,7 +338,8 @@ catalog reveals nothing about the bundle contents. Only the download is gated.
 
 To get access:
 
-1. Request the SAS token from the data owner.
+1. Request the SAS token from the repository owner (same contact for `PDP_DEFAULT_SAS`
+   and `PDP_AFTER_END_SAS`).
 2. Copy `.env.example` to `.env` and fill in the variable:
 
    ```dotenv
@@ -363,7 +372,8 @@ Cannot connect to PDP datastore
 ```
 
 - Check internet connection
-- Credentials for open datasets are built into the downloader
+- Open datasets fall back to anonymous access if `PDP_DEFAULT_SAS` isn't set; if that
+  still fails, request a `PDP_DEFAULT_SAS` token from the repository owner
 
 **Access Denied:**
 
