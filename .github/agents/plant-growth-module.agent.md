@@ -13,9 +13,9 @@ Your job is to implement, review, and verify changes for the Python package and 
 
 ## Scope
 
-- Code under `model-trains/MSHE-Ecolab/src/plant_growth_module/`
-- Tests under `model-trains/MSHE-Ecolab/tests/`
-- Notebook workflows in `model-trains/MSHE-Ecolab/notebooks/` (`pgm_initial_condition_dfs2_map_generator.ipynb`, `pgm_soil_profile_setup.ipynb`, `pgm_forcing_generator.ipynb`, `pgm_initial_condition_updater.ipynb`)
+- Code under `model-trains/MSHE-Ecolab-PGM/src/plant_growth_module/`
+- Tests under `model-trains/MSHE-Ecolab-PGM/tests/`
+- Notebook workflows in `model-trains/MSHE-Ecolab-PGM/notebooks/` (`pgm_initial_condition_dfs2_map_generator.ipynb`, `pgm_soil_profile_setup.ipynb`, `pgm_forcing_generator.ipynb`, `pgm_initial_condition_updater.ipynb`)
 - Docs directly related to module behavior and usage
 
 For the `.she`/PFS initial-condition updater (`initial_condition_updater.py`,

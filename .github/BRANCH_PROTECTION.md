@@ -35,11 +35,11 @@ Check the following boxes and configure as described:
 - ✅ **Require status checks to pass before merging**
   - ✅ **Require branches to be up to date before merging**
   - Search and add the following status checks (these match the job names in the workflow):
-    - `Lint and Test (model-trains/MSHE-Ecolab)`
+    - `Lint and Test (model-trains/MSHE-Ecolab-PGM)`
     - `Lint and Test (data-download-tool)`
     - `File Size Check (10 MB)`
     - `Secret Scan (trufflehog)`
-    - `Dependency Audit (model-trains/MSHE-Ecolab)`
+    - `Dependency Audit (model-trains/MSHE-Ecolab-PGM)`
     - `Dependency Audit (data-download-tool)`
     - `Basic PR Check`
     - `Code Quality Checks`
@@ -68,6 +68,23 @@ Check the following boxes and configure as described:
 ### 4. Save Changes
 
 Click **Create** or **Save changes** at the bottom of the page.
+
+### 5. Delete Merged Branches Automatically
+
+Because direct pushes to `main` are blocked, every change needs its own branch — so without
+cleanup the remote accumulates one dead branch per merged pull request forever.
+
+- Go to Settings → General → Pull Requests
+- ✅ **Automatically delete head branches**
+
+This is already enabled. Equivalent API call:
+
+```bash
+gh api -X PATCH repos/DHI/phishes-pdp -f delete_branch_on_merge=true
+```
+
+It only removes the *source* branch of a merged PR; nothing else is touched, and contributors
+keep their local copies.
 
 ## Verification
 
@@ -100,14 +117,20 @@ Edit `.github/CODEOWNERS` file to specify:
 Ensure the GitHub Actions workflow runs on all PRs:
 - The `.github/workflows/branch-protection.yml` workflow will run automatically
 - The `.github/workflows/ci.yml` workflow runs module-specific tests on push/PR:
-  - `Lint and Test (model-trains/MSHE-Ecolab)`
+  - `Lint and Test (model-trains/MSHE-Ecolab-PGM)`
   - `Lint and Test (data-download-tool)`
 
 ### 4. Enable Dependabot
-Configure automated dependency updates:
 - Go to Settings → Security & analysis
 - Enable "Dependabot alerts"
 - Enable "Dependabot security updates"
+
+Both are enabled. Note the split in `.github/dependabot.yml`: **security** updates are on, but
+**version** updates are switched off for the two pip ecosystems (`open-pull-requests-limit: 0`).
+Module dependencies are `>=` floors that `uv sync` already resolves past, and the `ruff==` pin
+must move in three files at once, which Dependabot cannot do — see the comment block at the top
+of `dependabot.yml`. Vulnerable dependencies are still caught by the blocking `pip-audit` check.
+GitHub Actions updates remain enabled, grouped into one monthly pull request.
 
 ### 5. Enable Code Scanning
 Set up automated code scanning:

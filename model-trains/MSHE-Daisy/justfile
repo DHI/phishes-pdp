@@ -1,0 +1,41 @@
+set windows-shell := ["powershell", "-NoLogo", "-NoProfile", "-Command"]
+
+FULL_RESULT_DIR := "data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_dr0_plugin.she - Result Files"
+LONGSIM_DFS3 := "data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_plugin.she - Result Files - LongSim/Cernici16_Ben_v100_DAISYinput_plugin_3DSZflow.dfs3"
+
+FULL_OVERLAND_DFS2 := "data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_dr0_plugin.she - Result Files/Cernici16_Ben_v100_DAISYinput_dr0_plugin_overland.dfs2"
+
+full-test: _run-full-3mo _plot-full-3mo-3dsz _plot-full-3mo-overland _report-full-3mo
+
+full-test-report: _plot-full-3mo-3dsz _plot-full-3mo-overland _report-full-3mo
+
+_run-full-3mo:
+    pixi run python -m src.Test_Cernici --sim-end 2020-11-01 --diagnostics-mode aggregated --diagnostics-output "{{FULL_RESULT_DIR}}/diagnostics_3mo.csv" --plot-diagnostics
+
+_plot-full-3mo-3dsz:
+    pixi run python src/plot_3dsz_layers.py --dfs3 "{{FULL_RESULT_DIR}}/Cernici16_Ben_v100_DAISYinput_dr0_plugin_3DSZflow.dfs3" --compare-dfs3 "{{LONGSIM_DFS3}}" --n-times 10 --primary-label "Full 3mo test" --secondary-label "LongSim" --output-dir "{{FULL_RESULT_DIR}}"
+
+_plot-full-3mo-overland:
+    pixi run python src/plot_overland_coupling.py --overland-dfs2 "{{FULL_OVERLAND_DFS2}}" --compare-times 2020-08-03 2020-08-15 2020-09-01 2020-09-15 2020-10-01 2020-10-15 --output-dir "{{FULL_RESULT_DIR}}"
+
+_report-full-3mo:
+    pixi run python src/report.py --result-dir "{{FULL_RESULT_DIR}}"
+
+runoff-test:
+    pixi run python -m src.Test_Cernici --setup data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_10d_sameparams4.she --daisy-output docs/Monthly_FWater_phase1_smoke.csv --disable-drain-coupling
+
+drain-test: _run-drain _plot-drain-crossrun
+
+percolation-test: _run-percolation _plot-percolation-crossrun
+
+_run-percolation:
+    pixi run python -m src.Test_Cernici --setup data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_10d_sameparams4.she --daisy-output docs/Monthly_FWater_phase1_smoke.csv --disable-runoff-coupling --disable-drain-coupling
+
+_run-drain:
+    pixi run python -m src.Test_Cernici --setup data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_10d_sameparams4.she --daisy-output docs/Monthly_FWater_phase3_smoke.csv --disable-runoff-coupling
+
+_plot-drain-crossrun:
+    pixi run python src/plot_3dsz_layers.py --dfs3 "data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_10d_sameparams4_plugin.she - Result Files/Cernici16_Ben_v100_DAISYinput_10d_sameparams4_plugin_3DSZflow.dfs3" --compare-dfs3 "data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_plugin.she - Result Files - LongSim/Cernici16_Ben_v100_DAISYinput_plugin_3DSZflow.dfs3" --primary-label "Drain test" --secondary-label "LongSim" --output-dir docs/investigations/phase3
+
+_plot-percolation-crossrun:
+    pixi run python src/plot_3dsz_layers.py --dfs3 "data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_10d_sameparams4_plugin.she - Result Files/Cernici16_Ben_v100_DAISYinput_10d_sameparams4_plugin_3DSZflow.dfs3" --compare-dfs3 "data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_plugin.she - Result Files - LongSim/Cernici16_Ben_v100_DAISYinput_plugin_3DSZflow.dfs3" --primary-label "Percolation test" --secondary-label "LongSim"

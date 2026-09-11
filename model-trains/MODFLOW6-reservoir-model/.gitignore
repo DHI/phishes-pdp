@@ -1,0 +1,13 @@
+.pixi
+
+# Large grid files exceeding GitHub's 100 MB limit
+workflows/input/grids/AHN4.TIF
+workflows/input/grids/ahn4_filled.nc
+
+# model output
+simulation_dir
+
+# Byte-compiled / cache files
+__pycache__/
+
+*.pyc

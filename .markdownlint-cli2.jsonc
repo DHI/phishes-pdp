@@ -20,5 +20,9 @@
     "MD051": false
   },
   "globs": ["**/*.md"],
-  "ignores": ["**/node_modules/**"]
+  "ignores": [
+    "**/node_modules/**",
+    "model-trains/hydrus-1d+modflow6/**",
+    "model-trains/MODFLOW6-reservoir-model/**"
+  ]
 }
