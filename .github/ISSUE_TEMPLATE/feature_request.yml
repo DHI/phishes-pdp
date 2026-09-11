@@ -13,7 +13,7 @@ body:
       description: Which module does this relate to?
       options:
         - data-download-tool
-        - model-trains/MSHE-Ecolab
+        - model-trains/MSHE-Ecolab-PGM
         - Repository / CI
         - New module
         - Other

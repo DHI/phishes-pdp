@@ -27,7 +27,7 @@ It describes:
 ### Out of scope
 
 - Internal architecture of `data-download-tool`
-- Internal architecture of `model-trains/MSHE-Ecolab`
+- Internal architecture of `model-trains/MSHE-Ecolab-PGM`
 - Detailed module workflows, APIs, and runtime behavior
 
 ## 3. Design Principles
@@ -72,7 +72,7 @@ Module-level documents should describe:
 - `.github/agents/phishes-pdp.agent.md`: main repository agent behavior and routing guidance
 - `REPOSITORY_DESIGN.md`: repository design baseline and scope boundaries
 - Policy files (`SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `LICENSE`): governance and compliance context
-- Module folders (`data-download-tool/`, `model-trains/MSHE-Ecolab/`): implementation ownership and module documentation
+- Module folders (`data-download-tool/`, `model-trains/MSHE-Ecolab-PGM/`): implementation ownership and module documentation
 
 ## 7. Acceptance Criteria
 

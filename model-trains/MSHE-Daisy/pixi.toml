@@ -1,0 +1,40 @@
+[workspace]
+authors = ["ejme <ejme@dhigroup.com>"]
+channels = ["conda-forge"]
+name = "wrd-mshe-phises"
+platforms = ["win-64"]
+version = "0.1.0"
+
+[tasks]
+run-test-cernici = "python -m src.Test_Cernici"
+check-imports = "python -c \"import os, sys; import numpy, pandas, mikeio; print('python', sys.version); print('MIKE_ZERO_X64', os.environ.get('MIKE_ZERO_X64')); print('PYTHONPATH', os.environ.get('PYTHONPATH'))\""
+show-config = "python -m src.Test_Cernici --print-config"
+phase0-diagnostic-spike = "python src/phase0_diagnostic_spike.py --output docs/investigations/phase0/phase0_diagnostic_spike.json"
+phase0-leakage-target-probe = "python src/investigations/phase0_leakage_target_probe.py --output docs/investigations/phase0/phase0_leakage_target_probe_2025.json"
+phase1-runoff-double-count-probe = "python src/investigations/phase1_runoff_double_count_probe.py --output docs/investigations/phase1/phase1_runoff_double_count_probe.json"
+phase1-runoff-alternate-observables-probe = "python src/investigations/phase1_runoff_alternate_observables_probe.py --output docs/investigations/phase1/phase1_runoff_alternate_observables_probe.json"
+phase3-matrix-drain-double-count-probe = "python src/investigations/phase3_matrix_drain_double_count_probe.py --output docs/investigations/phase3/phase3_matrix_drain_double_count_probe.json"
+phase1-plugin-timed-oldr-in-flo-probe = "python src/investigations/phase1_plugin_timed_oldr_in_flo_probe.py --output docs/investigations/phase1/phase1_plugin_timed_oldr_in_flo_probe.json"
+phase1-plugin-timed-ol-source-probe = "python src/investigations/phase1_plugin_timed_ol_source_probe.py --output docs/investigations/phase1/phase1_plugin_timed_ol_source_probe.json"
+phase1-plugin-timed-ol-source-readback-probe = "python src/investigations/phase1_plugin_timed_ol_source_probe.py --artifact-stem phase1_plugin_timed_ol_source_readback_probe --output docs/investigations/phase1/phase1_plugin_timed_ol_source_readback_probe.json"
+phase1-plugin-timed-uz-wc-probe = "python src/investigations/phase1_plugin_timed_uz_wc_probe.py --output docs/investigations/phase1/phase1_plugin_timed_uz_wc_probe.json"
+phase1-api-timed-uz-wc-probe = "python src/investigations/phase1_api_timed_uz_wc_probe.py --output docs/investigations/phase1/phase1_api_timed_uz_wc_probe.json"
+phase1-uz-wc-container-shape-probe = "python src/investigations/phase1_uz_wc_container_shape_probe.py --output docs/investigations/phase1/phase1_uz_wc_container_shape_probe.json"
+phase1-uz-wc-layer-mutation-probe = "python src/investigations/phase1_uz_wc_layer_mutation_probe.py --output docs/investigations/phase1/phase1_uz_wc_layer_mutation_probe.json"
+phase1-uz-wc-dataset-setter-probe = "python src/investigations/phase1_uz_wc_dataset_setter_probe.py --output docs/investigations/phase1/phase1_uz_wc_dataset_setter_probe.json"
+plot-3dsz-crossrun = "python src/plot_3dsz_layers.py --setup data/Cernici_060126_Test02_2/Cernici16_Ben_v100_DAISYinput_plugin.she"
+
+[activation.env]
+MIKE_ZERO_X64 = "C:/Program Files (x86)/DHI/MIKE Zero/2025/bin/x64"
+PYTHONPATH = "C:/Program Files (x86)/DHI/MIKE Zero/2025/bin/x64"
+
+[dependencies]
+python = "3.10.*"
+pip = "*"
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+python-dotenv = "*"
+
+[pypi-dependencies]
+mikeio = "*"

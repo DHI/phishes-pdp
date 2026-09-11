@@ -8,15 +8,19 @@
 #
 # Versions are pinned deliberately. The `ruff` rev here must match the `ruff==`
 # pin in data-download-tool/pyproject.toml and
-# model-trains/MSHE-Ecolab/pyproject.toml so local and CI results cannot
+# model-trains/MSHE-Ecolab-PGM/pyproject.toml so local and CI results cannot
 # diverge. Bump all three together.
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.0
+    rev: v0.16.1
     hooks:
       - id: ruff-check
         args: [--fix]
+        # hydrus-1d+modflow6 / MODFLOW6-reservoir-model: vendor deliveries kept byte-for-byte.
+        # MSHE-Daisy: DHI research code, not yet wired into CI (no pytest/ruff dev deps pinned yet).
+        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model|MSHE-Daisy)/
       - id: ruff-format
+        exclude: ^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model|MSHE-Daisy)/
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -25,9 +29,9 @@ repos:
       - id: trailing-whitespace
         # sample_data holds MIKE SHE PreProcessor output parsed by fixed column
         # position; notebook JSON is already handled by the ruff hooks.
-        exclude: (^|/)sample_data/|\.ipynb$
+        exclude: (^|/)sample_data/|\.ipynb$|^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
       - id: end-of-file-fixer
-        exclude: (^|/)sample_data/|\.ipynb$
+        exclude: (^|/)sample_data/|\.ipynb$|^model-trains/(hydrus-1d\+modflow6|MODFLOW6-reservoir-model)/
       - id: check-yaml
       - id: check-toml
       - id: check-merge-conflict
