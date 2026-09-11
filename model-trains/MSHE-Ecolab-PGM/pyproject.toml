@@ -19,7 +19,7 @@ dev = [
     "ipykernel>=6.0.0",
     "pytest>=8.0.0",
     "pytest-cov>=7.1.0",
-    "ruff==0.16.1",
+    "ruff==0.16.6",
 ]
 
 [dependency-groups]
@@ -28,7 +28,7 @@ dev = [
     "ipykernel>=6.0.0",
     "pytest>=8.0.0",
     "pytest-cov>=7.1.0",
-    "ruff==0.16.1",
+    "ruff==0.16.6",
 ]
 
 [build-system]
