@@ -26,7 +26,7 @@ The implementation should reuse the current proof-of-concept where it is useful,
   - Represents only a spatial footprint, not a full mapping model with class identifiers, drain subsets, or per-class metadata.
 - `src/Test_Cernici.py`
   - Handles MIKE Zero discovery, plugin setup, pre-processing, MIKE SHE initialization, and the main time-step loop.
-  - Already loads MIKE SHE datasets such as `OLDR_IN_FLO`, `SZ_LEAK_FLO`, `SZ_LEAK_FLX`, `SZDR_IN_FLO`, and `UZ_WC`.
+  - Loads MIKE SHE datasets such as `OLDR_IN_FLO`, `SZ_LEAK_FLO`, `SZ_LEAK_FLX`, `SZDR_IN_FLO`, and `UZ_WC`.
   - Contains a proof-of-concept for matrix percolation and `UZ_WC` bookkeeping.
 
 ### Important repository findings
