@@ -214,7 +214,7 @@ uv run ruff format .                     # CI checks this but does not block on 
 uv run jupyter notebook notebooks/<name>.ipynb
 ```
 
-**Always `uv run ruff`, never a bare `ruff`.** Each module pins `ruff==0.16.1` in its dev dependencies; a system-wide ruff is a different version enforcing a different rule set, and will disagree with CI.
+**Always `uv run ruff`, never a bare `ruff`.** Each module pins `ruff==0.16.6` in its dev dependencies; a system-wide ruff is a different version enforcing a different rule set, and will disagree with CI.
 
 ### CI contract
 
@@ -222,7 +222,7 @@ Checks are split by what a failure means. **Blocking** — the change is wrong: 
 
 Five invariants keep the gates honest — breaking any of them reintroduces a class of phantom failure we have already had:
 
-1. **Pin every tool.** `ruff==0.16.1` appears in both `pyproject.toml` files and as the `rev` in `.pre-commit-config.yaml`; bump all three together. Unpinned ruff went from a narrow default rule set to a broad one and turned the module red with no code change.
+1. **Pin every tool.** `ruff==0.16.6` appears in both `pyproject.toml` files and as the `rev` in `.pre-commit-config.yaml`; bump all three together. Unpinned ruff went from a narrow default rule set to a broad one and turned the module red with no code change.
 2. **Never hand-maintain a dependency list in CI.** Jobs run `uv sync`, resolving from `pyproject.toml`. The old `test_deps:` matrix list drifted when geoparquet support added `pyarrow`, failing five tests for an unrelated reason.
 3. **`pip-audit --skip-editable`.** Without it, pip-audit looks up the just-installed editable module on PyPI, does not find it, and exits non-zero on every run.
 4. **Pin the interpreter.** Each module has a `.python-version` of `3.11`, matching CI, and `requires-python = ">=3.10,<3.14"` matching the range README advertises. The bound is load-bearing: with an unbounded `>=3.10`, a fresh `uv sync` picks the newest interpreter present, and on 3.14 the resolve dies building `fiona` from source (`A GDAL API version must be specified`) because no wheel exists for that ABI.
