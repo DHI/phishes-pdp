@@ -6,8 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-26
+
+### Breaking
+
+- `plant-growth-module/` moved to `model-trains/MSHE-Ecolab-PGM/`. The `plant_growth_module`
+  package and imports are unchanged, but local paths and `uv sync` locations are not
+- The data-download-tool no longer ships a built-in SAS token. Set `PDP_DEFAULT_SAS` (shell or
+  `.env`) to read the datastore; without it, open datasets fall back to anonymous access
+- PGM forcing generator accepts exactly one YAML schema (`timeseries_inputs:` mapping, optional
+  `defaults:`). The earlier `forcings:` list form and `load_timeseries_inputs()` were removed
+
 ### Added
 
+- `model-trains/MSHE-Daisy/` — DHI's DAISY → MIKE SHE one-way coupling through the MShePy runtime
+  API (runoff, matrix percolation, matrix drain flow), validated on the Cernici site. Uses `pixi`
+- Data-download-tool: Cloud Optimized GeoTIFF layers (`cog_catalog.yaml`: ESA WorldCover,
+  OpenLandMap soil), GeoParquet vector layers (`geoparquet_catalog.yaml`: LUCAS texture, SGU),
+  and partner-data zip bundles (`partner_data_catalog.yaml`)
+- Data-download-tool: access-restricted datasets via `credential_env`, with tokens read from a
+  local `.env` (template in `.env.example`); restricted entries stay listable but are marked 🔒
+- Data-download-tool: SSRD and further time-series datasets in `dataset_catalog.yaml`
+- PGM soil profile setup (Workflow B): PreProcessor `*.txt` → per-cell wilting-point and
+  field-capacity DFS2 stacks
+- PGM forcing generator (Workflow C): local DFS0/CSV series → DFS2 grids from one YAML file,
+  replacing the MIKE tool; grid codes absent from a forcing are zero-filled
+- PGM initial condition updater (Workflow D): splits a 3D UZ WQ `.dfs3` result into per-layer
+  `.dfs2` files and writes them into a MIKE SHE `.she` as initial conditions for a hotstart
+- PGM user guide (`PGM User Guide_v1.0.pdf`) and `DISCLAIMER.md` for the data-download-tool,
+  MSHE-Ecolab-PGM and MSHE-Daisy
 - Repository-level GitHub workflows (CI, security scanning, notebook linting, branch protection)
 - Branch protection documentation and CODEOWNERS
 - Pull request template and issue templates
@@ -43,7 +70,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   load-bearing, since a fresh resolve on 3.14 fails building `fiona` from source
 - Split CI checks into blocking (lint, tests, file size, secret scan, dependency audit) and advisory
   (format, markdown lint, notebook lint), so formatting never blocks fork contributors
-- Pinned `ruff==0.16.0` in both modules and in `.pre-commit-config.yaml`
+- PGM template maps: land-use and soil-profile scopes are independent and optional; at least one
+  is required
+- PGM sample DFS2 grids now carry synthetic values (outline and origin unchanged)
+- Replaced `black` with `ruff` for linting and formatting
+- Pinned `ruff==0.16.6` in both modules and in `.pre-commit-config.yaml`
 - CI jobs now resolve dependencies via `uv sync` instead of a hand-maintained list
 - Refreshed root and module READMEs plus agent files for the `model-trains/MSHE-Ecolab-PGM` naming
 - Root README now points at `model-trains/README.md` as the single model-train index rather than
@@ -65,11 +96,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
-- Realigned the `ruff` pin: both modules were bumped to `0.16.1` by Dependabot while
-  `.pre-commit-config.yaml` stayed at `v0.16.0`, so pre-commit disagreed with CI
+- Realigned the `ruff` pin: Dependabot bumped both modules (to `0.16.1`, then `0.16.6`) while
+  `.pre-commit-config.yaml` lagged behind, so pre-commit disagreed with CI
 - Workflow and Dependabot paths updated to match renamed folders
 - Removed stray merge conflict marker from .gitignore
 - Corrected outdated file references in documentation
+- Zarr stores carrying both v2 and v3 metadata (e.g. `ssebop_eta`) no longer open empty
+
+### Security
+
+- Removed the hardcoded Azure SAS token from the data-download-tool source and revoked it
+- Pinned third-party GitHub Actions (`setup-uv`, `trufflehog`) to commit SHAs
 
 ## [1.0.0] - 2026-02-09
 
