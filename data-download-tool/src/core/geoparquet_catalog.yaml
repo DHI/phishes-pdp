@@ -9,7 +9,7 @@
 #   format: geoparquet -> routes the entry to the GeoParquet (vector) reader
 #   container: geoparquet -> Azure container holding the .parquet files
 #   path: <blob path>  -> single .parquet file within the container
-#   anon: true|false   -> read the container with anonymous access (false: use SAS)
+#   anon: true|false   -> read the container with anonymous access (false: default filesystem)
 #   temporal: false    -> static layer; temporal subsetting is skipped
 #   crs: EPSG:....      -> assigned only if the file lacks CRS metadata
 #   variable           -> informational / logged; the data is columnar, not gridded

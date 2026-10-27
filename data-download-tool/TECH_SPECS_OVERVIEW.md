@@ -33,7 +33,7 @@ The PHISHES Data Download Tool is a Python toolkit for downloading and managing 
 1. User configures catchment and options in the notebook.
 2. Catchment is loaded and validated (geometry type, AOI overlap, size checks).
 3. Dataset metadata is read from the merged catalog.
-4. Azure storage connection is created — the built-in SAS filesystem, an anonymous one for public containers, or one built from the environment variable named by the entry's `credential_env`.
+4. Azure storage connection is created — an anonymous, read-only one for the public containers, or one built from the environment variable named by the entry's `credential_env`.
 5. The entry's `format` selects one of four paths:
    - **Zarr** (default): open remotely → spatially subset to catchment bounds (optional mask on catchment) → temporal subset if a time range is given and the dataset is temporal → write as NetCDF, Zarr, DFS2, or GeoTIFF.
    - **COG**: read tile headers/extents in parallel, window-read and merge only the tiles intersecting the catchment → write GeoTIFF. Static, so no temporal step.
@@ -60,7 +60,7 @@ Outputs:
 ## 7. Configuration and Defaults
 
 - Azure account: phishesdatastore
-- Containers: `zarr` (default), `cogs`, `geoparquet`, `external-shared-open-data` (public partner data), `external-shared-after-end` (restricted)
+- Containers: `zarr` (default), `cogs`, `geoparquet`, `external-shared-open-data` (all public, anonymous read-only), `external-shared-after-end` (restricted)
 - Default output format: nc
 - Default buffer_cells: 1
 - Default mask_on_catchment: false
@@ -116,13 +116,13 @@ list anywhere in CI.
 - European AOI validation is enforced by default
 - Catchment size limits are enforced by default
 - Raster datasets are expected to have spatial dimensions named x/y or lon/lat
-- Default SAS token is read from `PDP_DEFAULT_SAS` unless overridden; if unset, falls back to anonymous access, and restricted entries require their `credential_env` variable
+- Open datasets need no token: their containers are public and read anonymously; restricted entries require their `credential_env` variable
 - Zarr stores are opened by trying consolidated → non-consolidated → `zarr_format=2`, taking the first result that exposes data variables (some stores carry both a v2 `.zmetadata` and a stray v3 `zarr.json`, which otherwise reads back empty)
 - DFS2 output requires equidistant axes; near-equidistant grids are snapped by `utils.regularize_axis`, and genuinely irregular ones still raise
 
 ## 12. Security Considerations
 
-- Default SAS token is read from the `PDP_DEFAULT_SAS` environment variable (see `.env.example`), not embedded in code
+- No token is embedded in code, and none is needed for open data: public access to the open containers is read-only
 - Access-restricted entries take their token from the environment variable named by `credential_env`, loaded from the nearest `.env`. `.env` is gitignored and must never be committed; only `.env.example` belongs in git. Tokens are never logged, and a missing token fails before any file is written
 - A read-only (`sp=r`) SAS token is sufficient for restricted bundles by design — do not introduce calls that need *list* permission on the container
 - Download logs may contain local paths and catchment references

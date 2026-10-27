@@ -38,6 +38,9 @@ at load time, and each format takes a different path through `download_dataset`:
   the catalogs before grepping for dataset names.
 - `eumtype`/`eumunit` are DHI EUM codes for DFS2 headers; `data_value_type`
   (`StepAccumulated` vs `Instantaneous`) drives aggregation.
+- The open containers (`zarr`, `cogs`, `geoparquet`, `external-shared-open-data`) are public:
+  anonymous, read-only access, no token. Never add a code path that needs a token for open
+  data; tokens exist only for `credential_env` entries.
 - Any entry may set `credential_env: <ENV_VAR>` for access-restricted data. A missing or blank
   variable must raise `PermissionError` naming the variable and container **before anything is
   written**. Never log or echo a token. Restricted entries stay fully listable — only downloading

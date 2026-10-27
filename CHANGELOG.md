@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-10-27
+
+### Added
+
+- Data-download-tool: Deltares MODFLOW 6 model results (groundwater head, unsaturated water
+  content, saturated/unsaturated concentrations; layers 1–2) as the `partner_model_results`
+  category in `dataset_catalog.yaml`, served as Zarr from `zarr/external_data/deltares/`
+- Data-download-tool: DFS2 output for datasets in a projected CRS, written in that projection
+  instead of `LONG/LAT`
+
+### Changed
+
+- Data-download-tool: all open containers, including `zarr`, are now public (anonymous,
+  read-only), so open datasets need no token
+
+### Removed
+
+- Data-download-tool: the `PDP_DEFAULT_SAS` environment variable. Open datasets are read
+  anonymously; only access-restricted entries (`credential_env`) take a token. The
+  `azure_credential` argument and `--credential` flag remain as an explicit override
+
 ## [2.0.0] - 2026-10-26
 
 ### Breaking

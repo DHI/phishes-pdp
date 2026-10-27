@@ -25,7 +25,7 @@ Constructor
   - output_base: str | Path
   - azure_account: optional str (default phishesdatastore)
   - azure_container: optional str (default zarr)
-  - azure_credential: optional str (default SAS token)
+  - azure_credential: optional str (default None: anonymous; only for a non-public account/container)
   - buffer_cells: int (default 1)
   - output_format: str (default nc)
   - mask_on_catchment: bool (default false)
@@ -209,7 +209,8 @@ Any catalog entry, in any format, may declare `credential_env: <ENV_VAR>`.
 
 - `_dataset_filesystem(dataset_info)` returns the filesystem for an entry: an `adlfs` filesystem
   built from `os.environ[<ENV_VAR>]` when `credential_env` is set (cached per variable in
-  `self._env_fs`), an anonymous one when `anon: true`, otherwise the built-in SAS filesystem.
+  `self._env_fs`), an anonymous one when `anon: true`, otherwise the main filesystem (anonymous
+  unless `azure_credential` was given).
 - `_dataset_credential(dataset_info)` supplies the same token to `_blob_url()` for GDAL/vsicurl.
 - A missing or blank variable raises `PermissionError` naming the variable and the container, before
   anything is written. The token is never logged.
@@ -273,7 +274,8 @@ Log entry schema
 
 ## 6. Configuration and Defaults
 
-- Default Azure account, container, and SAS token are baked into the class
+- Default Azure account and container are baked into the class; no token is. The open
+  containers are public (anonymous, read-only)
 - Output format defaults to nc
 - buffer_cells defaults to 1
 - mask_on_catchment defaults to false
@@ -290,6 +292,5 @@ See pyproject.toml for declared dependencies and versions.
 
 ## 9. Future Enhancements (Optional)
 
-- Externalize the default Azure credential the way restricted entries already do, via `credential_env`
 - Add unit tests for catchment validation and downloader flows
 - Document catalog extension process for new datasets

@@ -194,5 +194,90 @@ vegetation:
     eumunit: "__"
     data_value_type: Instantaneous
 
+# Deltares MODFLOW 6 model results (MS4), 2019-03-26 at ~10-minute steps, on a 61 x 61 m
+# domain at 1 m in the Netherlands. The domain is below the 0.01 km2 minimum catchment
+# area, so request it with a larger AOI that covers it.
+partner_model_results:
+  deltares_groundwater_levels_layer1:
+    path: external_data/deltares/groundwater_levels_layer1.zarr
+    display_name: Deltares groundwater head, layer 1
+    description: Deltares model groundwater head (m+NAP), model layer 1
+    variable: groundwater_levels_layer1
+    temporal: true
+    crs: EPSG:28992
+    eumtype: Head_Elevation
+    eumunit: meter
+    data_value_type: Instantaneous
+  deltares_groundwater_levels_layer2:
+    path: external_data/deltares/groundwater_levels_layer2.zarr
+    display_name: Deltares groundwater head, layer 2
+    description: Deltares model groundwater head (m+NAP), model layer 2
+    variable: groundwater_levels_layer2
+    temporal: true
+    crs: EPSG:28992
+    eumtype: Head_Elevation
+    eumunit: meter
+    data_value_type: Instantaneous
+  deltares_unsaturated_water_content_layer1:
+    path: external_data/deltares/unsaturated_water_content_layer1.zarr
+    display_name: Deltares unsaturated water content, layer 1
+    description: Deltares model volumetric water content (-), unsaturated zone, layer 1
+    variable: unsaturated_water_content_layer1
+    temporal: true
+    crs: EPSG:28992
+    eumtype: Volumetric_Water_Content
+    eumunit: "__"
+    data_value_type: Instantaneous
+  deltares_unsaturated_water_content_layer2:
+    path: external_data/deltares/unsaturated_water_content_layer2.zarr
+    display_name: Deltares unsaturated water content, layer 2
+    description: Deltares model volumetric water content (-), unsaturated zone, layer 2
+    variable: unsaturated_water_content_layer2
+    temporal: true
+    crs: EPSG:28992
+    eumtype: Volumetric_Water_Content
+    eumunit: "__"
+    data_value_type: Instantaneous
+  deltares_saturated_groundwater_concentrations_layer1:
+    path: external_data/deltares/saturated_groundwater_concentrations_layer1.zarr
+    display_name: Deltares saturated-zone concentration, layer 1
+    description: Deltares model solute concentration (mg/L), saturated zone, layer 1
+    variable: saturated_groundwater_concentrations_layer1
+    temporal: true
+    crs: EPSG:28992
+    eumtype: Concentration
+    eumunit: mg_per_liter
+    data_value_type: Instantaneous
+  deltares_saturated_groundwater_concentrations_layer2:
+    path: external_data/deltares/saturated_groundwater_concentrations_layer2.zarr
+    display_name: Deltares saturated-zone concentration, layer 2
+    description: Deltares model solute concentration (mg/L), saturated zone, layer 2
+    variable: saturated_groundwater_concentrations_layer2
+    temporal: true
+    crs: EPSG:28992
+    eumtype: Concentration
+    eumunit: mg_per_liter
+    data_value_type: Instantaneous
+  deltares_unsaturated_groundwater_concentrations_layer1:
+    path: external_data/deltares/unsaturated_groundwater_concentrations_layer1.zarr
+    display_name: Deltares unsaturated-zone concentration, layer 1
+    description: Deltares model solute concentration (mg/L), unsaturated zone, layer 1
+    variable: unsaturated_groundwater_concentrations_layer1
+    temporal: true
+    crs: EPSG:28992
+    eumtype: Concentration
+    eumunit: mg_per_liter
+    data_value_type: Instantaneous
+  deltares_unsaturated_groundwater_concentrations_layer2:
+    path: external_data/deltares/unsaturated_groundwater_concentrations_layer2.zarr
+    display_name: Deltares unsaturated-zone concentration, layer 2
+    description: Deltares model solute concentration (mg/L), unsaturated zone, layer 2
+    variable: unsaturated_groundwater_concentrations_layer2
+    temporal: true
+    crs: EPSG:28992
+    eumtype: Concentration
+    eumunit: mg_per_liter
+    data_value_type: Instantaneous
+
 # Cloud Optimized GeoTIFF (COG) datasets live in cog_catalog.yaml and are merged
 # into this catalog at load time. Add static raster layers there, not here.
