@@ -38,6 +38,34 @@ def test_dfs_from_xr_uses_dataset_variable(monkeypatch):
     assert "x" in captured["grid"] and "y" in captured["grid"]
 
 
+def test_projected_grid_writes_wkt_projection(tmp_path):
+    da = xr.DataArray(
+        np.arange(12, dtype=float).reshape(1, 3, 4),
+        dims=("time", "y", "x"),
+        coords={
+            "time": [np.datetime64("2019-03-26T07:08:59")],
+            "y": [432640.0, 432641.0, 432642.0],
+            "x": [95640.0, 95641.0, 95642.0, 95643.0],
+        },
+        name="head",
+    )
+    out = tmp_path.joinpath("head.dfs2")
+
+    dfsio.create_file(
+        da, out, varname="head", eumtype="Head_Elevation", eumunit="meter", crs="EPSG:28992"
+    )
+
+    ds = dfsio.mikeio.read(out)
+    assert "RD_New" in ds.geometry.projection_string
+    assert ds.geometry.nx == 4 and ds.geometry.ny == 3
+    np.testing.assert_allclose(ds[0].values[0], da.values[0])
+
+
+def test_geographic_crs_keeps_long_lat():
+    assert dfsio._dfs_projection(None) == "LONG/LAT"
+    assert dfsio._dfs_projection("EPSG:4326") == "LONG/LAT"
+
+
 def test_create_file_writes_output(monkeypatch, tmp_path):
     da = _sample_dataarray()
     out = tmp_path / "maps" / "x.dfs2"
