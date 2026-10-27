@@ -15,6 +15,8 @@ from mikeio.eum import EUMType, EUMUnit
 from mikeio import ItemInfo
 import xarray as xr
 import numpy as np
+from pyproj import CRS
+from pyproj.enums import WktVersion
 
 from .utils import get_grid_resolution, guess_data_variable, regularize_axis
 
@@ -25,6 +27,7 @@ def dfs_from_xr(
     eumtype: EUMType,
     eumunit: EUMUnit,
     res: Optional[float] = None,
+    crs: Optional[str] = None,
     **kwargs,
 ) -> mikeio.DataArray:
     """
@@ -42,6 +45,9 @@ def dfs_from_xr(
         EUM unit for the variable.
     res : float, optional
         Resolution override. If None, resolution is calculated from coordinates.
+    crs : str, optional
+        CRS of the data (e.g. ``"EPSG:28992"``). Geographic or None writes a
+        ``LONG/LAT`` grid; a projected CRS is written as its ESRI WKT.
     **kwargs
         Additional keyword arguments (unused).
 
@@ -55,8 +61,10 @@ def dfs_from_xr(
 
     # Snap near-equidistant axes (e.g. coordinates rounded to a few decimals)
     # to an exactly uniform grid; DFS2 requires equidistant x/y.
-    lon = regularize_axis(da["lon"])
-    lat = regularize_axis(da["lat"])
+    x_name, y_name = ("x", "y") if {"x", "y"}.issubset(da.dims) else ("lon", "lat")
+    lon = regularize_axis(da[x_name])
+    lat = regularize_axis(da[y_name])
+    projection = _dfs_projection(crs)
 
     if 1 in [np.ma.count(lon), np.ma.count(lat)]:
         dx = res or get_grid_resolution(lon, default=0.1)
@@ -75,7 +83,7 @@ def dfs_from_xr(
     geom = mikeio.spatial.Grid2D(
         x=lon,
         y=lat,
-        projection="LONG/LAT",
+        projection=projection,
         dx=dx,
         dy=dy,
         bbox=bbox,
@@ -87,6 +95,16 @@ def dfs_from_xr(
         geometry=geom,
         item=ItemInfo(varname, eumtype, eumunit),
     )
+
+
+def _dfs_projection(crs: Optional[str]) -> str:
+    """Return the DFS projection string for a CRS: ``LONG/LAT`` or ESRI WKT."""
+    if crs is None:
+        return "LONG/LAT"
+    parsed = CRS.from_user_input(crs)
+    if parsed.is_geographic:
+        return "LONG/LAT"
+    return parsed.to_wkt(WktVersion.WKT1_ESRI)
 
 
 def create_file(

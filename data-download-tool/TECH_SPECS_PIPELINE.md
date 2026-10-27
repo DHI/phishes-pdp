@@ -44,7 +44,7 @@ flowchart LR
 
 - Inputs: selected dataset category/subcategory
 - Outputs: catalog metadata (merged from the four catalogs) and a filesystem for the entry —
-  built-in SAS, anonymous for public containers, or built from the entry's `credential_env`
+  anonymous (read-only) for the public containers, or built from the entry's `credential_env`
   variable. A missing or blank token raises `PermissionError` here, before anything is written.
 - Then, per the entry's `format`: a remotely opened Zarr dataset, COG tile handles, a GeoParquet
   reader, or a blob stream for a zip bundle
@@ -209,7 +209,7 @@ How missing data, corrupt files, or unexpected formats are handled:
 
 Expected failure modes and recovery strategies:
 
-- SAS token expired -> retry with new token; alert user to update credentials
+- Expired restricted token -> request a new one and update `.env`
 - Restricted dataset without a token -> PermissionError; user requests the token and sets it in `.env` (see `.env.example`)
 - No AOI overlap -> abort with validation error
 - Empty spatial subset -> fallback to nearest-neighbor selection

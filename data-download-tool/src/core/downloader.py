@@ -52,22 +52,18 @@ class PDPDataDownloader:
     - Download logging and metadata
 
     Environment Variables:
-    The account and container for open datasets are built in, but the read-only SAS
-    token for them is not: it is read from ``PDP_DEFAULT_SAS``. Access-restricted
-    catalog entries declare a ``credential_env`` field naming the environment
-    variable that must hold the SAS token for their container (e.g.
-    ``PDP_AFTER_END_SAS``). All of these variables are read from the process
-    environment, which is populated from a ``.env`` file on init if one is found;
-    see ``.env.example``. Already-exported variables take precedence over the
-    ``.env`` file. If ``PDP_DEFAULT_SAS`` is unset, connections to the open
-    container fall back to anonymous access.
+    The account and container for open datasets are built in. The open containers are
+    public, so they are read anonymously (read-only) and need no token.
+    Access-restricted catalog entries declare a ``credential_env`` field naming the
+    environment variable that must hold the SAS token for their container (e.g.
+    ``PDP_AFTER_END_SAS``). These variables are read from the process environment,
+    which is populated from a ``.env`` file on init if one is found; see
+    ``.env.example``. Already-exported variables take precedence over the ``.env`` file.
     """
 
     # Azure Storage Configuration
     DEFAULT_AZURE_ACCOUNT = "phishesdatastore"
     DEFAULT_AZURE_CONTAINER = "zarr"
-    # Name of the env var holding the default (open-dataset) SAS token - see .env.example.
-    DEFAULT_AZURE_CREDENTIAL_ENV = "PDP_DEFAULT_SAS"
 
     DEFAULT_OUTPUT_FORMAT = "nc"
     # Raster outputs flow through the xarray pipeline; vector (GeoParquet) outputs
@@ -105,21 +101,19 @@ class PDPDataDownloader:
         azure_container : str, optional
             Azure container name. Uses default if None.
         azure_credential : str, optional
-            SAS token for authentication.
-            If None, attempts anonymous access.
+            SAS token for the default container. Only needed for a non-public
+            account or container; if None, the public containers are read anonymously.
         buffer_cells : int, default 1
             Buffer around catchment in number of grid cells.
         output_format : str, optional
             Output format for downloaded datasets. Supported: "nc", "zarr", "dfs2".
         """
-        # Must run before the default credential lookup below, so a token set via
-        # .env is visible to it.
         self._load_env_file()
 
         self.output_base = Path(output_base)
         self.azure_account = azure_account or self.DEFAULT_AZURE_ACCOUNT
         self.azure_container = azure_container or self.DEFAULT_AZURE_CONTAINER
-        self.azure_credential = azure_credential or self._default_azure_credential()
+        self.azure_credential = azure_credential or None
         self.buffer_cells = int(buffer_cells)
         self.output_format = (output_format or self.DEFAULT_OUTPUT_FORMAT).lower()
         self.mask_on_catchment = bool(mask_on_catchment)
@@ -178,15 +172,6 @@ class PDPDataDownloader:
             return
         load_dotenv(find_dotenv(usecwd=True), override=False)
 
-    @classmethod
-    def _default_azure_credential(cls) -> Optional[str]:
-        """Read-only SAS token for the open (non-restricted) dataset container.
-
-        Sourced from ``PDP_DEFAULT_SAS`` rather than hardcoded. Returns None
-        (anonymous access) if the variable is unset.
-        """
-        return os.environ.get(cls.DEFAULT_AZURE_CREDENTIAL_ENV, "").strip() or None
-
     def _load_catalog(self) -> Dict:
         """Load the dataset catalog, merging the COG, GeoParquet, and partner catalogs into it.
 
@@ -240,8 +225,6 @@ class PDPDataDownloader:
                     account_name=self.azure_account, sas_token=credential
                 )
             else:
-                # Try anonymous access
-                print("WARNING: No credential provided, attempting anonymous access")
                 fs = adlfs.AzureBlobFileSystem(account_name=self.azure_account, anon=True)
 
             # Test connection
@@ -503,7 +486,7 @@ class PDPDataDownloader:
         - ``credential_env: <VAR>`` -> SAS token supplied by the user through that
           environment variable (typically via a ``.env`` file). Access-restricted.
         - ``anon: true`` -> cached anonymous filesystem (public container).
-        - neither -> the main filesystem with the built-in read-only SAS token.
+        - neither -> the main filesystem (anonymous unless ``azure_credential`` was given).
         """
         env_var = dataset_info.get("credential_env")
         if env_var:
@@ -787,6 +770,7 @@ class PDPDataDownloader:
                 varname=dataset_info.get("variable"),
                 eumtype=dataset_info.get("eumtype"),
                 eumunit=dataset_info.get("eumunit"),
+                crs=dataset_info.get("crs"),
             )
         elif self.output_format == "tif":
             cogio.write_cog(
