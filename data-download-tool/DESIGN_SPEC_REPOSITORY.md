@@ -155,13 +155,14 @@ This subrepository is designed to be consumed by parent-level orchestration thro
 
 ### Current state
 
-- Downloader has default Azure account/container values
-- A default SAS credential is embedded as a class constant fallback
+- Downloader has default Azure account/container values; no credential is embedded
+- The open containers (`zarr`, `cogs`, `geoparquet`, `external-shared-open-data`) are public and read anonymously, read-only
+- Access-restricted entries read their SAS token from the environment variable named by
+  `credential_env`
 
 ### Design requirement for parent integration
 
-- Parent repository should inject credentials via environment or runtime secrets
-- Embedded credentials should be treated as temporary development behavior
+- Parent repository should inject restricted-dataset tokens via environment or runtime secrets
 - Logs should be considered operational metadata and may expose local paths
 
 ## 10. Reliability and Error Strategy
@@ -184,23 +185,22 @@ This subrepository is designed to be consumed by parent-level orchestration thro
 1. `pyproject.toml` script entry points reference modules not present in `src`
 2. Script download feature is specified but not implemented
 3. Some docs still reference outdated notebook/module paths
-4. Embedded default credential creates security and governance risk
 
 ## 13. Extension Strategy
 
 Preferred extension order:
 
-1. Externalize credential management
-2. Align CLI entry points with implemented modules
-3. Implement script registry/download capability with log integration
-4. Add automated tests for catchment validation and downloader happy path
-5. Introduce parent-repo integration smoke tests using fixture catchments
+1. Align CLI entry points with implemented modules
+2. Implement script registry/download capability with log integration
+3. Add automated tests for catchment validation and downloader happy path
+4. Introduce parent-repo integration smoke tests using fixture catchments
 
 ## 14. Acceptance Criteria for Parent-Level Adoption
 
 The subrepository is considered integration-ready when:
 
-- Parent workflow can call downloader API with explicit credentials
+- Parent workflow can call downloader API without credentials for open datasets, and with a
+  token for restricted ones
 - At least one dataset can be downloaded end-to-end with expected output path
 - Download logs are generated and machine-parseable
 - Catalog changes can be added without code modification in downloader logic

@@ -260,6 +260,22 @@ The following datasets are currently available in PDP datastore:
 
 Additional categories (soil, topography, landuse, hydrology) will be added as they become available.
 
+### Partner model results (Zarr)
+
+Deltares MODFLOW 6 model output (MS4), category `partner_model_results`, one entry per
+variable and model layer (`layer1`, `layer2`):
+
+| Subcategory (`deltares_…_layer<k>`)    | Unit  | Timestep | Spatial Res.       |
+| -------------------------------------- | ----- | -------- | ------------------ |
+| groundwater_levels                     | m+NAP | ~10 min  | 1 m (EPSG:28992)   |
+| unsaturated_water_content              | -     | ~10 min  | 1 m (EPSG:28992)   |
+| saturated_groundwater_concentrations   | mg/L  | ~10 min  | 1 m (EPSG:28992)   |
+| unsaturated_groundwater_concentrations | mg/L  | ~10 min  | 1 m (EPSG:28992)   |
+
+The data cover 2019-03-26 on a 61 × 61 m domain in the Netherlands, on its native RD New
+grid (DFS2 output is written in that projection). The domain is smaller than the 0.01 km²
+minimum catchment area, so request it with a larger area of interest that covers it.
+
 ### COG (Cloud Optimized GeoTIFF) datasets
 
 Static raster layers are served as COGs from the public `cogs` Azure container. They
@@ -317,11 +333,9 @@ Currently available:
 
 ### Default (open dataset) container token
 
-The default `zarr` container (open datasets) is read using a SAS token from the
-**`PDP_DEFAULT_SAS`** environment variable, rather than a token bundled with the tool.
-If it isn't set, the downloader falls back to anonymous access, which is sufficient for
-most open datasets. If you hit a connection/access error on an open dataset, request a
-`PDP_DEFAULT_SAS` token from the repository owner and add it to your `.env` (see below).
+The open containers (`zarr`, `cogs`, `geoparquet`, `external-shared-open-data`) are
+public, so **no token is needed** for any open dataset — the downloader reads them
+anonymously, with read-only access.
 
 ### Access-restricted datasets
 
@@ -338,8 +352,7 @@ catalog reveals nothing about the bundle contents. Only the download is gated.
 
 To get access:
 
-1. Request the SAS token from the repository owner (same contact for `PDP_DEFAULT_SAS`
-   and `PDP_AFTER_END_SAS`).
+1. Request the SAS token from the repository owner.
 2. Copy `.env.example` to `.env` and fill in the variable:
 
    ```dotenv
@@ -372,8 +385,7 @@ Cannot connect to PDP datastore
 ```
 
 - Check internet connection
-- Open datasets fall back to anonymous access if `PDP_DEFAULT_SAS` isn't set; if that
-  still fails, request a `PDP_DEFAULT_SAS` token from the repository owner
+- Open datasets need no token, so a connection error is a network problem, not an access one
 
 **Access Denied:**
 
