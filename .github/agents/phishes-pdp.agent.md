@@ -62,9 +62,9 @@ steps, dependency lists and command lines belong in the train's own README, not 
 
 ## Cross-Module Coordination
 
-- `model-trains/MSHE-Ecolab-PGM` resolves `phishes-data-downloader` from GitHub `main`, not the local
-  sibling folder. For coordinated changes, merge the `data-download-tool` change first, then re-run
-  `uv sync --link-mode copy` in the model train.
+- `model-trains/MSHE-Ecolab-PGM` installs `phishes-data-downloader` from the sibling
+  `data-download-tool` folder (editable `[tool.uv.sources]` path), so changes to both can land in
+  one PR and no Git install is needed. Moving either folder breaks the relative path.
 - The runtime import probes `core/downloader.py` and `analysis/catchment.py` directly. Restructuring
   `data-download-tool/src/` breaks it.
 

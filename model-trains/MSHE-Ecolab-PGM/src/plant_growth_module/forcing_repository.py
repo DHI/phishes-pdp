@@ -142,9 +142,8 @@ def _import_data_downloader_modules():
                 pass
 
         raise ModuleNotFoundError(
-            "data-download-tool modules could not be imported. Install with 'uv sync' or "
-            "install directly: "
-            'uv pip install "phishes-data-downloader @ git+https://github.com/DHI/phishes-pdp.git@main#subdirectory=data-download-tool"'
+            "data-download-tool modules could not be imported. Run 'uv sync --link-mode copy' "
+            "in model-trains/MSHE-Ecolab-PGM; it installs the sibling data-download-tool folder."
         ) from exc
 
 

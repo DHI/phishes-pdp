@@ -95,14 +95,11 @@ match CI. `uv` downloads that interpreter for you. Do not override it — severa
 dependencies publish no wheels for the newest Python and would be built from source against a
 system GDAL.
 
-**Shared dependency:** `pyproject.toml` resolves the forcing repository helper from the
-`data-download-tool` module on GitHub `main`, not from the local sibling folder:
-
-```
-phishes-data-downloader @ git+https://github.com/DHI/phishes-pdp.git@main#subdirectory=data-download-tool
-```
-
-After a `data-download-tool` change is merged, re-run `uv sync --link-mode copy` here to pick it up.
+**Shared dependency:** `pyproject.toml` installs the forcing repository helper from the sibling
+`data-download-tool` folder in this repository (`../../data-download-tool`, editable), so Git is
+not required — a ZIP download of the repository works, as long as the folder layout is kept.
+Edits to `data-download-tool` take effect immediately; re-run `uv sync --link-mode copy` only if
+its dependencies change.
 
 ---
 
@@ -442,7 +439,7 @@ Configure these settings in the notebook's configuration cell (Step 0):
 
 - `forcing_repository.py` loads the `data-download-tool` source at runtime and probes for
   `core/downloader.py` and `analysis/catchment.py`. If those moved, re-run
-  `uv sync --link-mode copy` to refresh the dependency from GitHub `main`.
+  `uv sync --link-mode copy` to reinstall the sibling `data-download-tool` folder.
 
 **Column names not recognized in template files:**
 

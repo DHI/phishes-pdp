@@ -137,11 +137,7 @@ Re-injects a 3D UZ water-quality (WQ) result into a MIKE SHE `.she` (PFS) file a
 
 ### Cross-module dependency
 
-`model-trains/MSHE-Ecolab-PGM/pyproject.toml` declares:
-```
-phishes-data-downloader @ git+https://github.com/DHI/phishes-pdp.git@main#subdirectory=data-download-tool
-```
-So PGM resolves DDT from **`main` on GitHub**, not from the local sibling folder. After merging a DDT change, PGM users need to re-run `uv sync` to pick it up. For coordinated changes, merge DDT first.
+`model-trains/MSHE-Ecolab-PGM/pyproject.toml` declares `phishes-data-downloader` and points it at the **sibling folder** via `[tool.uv.sources]` (`path = "../../data-download-tool"`, `editable = true`). So PGM always uses the DDT in the same checkout — DDT edits are live without re-syncing, and coordinated changes land in one PR. **No Git needed**: partners who download the repo as a ZIP can `uv sync` (a former `git+https://…@main` dependency failed with "Git executable not found" for them). Keep it **editable** — `pip-audit --skip-editable` in CI would otherwise try to look DDT up on PyPI and fail. Moving either folder breaks the relative path.
 
 ### Legacy facade
 
