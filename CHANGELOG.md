@@ -68,7 +68,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `model-trains/` parent folder to hold one self-contained project per model train
 - README stubs for the `MSHE-Daisy` and `hydrus-1d+modflow6` trains
 - `.python-version` (3.11) per module, matching CI
-- Dedicated agent and skill for the PGM initial condition updater (Workflow D)
 - `model-trains/hydrus-1d+modflow6/` — Hydrus-1D ↔ MODFLOW 6 coupling delivered by BRGM, added as
   vendored content. The path doubles (`hydrus-1d+modflow6/hydrus-1d+modflow6/`) because the delivery
   pairs a README with a like-named code folder
@@ -97,7 +96,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Replaced `black` with `ruff` for linting and formatting
 - Pinned `ruff==0.16.6` in both modules and in `.pre-commit-config.yaml`
 - CI jobs now resolve dependencies via `uv sync` instead of a hand-maintained list
-- Refreshed root and module READMEs plus agent files for the `model-trains/MSHE-Ecolab-PGM` naming
+- Refreshed root and module READMEs for the `model-trains/MSHE-Ecolab-PGM` naming
 - Root README now points at `model-trains/README.md` as the single model-train index rather than
   linking individual trains, so no train is singled out and the train list lives in one place
 - Disabled Dependabot *version* updates for both pip ecosystems (`open-pull-requests-limit: 0`).

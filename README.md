@@ -77,7 +77,7 @@ phishes-pdp/
 ├── CONTRIBUTING.md
 ├── CHANGELOG.md
 ├── SECURITY.md
-├── .github/                                # CI workflows, agents, governance
+├── .github/                                # CI workflows, governance
 ├── images/
 ├── data-download-tool/                     # Shared: datastore downloads + catchment analysis
 └── model-trains/                           # One self-contained project per model train
@@ -102,14 +102,14 @@ own `pyproject.toml`, environment, tests and notebooks — not a new top-level f
 
 ## Security and Contribution Guidelines
 
-This repository has branch protection rules enabled to ensure code quality and security.
-
 ### 🔒 Branch Protection
 
-- **Direct pushes to `main` are not allowed**
-- All changes must go through pull requests
-- Pull requests require approval from code owners
-- All **blocking** CI checks must pass before merging
+This repository is a published mirror: development happens in an internal DHI repository,
+and `main` here is updated only by an automated mirror. Nobody pushes or merges here directly.
+
+- Pull requests are welcome and get the same code-owner review and blocking CI checks
+- Once approved, a maintainer applies the change upstream and closes the pull request; the
+  change then appears on `main` through the mirror
 
 Checks are split by what a failure means. Blocking checks (lint, tests, file size, secret scan,
 dependency audit) mean the change is wrong. Advisory checks (formatting, markdown lint, notebook
@@ -123,7 +123,7 @@ full table.
 3. Make your changes and run `uv run ruff check .` plus `uv run pytest -q` in the affected module
 4. Open a pull request
 5. Wait for code owner approval and blocking CI checks to pass
-6. Merge after approval
+6. A maintainer brings the change in upstream; it reaches `main` here through the mirror
 
 Full details, including the fork workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
 

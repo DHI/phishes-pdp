@@ -137,6 +137,3 @@ MSHE-Daisy/
 artifacts; both are gitignored because the artifacts run into the hundreds of MB per file.
 `docs/setup/images/` holds the screenshots used in [Setting up a new site](#setting-up-a-new-site)
 above and is committed normally.
-
-Full architecture, module-by-module notes and coupling conventions are in this project's own
-[CLAUDE.md](CLAUDE.md).

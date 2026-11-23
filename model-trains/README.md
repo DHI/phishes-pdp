@@ -42,7 +42,7 @@ exchange. The current implementation and validation case is the Cernici field si
 
 Runs as Python scripts against a running MIKE SHE session (no notebook), managed with
 [pixi](https://pixi.sh) rather than uv. Setup, commands and coupling detail are in its
-**[README](MSHE-Daisy/README.md)** and its own `CLAUDE.md`. Runoff, matrix percolation and matrix
+**[README](MSHE-Daisy/README.md)**. Runoff, matrix percolation and matrix
 drain flow coupling are all implemented and pass the test suite against the Cernici case, with
 final sign-off recorded at the accepted milestone boundary. Two stricter physics-authority
 questions — proof that native MIKE SHE runoff generation is suppressed for coupled cells, and

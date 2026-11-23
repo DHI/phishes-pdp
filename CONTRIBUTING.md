@@ -119,12 +119,12 @@ before now, not yours.
 
 ## Pull Request Process
 
-1. Open a PR against `main`
+1. Open a PR against `main` (see [How changes reach `main`](README.md#-branch-protection))
 2. Fill out the [PR template](.github/PULL_REQUEST_TEMPLATE.md) completely
 3. Ensure the blocking checks pass
 4. Wait for review from a [code owner](.github/CODEOWNERS)
 5. Address any review feedback
-6. Merge after approval
+6. A maintainer applies the approved change upstream; it reaches `main` through the mirror
 
 ## Code Style
 
@@ -136,7 +136,8 @@ before now, not yours.
 - **Markdown**: `markdownlint-cli2`. See [.markdownlint-cli2.jsonc](.markdownlint-cli2.jsonc).
 - **Notebooks**: code cells are linted with `nbqa ruff`, using each module's config.
 - Prefer `pathlib.Path` and `Path.joinpath()` over the `/` operator; use
-  `pd.Timestamp` over `datetime`. See [CLAUDE.md](CLAUDE.md) for the full list.
+  `pd.Timestamp` over `datetime`; give every function and method a docstring
+  (a one-liner is fine).
 
 ## What to Contribute
 
