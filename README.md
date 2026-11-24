@@ -14,7 +14,7 @@ organised around two layers:
 - **`model-trains/`** — one self-contained project per coupled model train, producing that
   train's simulation inputs; some trains consume `data-download-tool` output
 
-Most user-facing workflows are provided as Jupyter notebooks in the module folders.
+Most user-facing workflows are provided as Jupyter notebooks inside the module folders.
 
 ## Requirements
 
